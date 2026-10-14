@@ -143,6 +143,15 @@ class RunHintRequest(BaseModel):
         return text
 
 
+class ColdDigestCompactRequest(BaseModel):
+    """Operator-triggered planner round for the durable cold digest view."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    R: int = Field(default=6, ge=1, le=1000)
+    K: int = Field(default=2, ge=2, le=1000)
+
+
 class QuestionBankInspectRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

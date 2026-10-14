@@ -1,4 +1,4 @@
-export const STATUS = { waiting: '待执行', running: '执行中', exploring: '执行中', approval: '等待审批', completed: '完成', failed: '失败', cancelled: '取消', timeout: '超时', known: '已知', confirmed: '已确认', candidate: '候选', pending: '待验证', ruled_out: '已排除', insufficient: '证据不足' }
+export const STATUS = { waiting: '待执行', running: '执行中', exploring: '执行中', approval: '等待审批', completed: '完成', failed: '失败', cancelled: '取消', timeout: '超时', known: '已知', confirmed: '已确认', candidate: '候选', pending: '待验证', ruled_out: '已排除', insufficient: '证据不足', active: '摘要生效', superseded: '摘要已失效' }
 export const TERMINAL = new Set(['completed', 'cancelled', 'failed', 'timeout'])
 export const ACTIVE = new Set(['running', 'exploring'])
 const FINISHED_RUNS = new Set(['completed', 'partial', 'failed', 'denied', 'cancelled'])
@@ -21,7 +21,7 @@ export function executionElapsed(node, now, runStatus, projectStatus) {
 const short = (value, max = 70) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max)
 export const isIntent = (node) => ['intent', 'hypothesis', 'conclusion'].includes(node.type)
 const nodeLabel = (node) => {
-  const kind = isIntent(node) ? '验证想法' : node.type === 'origin' ? '起点' : node.type === 'goal' ? '目标' : node.type === 'item' ? (node.item_type === 'finding' ? '漏洞候选' : '事实条目') : '结果包'
+  const kind = isIntent(node) ? '验证想法' : node.type === 'digest' ? '冷节点摘要' : node.type === 'origin' ? '起点' : node.type === 'goal' ? '目标' : node.type === 'item' ? (node.item_type === 'finding' ? '漏洞候选' : '事实条目') : '结果包'
   const title = short(node.title || node.label || node.description, 34)
   const metadata = isIntent(node)
     ? `${short(node.worker || '未领取', 16)} · ${short(node.current_tool || (ACTIVE.has(node.status) ? '暂无工具记录' : STATUS[node.status]), 18)}`
@@ -33,11 +33,17 @@ export function projectElements(graph, expanded, query, showHistory = true) {
   const nodes = []
   const edges = []
   const q = query.trim().toLocaleLowerCase()
+  const covers = (graph.edges || []).filter((edge) => edge.relation === 'covers' || edge.type === 'covers')
+  const coveredBy = new Map()
+  for (const edge of covers) if (!coveredBy.has(edge.target)) coveredBy.set(edge.target, edge.source)
   const matches = (node) => !q || [node.title, node.label, node.description, node.raw_id, ...(node.items || []).map((item) => `${item.title} ${item.summary} ${item.id} ${(item.evidence_ids || []).join(" ")}`)].join(' ').toLocaleLowerCase().includes(q)
   const visible = new Set()
   for (const node of graph.nodes || []) {
     if (node.type === 'hint' || node.type === 'worker') continue
-    if (matches(node) && (q || showHistory || (isIntent(node) && !TERMINAL.has(node.status)) || ['origin', 'goal'].includes(node.type))) visible.add(node.id)
+    const digestId = coveredBy.get(node.id)
+    const covered = Boolean(digestId) && !expanded.has(digestId) && !q
+    if (!covered && matches(node) && (q || showHistory || node.type === 'digest' || (isIntent(node) && !TERMINAL.has(node.status)) || ['origin', 'goal'].includes(node.type))) visible.add(node.id)
+    if (q && matches(node) && digestId) visible.add(digestId)
   }
   if (!q && !showHistory) {
     for (const edge of graph.edges || []) {
@@ -67,6 +73,7 @@ export function projectElements(graph, expanded, query, showHistory = true) {
   }
   const ids = new Set(nodes.map((node) => node.data.id))
   for (const edge of graph.edges || []) {
+    if ((edge.relation === 'covers' || edge.type === 'covers') && !expanded.has(edge.source) && !q) continue
     if (ids.has(edge.source) && ids.has(edge.target)) edges.push({ group: 'edges', data: edge, classes: `edge-${edge.type || 'source'} ${edge.status === 'running' ? 'edge-running' : edge.status === 'approval' ? 'edge-approval' : ''}` })
   }
   return [...nodes, ...edges]

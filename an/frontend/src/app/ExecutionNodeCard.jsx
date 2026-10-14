@@ -7,6 +7,7 @@ export function StatusBadge({ status }) {
 
 export function nodeKind(node) {
   if (isIntent(node)) return '验证想法'
+  if (node.type === 'digest') return '冷节点摘要'
   if (node.type === 'origin') return '任务起点'
   if (node.type === 'goal') return '任务目标'
   if (node.type === 'item') return node.item_type === 'finding' ? '漏洞验证' : '事实条目'

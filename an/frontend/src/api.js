@@ -101,6 +101,10 @@ export const getPenetrationGraph = (runId) =>
   request(`/api/v1/runs/${encodeURIComponent(runId)}/penetration-graph`)
 export const getBlackboardGraph = (runId, signal = AbortSignal.timeout(15000)) =>
   request(`/api/v1/runs/${encodeURIComponent(runId)}/blackboard-graph`, { signal })
+export const compactColdDigest = (runId, payload = {}) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/cold-digest/compact`, { method: 'POST', body: JSON.stringify(payload) })
+export const getColdDigest = (runId, signal = AbortSignal.timeout(15000)) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/cold-digest`, { signal })
 export const getAssetGraph = (runId, signal = AbortSignal.timeout(15000)) =>
   request(`/api/v1/runs/${encodeURIComponent(runId)}/asset-graph`, { signal })
 export const thoughtProcessUrl = (runId) =>

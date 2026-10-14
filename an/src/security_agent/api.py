@@ -20,6 +20,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from security_agent.asset_graph import project_asset_graph
 from security_agent.batch import BatchError, BatchService
 from security_agent.budget_policy import TASK_BUDGET_LIMITS
+from security_agent.cold_digest import ColdDigestError, ColdDigestStore
 from security_agent.config import Settings, get_settings
 from security_agent.dashboard import dashboard_snapshot
 from security_agent.evaluation import EvaluationError, EvaluationService
@@ -51,6 +52,7 @@ from security_agent.runtime_prompts import RuntimePrompts
 from security_agent.schemas import (
     ApprovalResponse,
     BatchCreateRequest,
+    ColdDigestCompactRequest,
     EvaluationCreateRequest,
     ExperienceCreateRequest,
     MCPServerUpsertRequest,
@@ -457,6 +459,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     allowed_hosts.extend(host.strip() for host in actual_settings.allowed_hosts.split(",") if host.strip())
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
     app.state.service = service
+    app.state.cold_digests = ColdDigestStore(service.ledger.engine)
     app.state.evaluation_service = evaluation_service
     app.state.question_banks = question_banks
     app.state.batches = batches
@@ -1241,7 +1244,63 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(502, str(exc)) from exc
         result["source"] = "blackboard"
         result["sync_error"] = board.get("sync_error")
-        return result
+        return app.state.cold_digests.project_graph(run_id, result)
+
+    @app.get("/api/v1/runs/{run_id}/cold-digest")
+    async def get_cold_digest(run_id: str) -> dict[str, Any]:
+        try:
+            service.state(run_id)
+        except KeyError as exc:
+            raise HTTPException(404, "Run not found") from exc
+        return app.state.cold_digests.snapshot(run_id)
+
+    @app.post("/api/v1/runs/{run_id}/cold-digest/compact")
+    async def compact_cold_digest(run_id: str, payload: ColdDigestCompactRequest) -> dict[str, Any]:
+        try:
+            state = service.state(run_id)
+        except KeyError as exc:
+            raise HTTPException(404, "Run not found") from exc
+        board = state.external_execution.get("blackboard", {})
+        if not isinstance(board, dict) or not board.get("project_id"):
+            raise HTTPException(409, "任务尚未绑定黑板项目")
+        project_id = board["project_id"]
+        if board.get("backend") == "local":
+            graph = board.get("graph")
+            if (not isinstance(graph, dict) or project_id != "local:" + run_id
+                    or graph.get("title") != project_title_for_run(run_id)):
+                raise HTTPException(409, "Local blackboard identity mismatch")
+            detail = {"project": {"id": project_id, "title": graph["title"], "status": graph.get("status")},
+                      "facts": graph.get("facts", []), "intents": graph.get("intents", []),
+                      "hints": graph.get("hints", [])}
+        elif board.get("backend") == "remote":
+            try:
+                detail = await penetration_get(actual_settings.penetration_base_url, f"/projects/{project_id}",
+                                               actual_settings.module_timeout_seconds)
+            except KeyError as exc:
+                raise HTTPException(404, "Linked blackboard project was not found") from exc
+            except PenetrationUnavailableError as exc:
+                raise HTTPException(503, str(exc)) from exc
+            if (not isinstance(detail, dict) or not isinstance(detail.get("project"), dict)
+                    or detail["project"].get("id") != project_id
+                    or detail["project"].get("title") != project_title_for_run(run_id)):
+                raise HTTPException(409, "Blackboard project identity mismatch")
+        else:
+            raise HTTPException(409, "Unknown blackboard backend")
+        try:
+            projection = normalize_penetration_graph(
+                detail, state.external_execution.get("fact_assessments"),
+                service.ledger.events(run_id, limit=100000), state,
+                app.state.mcp_runtime.store.pending_mcp_approvals(run_id),
+            )
+            snapshot = app.state.cold_digests.compact(run_id, projection, R=payload.R, K=payload.K)
+        except (PenetrationProtocolError, ColdDigestError) as exc:
+            raise HTTPException(409, str(exc)) from exc
+        service.ledger.append(run_id, "blackboard.cold_digest.compacted", {
+            "round_no": snapshot["round_no"],
+            "active_digest_ids": [item["digest_id"] for item in snapshot["digests"] if item["status"] == "active"],
+            "R": payload.R, "K": payload.K,
+        }, actor="cold_digest")
+        return app.state.cold_digests.project_graph(run_id, projection)
 
     @app.get("/api/v1/runs/{run_id}/asset-graph")
     async def get_asset_graph(run_id: str) -> dict[str, Any]:

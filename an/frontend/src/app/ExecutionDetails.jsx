@@ -13,7 +13,23 @@ export default function ExecutionDetails({ node, graph, expanded, toggleBundle, 
     <div className="execution-detail-top"><span>{nodeKind(node)}</span><code title={node.raw_id}>{node.raw_id}</code></div>
     <h3>{node.title || node.label}</h3><StatusBadge status={node.status} />
     {(!intent || node.summary) && <p className="execution-detail-lead">{node.summary || node.title || node.description}</p>}
-    {intent ? <>
+    {node.type === 'digest' ? <>
+      <Section title="摘要内容"><p className="execution-detail-lead">{node.body || node.description || node.summary || '暂无摘要正文'}</p></Section>
+      <Section title="摘要版本"><dl className="execution-meta">
+        <dt>状态</dt><dd>{STATUS[node.status] || node.status}</dd>
+        <dt>生成代数</dt><dd>{node.generation || '—'}</dd>
+        <dt>签名</dt><dd><code>{node.signature || '—'}</code></dd>
+      </dl></Section>
+      <Section title={`原始记录 · ${(node.member_ids || []).length}`}>
+        {(node.member_ids || []).length ? node.member_ids.map((id) => <button className="execution-source-reference" key={id} onClick={() => {
+          if (!expanded.has(node.id)) toggleBundle(node.id)
+          window.setTimeout(() => focus(id), 0)
+        }}>
+          {graph.nodes?.find((item) => item.id === id)?.title || id}<small>{id} · 展开原始节点</small>
+        </button>) : <p>没有可展开的成员</p>}
+      </Section>
+      {!!node.anchor_ids?.length && <Section title="上下文锚点"><p>{node.anchor_ids.join('、')}</p></Section>}
+    </> : intent ? <>
       <Section title="验证目标"><p>{node.description || '未记录验证目标'}</p></Section>
       {node.step_id && <Section title="规划步骤"><p><code>{node.step_id}</code></p>
         {!!node.depends_on?.length && node.depends_on.map((step) => {
