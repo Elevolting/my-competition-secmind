@@ -60,6 +60,8 @@ function socketUrl(path, params = {}, location = window.location) {
 export const modelUsageSocketUrl = (location = window.location) => socketUrl('/api/v1/model-usage/events', {}, location)
 export const listRuns = (params = {}) => request(`/api/v1/runs?${new URLSearchParams({ refresh: String(Date.now()), ...params })}`)
 export const getRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}`)
+export const searchRunTraces = (runId, params = {}) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traces?${new URLSearchParams(params)}`)
+export const getRunTrace = (runId, traceId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traces/${encodeURIComponent(traceId)}`)
 export const retryRun = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retry`, { method: 'POST', body: JSON.stringify(payload) })
 export const cancelRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/cancel`, { method: 'POST' })
 export const submitRunHint = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/hint`, { method: 'POST', body: JSON.stringify(payload) })

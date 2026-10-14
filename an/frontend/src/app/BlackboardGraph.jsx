@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { App, Button, Empty, Input, Modal, Tooltip } from 'antd'
+import { App, Button, Empty, Input, Modal, Segmented, Tooltip } from 'antd'
 import { BulbOutlined, ReloadOutlined, SearchOutlined, ApartmentOutlined } from '@ant-design/icons'
 import cytoscape from 'cytoscape'
 import dagre from 'cytoscape-dagre'
@@ -7,6 +7,7 @@ import { getBlackboardGraph, submitRunHint } from '../api.js'
 import './ExecutionCanvas.css'
 import ExecutionNodeCard, { StatusBadge } from './ExecutionNodeCard.jsx'
 import ExecutionDetails from './ExecutionDetails.jsx'
+import TraceSearch from './TraceSearch.jsx'
 
 cytoscape.use(dagre)
 
@@ -74,6 +75,7 @@ export function BlackboardGraph({ run, events = [] }) {
   const [clock, setClock] = useState(Date.now())
   const [graph, setGraph] = useState(null)
   const [selected, setSelected] = useState(null)
+  const [detailMode, setDetailMode] = useState('node')
   const [query, setQuery] = useState('')
   const [expanded, setExpanded] = useState(new Set())
   const [history, setHistory] = useState(false)
@@ -389,7 +391,12 @@ export function BlackboardGraph({ run, events = [] }) {
         </div>
         <footer className="execution-canvas-footer"><div className="execution-legend"><span><i />已记录</span><span><i className="live" />执行中</span><span><i className="wait" />待审批</span></div><span className="execution-sync">{error ? '同步异常' : `最近同步 ${syncedAt || '等待中'}`}</span></footer>
       </section>
-      <aside className={`execution-detail execution-mobile-${mobileView}`} aria-label="节点详情"><ExecutionDetails node={selectedNode} graph={shown} expanded={expanded} toggleBundle={toggleBundle} focus={focus} elapsed={elapsed} /></aside>
+      <aside className={`execution-detail execution-mobile-${mobileView}`} aria-label="节点详情">
+        <Segmented block size="small" aria-label="详情视图" options={[{ label: '节点详情', value: 'node' }, { label: '执行检索', value: 'traces' }]} value={detailMode} onChange={setDetailMode} />
+        {detailMode === 'traces'
+          ? <TraceSearch runId={run.run_id} graph={shown} focus={focus} />
+          : <ExecutionDetails node={selectedNode} graph={shown} expanded={expanded} toggleBundle={toggleBundle} focus={focus} elapsed={elapsed} />}
+      </aside>
     </div>
     <footer className="execution-footer"><span>事实提供依据，想法组织验证，证据支撑结论。</span><span>{shown.nodes?.length || 0} 节点 · {shown.project_id || '未关联项目'} · {resultItems.length} 条结果</span><div>
       <Tooltip title="提交提示"><Button size="small" aria-label="提交提示" icon={<BulbOutlined />} disabled={!shown.linked || !['running', 'pending', 'waiting_approval'].includes(run.status)} onClick={submitHint}>添加提示</Button></Tooltip>

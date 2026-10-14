@@ -33,6 +33,8 @@ from security_agent.session_http import MAX_CALLS_PER_RUN as SESSION_CALLS_PER_R
 from security_agent.session_http import POLICY as SESSION_HTTP_POLICY
 from security_agent.session_http import UnsafeSessionHeaderError
 from security_agent.session_http import validate_request as validate_session_request
+from security_agent.trace_tools import TraceTool
+from security_agent.traces import TraceStore
 
 
 class BlackboardInvocation(BaseModel):
@@ -54,6 +56,8 @@ class BlackboardModelRequest(BaseModel):
 
 
 def register_blackboard_mcp(app, runtime, settings):
+    trace_store = getattr(app.state, 'traces', None) or TraceStore(runtime.ledger)
+    trace_tools = (TraceTool(trace_store), TraceTool(trace_store, detail=True))
     async def assignment(project_id, intent_id, worker, *, with_intent=False):
         try:
             detail = await penetration_get(
@@ -211,12 +215,32 @@ def register_blackboard_mcp(app, runtime, settings):
              'inputSchema': tool.manifest.input_schema,
              'version': module_version(name, tool) if name in module_tools(state) else tool.manifest.version}
             for name, tool in tools.items()
+        ] + [
+            {'name': tool.manifest.name, 'description': tool.manifest.description,
+             'inputSchema': tool.manifest.input_schema, 'version': tool.manifest.version}
+            for tool in trace_tools
         ]}
 
     @app.post('/api/v1/mcp/blackboard/{project_id}/{intent_id}/invoke')
     async def invoke(project_id: str, intent_id: str, payload: BlackboardInvocation):
         worker = payload.worker
         state, assigned_intent = await assignment(project_id, intent_id, worker, with_intent=True)
+        if payload.tool in {'search_all_worker_traces', 'get_worker_trace'}:
+            tool = TraceTool(trace_store, detail=payload.tool == 'get_worker_trace')
+            if payload.version != tool.manifest.version:
+                raise HTTPException(409, '执行检索工具版本已变更')
+            try:
+                jsonschema.validate(payload.arguments, tool.manifest.input_schema)
+            except jsonschema.ValidationError as exc:
+                raise HTTPException(422, '执行检索参数无效') from exc
+            result = await tool.invoke(payload.arguments, ToolContext(
+                run_id=state.run_id, step_id=intent_id, workspace=state.workspace,
+                allowed_paths=[state.workspace], target_scope=state.task.target_scope,
+                blackboard={'project_id': project_id, 'intent_id': intent_id, 'worker': worker,
+                            'attempt_id': assigned_intent.get('attempt_id')}))
+            return {'call_id': str(uuid4()), 'run_id': state.run_id,
+                    'status': 'completed' if result.status == ToolStatus.SUCCESS else 'failed',
+                    'result': {'structuredContent': result.model_dump(mode='json')}}
         native_tools = module_tools(state)
         if payload.tool in native_tools:
             tool = native_tools[payload.tool]

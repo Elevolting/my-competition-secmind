@@ -19,6 +19,7 @@ from security_runtime.dispatcher.usage import (
     pi_usage,
     write_receipt,
 )
+from security_runtime.dispatcher.traces import write_trace
 
 PROCESS_COMMUNICATE_GRACE_SECONDS = 15
 LOG_PREVIEW_LIMIT = 1200
@@ -199,6 +200,7 @@ def run_worker_process(
                "project_id": project_id, "intent_id": intent_id, "worker": worker.name,
                "phase": phase, "model": worker.env.get("PI_MODEL") or worker.env.get("ANTHROPIC_MODEL", "unknown"),
                "call_unit": "cli_execution", "usage": {}}
+    trace_receipt = {**receipt, "attempt_id": attempt_id}
     write_receipt(worker.usage_journal, {**receipt, "status": "started"})
     def stage(status):
         if lease is not None and callable(getattr(lease, "stage", None)):
@@ -211,6 +213,7 @@ def run_worker_process(
         process.start()
     except Exception:
         write_receipt(worker.usage_journal, {**receipt, "status": "failed"})
+        write_trace(worker.usage_journal, {**trace_receipt, "status": "failed"}, kind=worker.type)
         stage("failed")
         raise
     if lease is not None:
@@ -222,12 +225,16 @@ def run_worker_process(
         envelope = claude_result(result.stdout) if worker.type == "claudecode" else None
         failed = result.returncode != 0 or result.timed_out or result.cancelled or bool(envelope and envelope.get("is_error"))
         stage("cancelled" if result.cancelled else "timeout" if did_timeout(result) else "failed" if failed else "completed")
+        write_trace(worker.usage_journal, {**trace_receipt,
+                    "status": "cancelled" if result.cancelled else "timeout" if did_timeout(result) else "failed" if failed else "completed"},
+                    kind=worker.type, stdout=result.stdout)
         write_receipt(worker.usage_journal, {**receipt, "status": "failed" if failed else "completed",
             "usage": claude_usage(result.stdout) if worker.type == "claudecode" else
                      pi_usage(result.stdout) if worker.type == "pi" else {}})
         return result
     except Exception:
         write_receipt(worker.usage_journal, {**receipt, "status": "failed"})
+        write_trace(worker.usage_journal, {**trace_receipt, "status": "failed"}, kind=worker.type)
         stage("failed")
         raise
     finally:

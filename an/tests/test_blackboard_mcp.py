@@ -53,6 +53,32 @@ async def setup_bridge(settings, monkeypatch, run_id='bridge-test'):
     return service, gateway, detail, transport, bridge
 
 
+async def test_trace_search_bridge_is_bound_to_active_assignment(settings, monkeypatch):
+    service, gateway, detail, transport, _ = await setup_bridge(settings, monkeypatch)
+    try:
+        event = service.ledger.append('bridge-test', 'mcp.call.completed', {
+            'blackboard': {'intent_id': 'other-intent', 'worker': 'other-worker'},
+            'result': {'content': [{'type': 'text', 'text': 'trace marker'}]}})
+        async with httpx.AsyncClient(transport=transport, base_url='http://workbench.test') as client:
+            prefix = '/api/v1/mcp/blackboard/proj-test/i001'
+            names = {tool['name'] for tool in (await client.get(prefix + '/tools?worker=worker-test')).json()['tools']}
+            assert {'search_all_worker_traces', 'get_worker_trace'} <= names
+            request = {'worker': 'worker-test', 'tool': 'search_all_worker_traces', 'version': '1.0',
+                       'arguments': {'keyword': 'trace marker'}}
+            response = await client.post(prefix + '/invoke', json=request)
+            assert response.status_code == 200
+            receipt = response.json()
+            assert receipt['call_id'] and receipt['status'] == 'completed'
+            assert receipt['result']['structuredContent']['data']['items'][0]['trace_id'] == event.event_id
+            request['arguments']['run_id'] = 'other-run'
+            assert (await client.post(prefix + '/invoke', json=request)).status_code == 422
+            request['arguments'].pop('run_id')
+            request['worker'] = 'unassigned-worker'
+            assert (await client.post(prefix + '/invoke', json=request)).status_code == 409
+    finally:
+        await gateway.close()
+
+
 async def test_mcp_approval_expires_when_intent_attempt_changes(settings, monkeypatch):
     service, gateway, detail, transport, _ = await setup_bridge(settings, monkeypatch)
     runtime = service.orchestrator.mcp_runtime

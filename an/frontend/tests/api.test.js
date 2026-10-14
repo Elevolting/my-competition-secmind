@@ -1,7 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { evaluationEventSocketUrl, eventSocketUrl, getPrompt, refreshRunReport, terminalStatus } from '../src/api.js'
+import { evaluationEventSocketUrl, eventSocketUrl, getPrompt, getRunTrace, refreshRunReport,
+  searchRunTraces, terminalStatus } from '../src/api.js'
 
 test('builds the current run event websocket URL', () => {
   const url = eventSocketUrl('run id', 12, new URL('http://127.0.0.1:5173/workbench'))
@@ -24,4 +25,19 @@ test('exports the latest-result refresh API used by the workbench', () => {
 
 test('exports the read-only prompt detail API', () => {
   assert.equal(typeof getPrompt, 'function')
+})
+
+test('execution trace routes encode task, trace and search parameters', async () => {
+  const original = globalThis.fetch
+  const paths = []
+  globalThis.fetch = async (path) => {
+    paths.push(path)
+    return { ok: true, status: 200, json: async () => ({ items: [] }) }
+  }
+  try {
+    await searchRunTraces('run id', { keyword: 'a&b', cursor: 4 })
+    await getRunTrace('run id', 'trace/id')
+    assert.equal(paths[0], '/api/v1/runs/run%20id/traces?keyword=a%26b&cursor=4')
+    assert.equal(paths[1], '/api/v1/runs/run%20id/traces/trace%2Fid')
+  } finally { globalThis.fetch = original }
 })

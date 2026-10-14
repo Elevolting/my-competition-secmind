@@ -380,9 +380,21 @@ def build_runtime(settings: Settings) -> tuple[RunService, EvaluationService, Mo
     mcp = MCPRuntime(catalog, settings.run_root.parent,
         [settings.upload_root, settings.input_root, settings.run_root, settings.run_root.parent / 'incident/samples'],
         ledger, kali_enabled=settings.kali_mcp_enabled, kali_container=settings.kali_container)
-    broker = ToolBroker(MCPToolRegistry(default_registry(), mcp), Guardrail())
+    from security_agent.trace_tools import TraceTool
+    from security_agent.traces import TraceStore
+    from security_agent.receipt_traces import ReceiptTraceImporter, TraceSources
+    from security_agent.worker_traces import WorkerTraceImporter
+    native = default_registry()
+    trace_store = TraceStore(ledger, TraceSources(
+        WorkerTraceImporter(ledger, settings.runtime_model_config_path.resolve().parent / 'worker-usage.db'),
+        ReceiptTraceImporter(ledger, mcp.store),
+    ))
+    native.register(TraceTool(trace_store))
+    native.register(TraceTool(trace_store, detail=True))
+    broker = ToolBroker(MCPToolRegistry(native, mcp), Guardrail())
     orchestrator = SecurityOrchestrator(settings, ledger, gateway, broker, hub.publish, experiences, mcp_runtime=mcp)
     service = RunService(orchestrator, ledger, hub)
+    service.traces = trace_store
     return service, EvaluationService(settings, service), gateway, experiences
 
 
@@ -445,9 +457,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # the blackboard bridge.  This keeps code audit and reverse analysis on
     # the Runtime lease/event path instead of starting a second executor.
     app.state.workbench_tool_registry = service.orchestrator.broker.registry
+    app.state.traces = service.traces
     register_operations(app, incident_manager, app.state.mcp_runtime, app.state.prompt_catalog)
     from security_agent.blackboard_mcp import register_blackboard_mcp
     register_blackboard_mcp(app, app.state.mcp_runtime, actual_settings)
+    from security_agent.traces_api import register_traces
+    register_traces(app, service.traces)
     register_experiences(app, experiences, service, gateway)
     register_tsec(app, actual_settings)
 
