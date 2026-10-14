@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { bindTrafficEvidence, createTrafficEvidence, evaluationEventSocketUrl, eventSocketUrl,
-  getPrompt, getRunTrace, getTrafficEvidence, refreshRunReport, searchRunTraces,
+  getAsset, listAssets, getPrompt, getRunTrace, getTrafficEvidence, refreshRunReport, searchRunTraces,
   terminalStatus, trafficEvidenceExportUrl } from '../src/api.js'
 
 test('builds the current run event websocket URL', () => {
@@ -61,5 +61,23 @@ test('traffic evidence routes encode task, finding and evidence identifiers', as
     ])
     assert.equal(trafficEvidenceExportUrl('run id', 'evidence/1'),
       '/api/v1/runs/run%20id/traffic-evidence/evidence%2F1/export')
+  } finally { globalThis.fetch = original }
+})
+
+test('asset queries omit empty filters, encode input and pass cancellation', async () => {
+  const original = globalThis.fetch
+  const requests = []
+  globalThis.fetch = async (path, options) => {
+    requests.push({ path, options })
+    return { ok: true, status: 200, json: async () => ({ assets: [] }) }
+  }
+  try {
+    const controller = new AbortController()
+    await listAssets({ search: 'a&b', run_id: 'run id', kind: '', coverage: undefined, offset: 0 }, controller.signal)
+    await getAsset('asset/id', controller.signal)
+    assert.equal(requests[0].path, '/api/v1/assets?search=a%26b&run_id=run+id&offset=0')
+    assert.equal(requests[1].path, '/api/v1/assets/asset%2Fid')
+    assert.equal(requests[0].options.signal, controller.signal)
+    assert.equal(requests[1].options.signal, controller.signal)
   } finally { globalThis.fetch = original }
 })

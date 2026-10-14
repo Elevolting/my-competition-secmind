@@ -60,6 +60,11 @@ function socketUrl(path, params = {}, location = window.location) {
 export const modelUsageSocketUrl = (location = window.location) => socketUrl('/api/v1/model-usage/events', {}, location)
 export const listRuns = (params = {}) => request(`/api/v1/runs?${new URLSearchParams({ refresh: String(Date.now()), ...params })}`)
 export const getRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}`)
+export const listAssets = (params = {}, signal) => {
+  const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== ''))
+  return request(`/api/v1/assets?${query}`, { signal })
+}
+export const getAsset = (assetId, signal) => request(`/api/v1/assets/${encodeURIComponent(assetId)}`, { signal })
 export const searchRunTraces = (runId, params = {}) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traces?${new URLSearchParams(params)}`)
 export const getRunTrace = (runId, traceId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traces/${encodeURIComponent(traceId)}`)
 export const createTrafficEvidence = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traffic-evidence`, { method: 'POST', body: JSON.stringify(payload) })
