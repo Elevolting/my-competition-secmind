@@ -136,3 +136,79 @@ def test_side_question_api_cancel_does_not_change_main_run(settings):
         assert final["answer"] is None
         assert app.state.runtime.service.state(run_id).status == RunStatus.RUNNING
 
+
+def test_side_question_api_fault_matrix_and_refresh_reconnect(settings):
+    app = create_app(settings)
+    run_id = "secmind-api-fault-matrix"
+
+    async def answer(_context, question):
+        return f"回答：{question}", {"input_tokens": 4, "output_tokens": 5}
+
+    app.state.side_question_call_model = answer
+    with TestClient(app, base_url="http://127.0.0.1") as client:
+        _run(app, run_id)
+        snapshot = _snapshot(app, settings, run_id)
+        first = client.post(
+            f"/api/v1/runs/{run_id}/side-questions",
+            json={"snapshot_id": snapshot["snapshot_id"], "request_key": "fault-key", "question": "第一个问题"},
+        )
+        assert first.status_code == 202
+        question_id = first.json()["question"]["question_id"]
+        _wait_for(client, run_id, question_id, "completed")
+        conflict = client.post(
+            f"/api/v1/runs/{run_id}/side-questions",
+            json={"snapshot_id": snapshot["snapshot_id"], "request_key": "fault-key", "question": "不同问题"},
+        )
+        assert conflict.status_code == 409
+        budget = client.post(
+            f"/api/v1/runs/{run_id}/side-questions",
+            json={
+                "snapshot_id": snapshot["snapshot_id"], "request_key": "budget-key",
+                "question": "预算不足", "estimated_input_tokens": settings.side_question_input_token_budget + 1,
+            },
+        )
+        assert budget.status_code == 409
+
+        app.state.runtime.side_questions.max_concurrency = 1
+        concurrency_run_id = "secmind-api-fault-concurrency"
+        _run(app, concurrency_run_id)
+        concurrency_snapshot = _snapshot(app, settings, concurrency_run_id)
+        entered = threading.Event()
+        release = threading.Event()
+
+        async def blocked(_context, _question):
+            entered.set()
+            await asyncio.to_thread(release.wait, 3)
+            return "完成", SideQuestionBudget(2, 2, 1)
+
+        app.state.side_question_call_model = blocked
+        running = client.post(
+            f"/api/v1/runs/{concurrency_run_id}/side-questions",
+            json={
+                "snapshot_id": concurrency_snapshot["snapshot_id"],
+                "request_key": "concurrency-1",
+                "question": "占用并发",
+            },
+        )
+        assert running.status_code == 202
+        running_id = running.json()["question"]["question_id"]
+        assert entered.wait(2)
+        limited = client.post(
+            f"/api/v1/runs/{concurrency_run_id}/side-questions",
+            json={
+                "snapshot_id": concurrency_snapshot["snapshot_id"],
+                "request_key": "concurrency-2",
+                "question": "超过并发",
+            },
+        )
+        assert limited.status_code == 409
+        assert client.post(f"/api/v1/runs/{concurrency_run_id}/side-questions/{running_id}/cancel").status_code == 200
+        release.set()
+        _wait_for(client, concurrency_run_id, running_id, "cancelled")
+
+    refreshed = create_app(settings)
+    with TestClient(refreshed, base_url="http://127.0.0.1") as client:
+        history = client.get(f"/api/v1/runs/{run_id}/side-questions")
+        assert history.status_code == 200
+        assert any(item["question_id"] == question_id for item in history.json()["items"])
+
