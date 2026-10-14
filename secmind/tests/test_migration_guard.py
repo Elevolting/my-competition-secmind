@@ -24,4 +24,4 @@ def test_migration_guard_accepts_only_the_current_head(tmp_path: Path, monkeypat
         verify_database_at_head(url)
 
     command.upgrade(_config(url), "head")
-    assert verify_database_at_head(url) == "0023_model_request_snapshots"
+    assert verify_database_at_head(url) == "0024_side_question_requests"
