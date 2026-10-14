@@ -109,3 +109,57 @@ async def test_running_question_cancel_is_independent_and_late_answer_is_discard
     result = await task
     assert result.status == "cancelled"
     assert store.get(question_id)["answer"] is None
+
+
+def test_output_events_are_ordered_and_clear_fences_late_chunks():
+    store, parent, configuration, snapshot = setup_store()
+    reserved = store.reserve(
+        parent=parent, snapshot_id=snapshot["snapshot_id"], configuration=configuration,
+        request_key="question-stream", question="流式回答", estimated_input_tokens=10,
+    )
+    question_id = reserved["question_id"]
+    store.mark_running(question_id)
+    store.append_output(question_id, "第一段", clear_version=0)
+    store.append_output(question_id, "第二段", clear_version=0)
+    cleared = store.clear_output(question_id)
+    assert cleared["clear_version"] == 1
+    with pytest.raises(SideQuestionConflict):
+        store.append_output(question_id, "迟到片段", clear_version=0)
+    store.append_output(question_id, "新回答", clear_version=1)
+    assert store.get(question_id)["answer"] == "新回答"
+    assert [event["type"] for event in store.output_events(question_id)] == ["delta", "delta", "clear", "delta"]
+    assert [event["sequence"] for event in store.output_events(question_id)] == [1, 2, 3, 4]
+
+
+@pytest.mark.asyncio
+async def test_restart_marks_running_interrupted_and_does_not_replay():
+    store, parent, configuration, snapshot = setup_store()
+    reserved = store.reserve(
+        parent=parent, snapshot_id=snapshot["snapshot_id"], configuration=configuration,
+        request_key="question-restart", question="重启后怎么办？", estimated_input_tokens=10,
+    )
+    question_id = reserved["question_id"]
+    store.mark_running(question_id)
+    store.append_output(question_id, "已经收到", clear_version=0)
+    store.record_usage(question_id, SideQuestionBudget(5, 4, 1))
+    assert store.interrupt_running() == 1
+    interrupted = store.get(question_id)
+    assert interrupted["status"] == "interrupted"
+    assert interrupted["answer"] == "已经收到"
+    assert interrupted["settled"] == {"input_tokens": 5, "output_tokens": 4, "provider_requests": 1}
+
+    calls = 0
+
+    async def should_not_run(_context, _question):
+        nonlocal calls
+        calls += 1
+        raise AssertionError("interrupted side question must not be replayed")
+
+    result = await SideQuestionRunner(store).ask(
+        parent=parent, snapshot_id=snapshot["snapshot_id"], configuration=configuration,
+        request_key="question-restart", question="重启后怎么办？", estimated_input_tokens=10,
+        call_model=should_not_run,
+    )
+    assert result.status == "interrupted"
+    assert result.answer == "已经收到"
+    assert calls == 0

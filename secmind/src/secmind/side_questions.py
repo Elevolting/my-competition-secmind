@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Integer, String, Text, func, select
+from sqlalchemy import Boolean, Integer, PrimaryKeyConstraint, String, Text, func, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
@@ -60,8 +60,26 @@ class SideQuestionRow(SideQuestionBase):
     provider_requests: Mapped[int] = mapped_column(Integer, default=0)
     answer_text: Mapped[str | None] = mapped_column(Text)
     error_type: Mapped[str | None] = mapped_column(String(100))
+    output_sequence: Mapped[int] = mapped_column(Integer, default=0)
+    clear_version: Mapped[int] = mapped_column(Integer, default=0)
+    observed_input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    observed_output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    observed_provider_requests: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(String(40))
     updated_at: Mapped[datetime] = mapped_column(String(40))
+
+
+class SideQuestionOutputEvent(SideQuestionBase):
+    __tablename__ = "side_question_output_events"
+    __table_args__ = (PrimaryKeyConstraint("question_id", "event_sequence"),)
+
+    question_id: Mapped[str] = mapped_column(String(36), index=True)
+    event_sequence: Mapped[int] = mapped_column(Integer)
+    event_type: Mapped[str] = mapped_column(String(20))
+    clear_version: Mapped[int] = mapped_column(Integer)
+    delta_text: Mapped[str | None] = mapped_column(Text)
+    cumulative_text: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(String(40))
 
 
 @dataclass(frozen=True)
@@ -91,7 +109,7 @@ class SideQuestionStore:
     """Persist independent requests without mutating the parent run."""
 
     ACTIVE = ("queued", "running")
-    TERMINAL = ("completed", "failed", "cancelled")
+    TERMINAL = ("completed", "failed", "cancelled", "interrupted")
 
     def __init__(
         self,
@@ -197,11 +215,118 @@ class SideQuestionStore:
                 question_sha256=digest, question_text=str(safe_question), status="queued",
                 cancel_requested=False, reserved_input_tokens=estimated_input_tokens,
                 reserved_output_tokens=requested_output, settled_input_tokens=0, settled_output_tokens=0,
-                provider_requests=0, answer_text=None, error_type=None, created_at=now, updated_at=now,
+                provider_requests=0, answer_text=None, error_type=None, output_sequence=0, clear_version=0,
+                observed_input_tokens=0, observed_output_tokens=0, observed_provider_requests=0,
+                created_at=now, updated_at=now,
             )
             session.add(row)
             session.flush()
             return self._document(row)
+
+    def append_output(self, question_id: str, delta: str, *, clear_version: int) -> dict[str, Any]:
+        """Persist one streamed output event under a clear-version fence."""
+
+        if not isinstance(delta, str) or not delta:
+            raise ValueError("side-question output delta must be non-empty text")
+        with Session(self.engine) as session, session.begin():
+            row = session.get(SideQuestionRow, question_id)
+            if row is None:
+                raise LookupError("side-question request not found")
+            if row.clear_version != clear_version:
+                raise SideQuestionConflict("side-question output belongs to a cleared generation")
+            if row.status in self.TERMINAL or row.cancel_requested:
+                raise SideQuestionCancelled("side-question output arrived after cancellation")
+            safe_delta = str(self.sanitize(delta))
+            if not safe_delta:
+                raise ValueError("side-question output delta became empty after sanitization")
+            row.output_sequence += 1
+            row.answer_text = (row.answer_text or "") + safe_delta
+            row.updated_at = _now()
+            session.add(SideQuestionOutputEvent(
+                question_id=question_id,
+                event_sequence=row.output_sequence,
+                event_type="delta",
+                clear_version=row.clear_version,
+                delta_text=safe_delta,
+                cumulative_text=row.answer_text,
+                created_at=row.updated_at,
+            ))
+            return self._document(row)
+
+    def clear_output(self, question_id: str) -> dict[str, Any]:
+        """Fence late provider chunks and clear only the visible partial answer."""
+
+        with Session(self.engine) as session, session.begin():
+            row = session.get(SideQuestionRow, question_id)
+            if row is None:
+                raise LookupError("side-question request not found")
+            if row.status in self.TERMINAL:
+                return self._document(row)
+            row.clear_version += 1
+            row.output_sequence += 1
+            row.answer_text = None
+            row.updated_at = _now()
+            session.add(SideQuestionOutputEvent(
+                question_id=question_id,
+                event_sequence=row.output_sequence,
+                event_type="clear",
+                clear_version=row.clear_version,
+                delta_text=None,
+                cumulative_text=None,
+                created_at=row.updated_at,
+            ))
+            return self._document(row)
+
+    def output_events(self, question_id: str, *, after_sequence: int = 0) -> list[dict[str, Any]]:
+        with Session(self.engine) as session:
+            events = session.scalars(
+                select(SideQuestionOutputEvent).where(
+                    SideQuestionOutputEvent.question_id == question_id,
+                    SideQuestionOutputEvent.event_sequence > after_sequence,
+                ).order_by(SideQuestionOutputEvent.event_sequence)
+            ).all()
+            return [
+                {
+                    "sequence": event.event_sequence,
+                    "type": event.event_type,
+                    "clear_version": event.clear_version,
+                    "delta": event.delta_text,
+                    "text": event.cumulative_text,
+                    "created_at": event.created_at,
+                }
+                for event in events
+            ]
+
+    def record_usage(self, question_id: str, usage: SideQuestionBudget) -> dict[str, Any]:
+        """Record provider usage observed before a stream reaches a terminal state."""
+
+        if min(usage.input_tokens, usage.output_tokens, usage.provider_requests) < 0:
+            raise ValueError("side-question usage cannot be negative")
+        with Session(self.engine) as session, session.begin():
+            row = session.get(SideQuestionRow, question_id)
+            if row is None:
+                raise LookupError("side-question request not found")
+            row.observed_input_tokens = min(usage.input_tokens, row.reserved_input_tokens)
+            row.observed_output_tokens = min(usage.output_tokens, row.reserved_output_tokens)
+            row.observed_provider_requests = usage.provider_requests
+            row.updated_at = _now()
+            return self._document(row)
+
+    def interrupt_running(self) -> int:
+        """Fence requests left in flight by a process restart without replaying them."""
+
+        changed = 0
+        with Session(self.engine) as session, session.begin():
+            rows = session.scalars(select(SideQuestionRow).where(SideQuestionRow.status == "running")).all()
+            for row in rows:
+                row.status = "interrupted"
+                row.error_type = "interrupted"
+                row.settled_input_tokens = row.observed_input_tokens
+                row.settled_output_tokens = row.observed_output_tokens
+                row.provider_requests = row.observed_provider_requests
+                row.updated_at = _now()
+                changed += 1
+        return changed
 
     def mark_running(self, question_id: str) -> dict[str, Any]:
         with Session(self.engine) as session, session.begin():
@@ -246,6 +371,9 @@ class SideQuestionStore:
             row.settled_input_tokens = min(usage.input_tokens, row.reserved_input_tokens)
             row.settled_output_tokens = min(usage.output_tokens, row.reserved_output_tokens)
             row.provider_requests = usage.provider_requests
+            row.observed_input_tokens = row.settled_input_tokens
+            row.observed_output_tokens = row.settled_output_tokens
+            row.observed_provider_requests = row.provider_requests
             row.updated_at = _now()
             return self._document(row)
 
@@ -278,6 +406,9 @@ class SideQuestionStore:
             "reserved": {"input_tokens": row.reserved_input_tokens, "output_tokens": row.reserved_output_tokens},
             "settled": {"input_tokens": row.settled_input_tokens, "output_tokens": row.settled_output_tokens,
                         "provider_requests": row.provider_requests},
+            "observed": {"input_tokens": row.observed_input_tokens, "output_tokens": row.observed_output_tokens,
+                         "provider_requests": row.observed_provider_requests},
+            "output_sequence": row.output_sequence, "clear_version": row.clear_version,
             "answer": row.answer_text, "error_type": row.error_type,
             "created_at": row.created_at, "updated_at": row.updated_at,
         }
@@ -305,8 +436,8 @@ class SideQuestionRunner:
             parent=parent, snapshot_id=snapshot_id, configuration=configuration,
             request_key=request_key, question=question, estimated_input_tokens=estimated_input_tokens,
         )
-        if reserved["status"] == "completed":
-            return SideQuestionAnswer(reserved["question_id"], "completed", reserved["answer"],
+        if reserved["status"] in self.store.TERMINAL:
+            return SideQuestionAnswer(reserved["question_id"], reserved["status"], reserved["answer"],
                                        SideQuestionBudget(**reserved["settled"]))
         async with self._semaphore:
             try:
