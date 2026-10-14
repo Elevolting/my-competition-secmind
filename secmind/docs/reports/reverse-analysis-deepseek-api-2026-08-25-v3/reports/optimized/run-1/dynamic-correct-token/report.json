@@ -1,0 +1,163 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-4dfd8096b17049c6aa48a39f23d09392bd0d4559a5d2eb49566e194a6005bcd5",
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "仿真验证了正确口令路径：程序将输入字符串与硬编码口令“SECMIND-REVERSE-OK”进行strcmp比较，匹配后以写模式打开reverse_demo_result.txt文件，写入多行包括安全测试结果、训练域和网络访问状态等内容，然后以退出码0正常退出。未观察到网络请求或违反沙箱的行为。",
+    "findings": [
+      {
+        "business_impact": "口令以明文形式硬编码在二进制中，攻击者可通过静态分析直接提取，绕过认证逻辑，可能导致未授权访问或功能滥用。",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-4dfd8096b17049c6aa48a39f23d09392bd0d4559a5d2eb49566e194a6005bcd5"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "strcmp调用参数显示比较字符串为“SECMIND-REVERSE-OK”，静态分析也发现该字符串。明文比较无哈希或加密保护，降低了逆向难度。",
+        "title": "硬编码口令与明文比较"
+      },
+      {
+        "business_impact": "程序在认证成功后创建本地报告文件reverse_demo_result.txt，可能泄露系统信息或为后续恶意行为提供日志。",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-4dfd8096b17049c6aa48a39f23d09392bd0d4559a5d2eb49566e194a6005bcd5"
+        ],
+        "severity": "Low",
+        "technical_explanation": "fopen以“w”模式打开文件，随后通过fputc写入包含域名和网络状态的多行文本，这些信息可能被用于进一步侦查。",
+        "title": "本地文件写入行为"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "将硬编码口令替换为动态凭据管理，如环境变量或安全存储，并引入哈希比对。",
+        "decision_role": "Security Engineering Lead",
+        "expected_outcome": "显著降低未授权访问风险。",
+        "priority": "P1",
+        "rationale": "减少静态提取口令的风险，提升认证强度。"
+      },
+      {
+        "action": "审查文件写入内容，移除敏感信息如内部域名，并限制文件写入路径。",
+        "decision_role": "Product Security Manager",
+        "expected_outcome": "降低本地信息泄露风险。",
+        "priority": "P2",
+        "rationale": "防止信息泄露，控制程序行为边界。"
+      }
+    ],
+    "limitations": [
+      "仿真仅覆盖正确口令路径，未验证错误口令行为。",
+      "未进行完整反汇编，静态分析可能遗漏部分逻辑。"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "对二进制实施完整反汇编分析，确认是否存在其他隐藏路径或后门。",
+      "运行动态沙箱验证不同输入条件下的行为差异。",
+      "检查二进制数字签名，确认来源可信度。"
+    ],
+    "reverse_analysis": "仿真事件序列显示程序初始化后，通过strlen和memcpy复制命令行参数和预期口令字符串。随后调用strcmp比较输入与“SECMIND-REVERSE-OK”，返回值0表示匹配。匹配后调用fopen以“w”模式创建reverse_demo_result.txt，并通过多次fputc写入内容，包括“safe reverse training domain: training.example.invalid”和“network access disabled”等。最后调用fclose关闭文件，puts输出“token accepted; local report created”，并以exit(0)正常结束。全程未观察到网络API调用。",
+    "risk_assessment": {
+      "exploitability": "High",
+      "impact_scope": "Local",
+      "overall_risk": "Medium",
+      "urgency": "Medium"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "argument_check",
+        "file_io",
+        "string_comparison"
+      ],
+      "error": null,
+      "facts": {
+        "architecture": "x86-64",
+        "created_files": [
+          "reverse_demo_result.txt"
+        ],
+        "exit_code": 0,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "错误口令输入时的具体行为未知。",
+      "程序是否包含网络通信能力尚未完全确认。"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "static_presence",
+    "sources": [
+      "emulated"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-correct-token",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

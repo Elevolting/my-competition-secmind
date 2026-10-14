@@ -1,0 +1,211 @@
+{
+  "execution_status": "partial",
+  "model_response_sha256": "86fc0da663fc35850f67103f7880ab9c6aec900679e8e2dc0d0b128d7282b864",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "partial",
+    "executive_summary": "动态仿真不可用，保留静态分析结果。样本为 x86-64 PE 文件，包含 10 个节区，导入较多 C 运行时函数，静态提示存在文件 I/O、字符串比较和 XOR 解码候选，但无法确认实际运行行为。",
+    "findings": [
+      {
+        "business_impact": "若攻击者用于识别分析环境，可能影响安全团队对样本的判定和响应优先级。",
+        "confidence": "中",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "中",
+        "technical_explanation": "静态分析发现多个 XOR 密钥及解码候选，包括 'SECMIND-REVERSE-OK'、'training.example.invalid' 等。由于动态仿真不可用，这些仅为静态推测，需进一步验证。",
+        "title": "XOR 解码候选字符串暗示可能存在的反分析标记"
+      },
+      {
+        "business_impact": "可能涉及敏感文件读取或写操作，如配置文件窃取或数据外传。",
+        "confidence": "中",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "中",
+        "technical_explanation": "导入表中包含 fopen、fwrite、strcmp、strncmp 等 CRT 函数，结合 static_hints 中的 possible_file_io 和 possible_string_comparison，推测存在文件操作和基于字符串的逻辑判断。",
+        "title": "大量文件 I/O 与字符串比较导入"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "在隔离沙箱中执行样本，获取动态行为（如 API 调用、文件操作、网络活动）。",
+        "decision_role": "安全运营负责人",
+        "expected_outcome": "获得真实执行行为，确认是否存在恶意文件操作或反分析逻辑。",
+        "priority": "P1",
+        "rationale": "动态仿真失败，静态分析不足以确认实际威胁行为，需补充动态数据以支撑决策。"
+      },
+      {
+        "action": "分析 XOR 解码出现的字符串（如 'SECMIND-REVERSE-OK'）是否与已知威胁特征或内部测试标记相关。",
+        "decision_role": "威胁情报负责人",
+        "expected_outcome": "判定这些字符串是否为测试/演示标记或真实恶意载荷的一部分。",
+        "priority": "P2",
+        "rationale": "这些字符串可能用于识别环境或作为区分标志，理解其用途有助于归因。"
+      }
+    ],
+    "limitations": [
+      "No dynamic execution was performed.",
+      "No full disassembly engine is bundled in this helper.",
+      "XOR decoding is heuristic and may include false positives.",
+      "dynamic emulation unavailable"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "在受控环境执行样本并捕获 API 调用日志",
+      "对样本进行完整反汇编以验证 XOR 解码逻辑",
+      "关联样本哈希与威胁情报平台",
+      "检查是否存在其他隐藏字符串或资源"
+    ],
+    "reverse_analysis": "基于静态证据，样本为 PE 格式 x86-64 可执行文件，节区数量 10。导入函数集包含大量 MSVC CRT 函数（如 fopen、fwrite、fclose 等）以及 Win32 API（如 VirtualProtect、VirtualQuery、GetLastError 等），暗示文件操作与内存保护相关功能。static_hints 提示存在文件 I/O、字符串比较及 XOR 解码候选。XOR 键包括 0x5a、0x4f 等，解码值中出现 'SECMIND-REVERSE-OK'、'training.example.invalid' 等字符串，可能用于反调试或标识。由于动态仿真失败，无法验证这些静态线索是否对应实际执行路径。",
+    "risk_assessment": {
+      "exploitability": "低（静态分析无法证明可利用性）",
+      "impact_scope": "未知（动态行为未确认）",
+      "overall_risk": "中",
+      "urgency": "中"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "status": "partial"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "样本的真实运行时行为",
+      "XOR 解码结果是否在代码中使用",
+      "解码字符串的实际用途"
+    ]
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-failure-fallback",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

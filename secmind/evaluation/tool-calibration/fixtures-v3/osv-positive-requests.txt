@@ -1,0 +1,2 @@
+requests==2.19.1
+# v3 release snapshot: vulnerable baseline

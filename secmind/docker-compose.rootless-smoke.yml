@@ -1,0 +1,26 @@
+services:
+  # Windows Docker Desktop's default engine is rootful.  This optional smoke
+  # profile starts a separate rootless dockerd inside a dind-rootless VM so
+  # the Runner can be pointed at an independently attested daemon.  It is
+  # intentionally TCP-local for the desktop proof only; competition Compose
+  # must use a per-user Unix socket as declared in
+  # docker-compose.competition.yml.
+  rootless-docker:
+    # Digest pinned from the independently probed image (Docker 29.0.0).
+    image: docker:29.0.0-dind-rootless@sha256:655682420c390d78bdac672dc9d35667fa1e52a760680657f6d45589047602fb
+    privileged: true
+    security_opt:
+      - seccomp=unconfined
+      - apparmor=unconfined
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    command:
+      - --host=tcp://0.0.0.0:2375
+    ports:
+      - "127.0.0.1:23760:2375"
+    healthcheck:
+      test: ["CMD-SHELL", "docker info >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: "no"

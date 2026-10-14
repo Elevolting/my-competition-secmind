@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.5",
+  "openapi_sha256": "2a7a4dabc4efec0f393efe5f141157f8f17d8a4510f6fe2a704cfd3bba81f997",
+  "public_models_sha256": "7798284a9d8455836098d594f7248ee06c886f91073b7f16f4939f89a11c2f20",
+  "tool_manifest_sha256": "d68d08b552ce260fcc5eb18ea9dc6c34fbc50c2de1174ebfba36f769071c87f1",
+  "ledger_event_sha256": "7d51619d47bf1b769acfd36c79b16acdc46916267c481ee6fe9a629e69fea827",
+  "prompt_manifest_sha256": "2a035c39447fb8ca0178078f22bdc07f3db97c0b594711b63eecbd75160901df",
+  "migration_heads": [
+    "0011_v06_usage_execution"
+  ]
+}

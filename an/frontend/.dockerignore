@@ -1,0 +1,10 @@
+.env
+.env.*
+node_modules
+dist
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+model-runtime.json

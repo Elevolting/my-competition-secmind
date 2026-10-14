@@ -1,0 +1,47 @@
+{
+  "schema_version": "tool-calibration-external-images-1.0",
+  "source_id": "rootless-offline-toolchain-2026-08-17",
+  "staging_image": "sha256:cfdf79f9b13a19b55fbbb0dc1eadecb5625da16a958d4eb1ee83a2a55571c985",
+  "base_image": {
+    "reference": "python:3.11-slim-bookworm",
+    "digest": "sha256:2e32f7d302adc1c37428355c1e646897c0c53f4fd60b6a551245fb90ee129f91"
+  },
+  "tool_image": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+  "capture_utc": "2026-08-17T14:27:00Z",
+  "tools": {
+    "semgrep_sast": {
+      "version": "1.110.0",
+      "image_digest": "sha256:5c4bc18bfb9bf178afaf3009675f6ba444e967b34b675c9de478aea65d225974",
+      "entrypoint": ["python", "/opt/secmind-tools/run-semgrep"],
+      "rule_bundle_digest": "358d2fdefe8949bdfe0fc02e616f904a4d59a3baf88380d90552107004a09ac1",
+      "rule_bundle": "reviewed-rules-in-image"
+    },
+    "gitleaks_secret_scan": {
+      "version": "8.30.1",
+      "image_digest": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+      "entrypoint": ["python", "/opt/secmind-tools/run-gitleaks.py"],
+      "rule_bundle_digest": "edb55ed8c437e1cb6c56e503ccc067593161a3fb90c7f4eda5956bb051c4ce33",
+      "rule_bundle": "gitleaks-v8.30.1-plus-reviewed-adapter-v3",
+      "official_artifact_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+    },
+    "syft_sbom": {
+      "version": "1.51.0",
+      "image_digest": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+      "entrypoint": ["python", "/opt/secmind-tools/run-syft.py"],
+      "rule_bundle_digest": "0f5f675b860d7e2a57c32d1283643fbb50628d0f074682285d76d946c4f70a42",
+      "rule_bundle": "syft-cyclonedx-1.7-v1.51.0-plus-maven-root-filter-v3",
+      "official_artifact_sha256": "2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f"
+    },
+    "osv_dependency_audit": {
+      "version": "2.5.1",
+      "image_digest": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+      "entrypoint": ["python", "/opt/secmind-tools/run-osv.py"],
+      "rule_bundle_digest": "5dbbb9c04d50448207c3d114670108092876ccc79ea3eddb737a465b0c99f52c",
+      "rule_bundle": "osv-offline-v2.5.1",
+      "database": {
+        "ecosystems": ["Go", "Maven", "PyPI", "crates.io", "npm"],
+        "archive_manifest_digest": "5dbbb9c04d50448207c3d114670108092876ccc79ea3eddb737a465b0c99f52c"
+      }
+    }
+  }
+}

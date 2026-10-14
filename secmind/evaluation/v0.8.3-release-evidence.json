@@ -1,0 +1,58 @@
+{
+  "schema_version": "secmind-release-evidence-1.0",
+  "release": "0.8.3",
+  "created_at": "2026-08-11T23:00:00+08:00",
+  "baseline": {
+    "version": "0.8.2",
+    "run_id": "safe-20260810T140127-secmind-v0.8.2-deepseek-v4-flash-af4ef660",
+    "suite_score": 53.212,
+    "round_count": 2,
+    "seed": 0
+  },
+  "candidate": {
+    "run_id": "safe-20260811T220616-secmind-v0.8.3-deepseek-v4-flash-6d955b9e",
+    "suite_score": 71.2347,
+    "round_count": 1,
+    "seed": 20260811,
+    "submitted_tasks": 60,
+    "valid_tasks": 54,
+    "correct_tasks": 43,
+    "evidence_completeness_percent": 53.6,
+    "provider_requests": 74,
+    "tool_calls": 17,
+    "input_tokens": 2196901,
+    "output_tokens": 585233,
+    "cost_status": "UNKNOWN"
+  },
+  "observed_suite_delta": 18.0227,
+  "paired_nonvoid": {
+    "task_count": 51,
+    "baseline_mean": 52.861,
+    "candidate_mean": 73.9893,
+    "delta": 21.1283,
+    "improved": 44,
+    "regressed": 7
+  },
+  "tool_delta_probe": {
+    "run_id": "safe-20260811T222912-secmind-v0.8.3-deepseek-v4-flash-2e94de65",
+    "task_id": "T3S-709DBE1058",
+    "tools": ["bandit_python_audit", "python_taint_audit", "semgrep_sast"],
+    "candidate_findings": 34,
+    "semantic_clusters": 24,
+    "accepted_delta_count": 1,
+    "outcome_score": 100.0,
+    "task_score": 90.8
+  },
+  "large_input_recovery_probe": {
+    "run_id": "safe-20260811T230451-secmind-v0.8.3-deepseek-v4-flash-d8be0dfb",
+    "task_id": "T3S-D6E9BCFACC",
+    "status": "SUCCESS",
+    "provider_requests": 1,
+    "input_tokens": 8461,
+    "output_tokens": 15860,
+    "finding_count": 3,
+    "fallback_exercised": false
+  },
+  "control_warning": "Baseline and candidate used the same task-set but different seed and round count; score delta is release regression evidence, not a strict causal A/B estimate.",
+  "secrets_included": false
+}

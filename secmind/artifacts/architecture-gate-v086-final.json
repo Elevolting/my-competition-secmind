@@ -1,0 +1,39 @@
+{
+  "gate": "architecture-budget",
+  "passed": true,
+  "modules": [
+    {
+      "file": "src/secmind/orchestrator.py",
+      "lines": 5151,
+      "limit": 5810
+    },
+    {
+      "file": "src/secmind/tools.py",
+      "lines": 156,
+      "limit": 2900
+    },
+    {
+      "file": "src/secmind/llm.py",
+      "lines": 1501,
+      "limit": 2350
+    },
+    {
+      "file": "src/secmind/schemas.py",
+      "lines": 1667,
+      "limit": 1700
+    }
+  ],
+  "orchestrator_direct_imports": [
+    "secmind.orchestration.obligation_runtime",
+    "secmind.orchestration.orchestrator_dependencies",
+    "secmind.orchestration.orchestrator_projections"
+  ],
+  "orchestrator_direct_import_count": 3,
+  "orchestrator_direct_import_limit": 65,
+  "orchestrator_class_lines": 4951,
+  "orchestrator_class_line_limit": 5000,
+  "orchestrator_class_methods": 84,
+  "orchestrator_class_method_limit": 93,
+  "oversized_functions": [],
+  "failures": []
+}

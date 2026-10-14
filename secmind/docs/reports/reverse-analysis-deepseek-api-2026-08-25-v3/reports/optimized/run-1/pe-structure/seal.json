@@ -1,0 +1,13 @@
+{
+  "arm": "optimized",
+  "case_id": "pe-structure",
+  "receipt_sha256": "3f8ad8b36ebcb216b0ed8fa8f01fb76e7b57676b747e8f8c757aa8e743043ea5",
+  "repeat_id": 1,
+  "report_html_sha256": "ee72fc1b048c11689cc8a2c3a538e4f5efe3c02dfa3c377c3194c6eee3146434",
+  "report_json_sha256": "df3e501eb23052aed0418f064c9d35fcfed0b6f357c39be89efb034dc4b2f6c0",
+  "report_md_sha256": "227aa9365410c17794d007d666c98af0eb592e338f10bf98157c338bad859f41",
+  "request_sha256": "00d0fa5423886bbdc9c509ae3cf31acb7f25997b1e9057d92428c0e82ba00c33",
+  "response_sha256": "83437f627711da11ca5435201ebb1acf8c91fe86276aa5030d5d6e32cd04c7a2",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

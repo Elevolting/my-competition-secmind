@@ -1,0 +1,123 @@
+{
+  "attempts": [
+    {
+      "conservative_reserved_usage": {
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 0,
+        "cost_units": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_requests": 0
+      },
+      "duration_ms": 3651,
+      "logical_call_id": "a7e141ee-9c6e-4228-bac3-189793f56678",
+      "ordinal": 1,
+      "provider_reported_usage": {
+        "cache_hit_input_tokens": 1792,
+        "cache_miss_input_tokens": 25,
+        "cost_units": 0.009052,
+        "input_tokens": 1817,
+        "output_tokens": 446,
+        "provider_requests": 1
+      },
+      "provider_request": true,
+      "provider_request_id": "279e3bf6-3593-42f2-a664-ceca93efcaa2",
+      "request_digest": "05ff5e2d0e24e9b3a63e7f75d594e266e24970a4aaecc962a5c97d65e6ca49ff",
+      "response_digest": "533b117f2f91c75ced5acb839a61a57c0b5c3e2fe2589089efe71d366e0013fa",
+      "retryable": false,
+      "status_code": 200,
+      "unknown_usage": false,
+      "usage": {
+        "cache_hit_input_tokens": 1792,
+        "cache_miss_input_tokens": 25,
+        "cost_units": 0.009052,
+        "input_tokens": 1817,
+        "output_tokens": 446,
+        "provider_requests": 1
+      }
+    }
+  ],
+  "base_url": "https://api.deepseek.com",
+  "error_type": null,
+  "execution_status": "completed",
+  "latency_ms": 3651,
+  "model": "deepseek-v4-flash",
+  "model_receipt_id": "a7e141ee-9c6e-4228-bac3-189793f56678",
+  "model_request_sha256": "05ff5e2d0e24e9b3a63e7f75d594e266e24970a4aaecc962a5c97d65e6ca49ff",
+  "model_response_sha256": "533b117f2f91c75ced5acb839a61a57c0b5c3e2fe2589089efe71d366e0013fa",
+  "pricing": {
+    "estimated_cny": 0.0042682,
+    "formula": "(cache_hit_input*rate + cache_miss_input*rate + output*rate) / 1000000",
+    "priced_at": "2026-08-25T14:13:46.939138+08:00",
+    "pricing_band": "peak",
+    "snapshot": {
+      "currency": "CNY",
+      "model": "deepseek-v4-flash",
+      "off_peak": {
+        "cache_hit_input": 0.05,
+        "cache_miss_input": 1.5,
+        "output": 4.5
+      },
+      "peak": {
+        "cache_hit_input": 0.1,
+        "cache_miss_input": 3.0,
+        "output": 9.0
+      },
+      "peak_beijing_hours": [
+        "09:00-12:00",
+        "14:00-18:00"
+      ],
+      "retrieved_at": "2026-08-24",
+      "schema_version": "1.0",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing-details-cny/",
+      "unit_tokens": 1000000
+    },
+    "usage_components": {
+      "cache_accounting": "provider_reported",
+      "cache_hit_input_tokens": 1792,
+      "cache_miss_input_tokens": 25,
+      "output_tokens": 446
+    }
+  },
+  "provider": "deepseek",
+  "public_request_sha256": "08fda98507be67724de5e23fe2e35976a6cfff9844c9817787b34bc60c4632fd",
+  "retry_count": 0,
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-dll-injection-incomplete",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "558012dd9efe83447d56b4a8a6437185b849ea21b7c9e63fd8248aa31d6b00af",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  },
+  "usage": {
+    "cache_hit_input_tokens": 1792,
+    "cache_miss_input_tokens": 25,
+    "cost_units": 0.009052,
+    "input_tokens": 1817,
+    "output_tokens": 446,
+    "provider_requests": 1,
+    "total_tokens": 2263
+  },
+  "usage_provenance": {
+    "conservative_reserved_usage": {
+      "cache_hit_input_tokens": 0,
+      "cache_miss_input_tokens": 0,
+      "cost_units": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "provider_requests": 0
+    },
+    "provider_reported_usage": {
+      "cache_hit_input_tokens": 1792,
+      "cache_miss_input_tokens": 25,
+      "cost_units": 0.009052,
+      "input_tokens": 1817,
+      "output_tokens": 446,
+      "provider_requests": 1
+    },
+    "unknown_usage_attempts": 0
+  }
+}

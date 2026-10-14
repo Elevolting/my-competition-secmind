@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none';
+form-action 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'">
+<title>SecMind 逆向分析业务报告 · malformed-pe</title>
+<style>:root {
+  --paper:#F5F7FA; --ink:#172033; --blue:#315B8A; --teal:#16736B;
+  --rust:#A54835; --slate:#667085; --line:#D7DEE8; --card:#FFFFFF;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; color:var(--ink); background:var(--paper);
+  font:15px/1.65 "PingFang SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+main { max-width:1120px; margin:0 auto; padding:42px 28px 64px; }
+h1,h2,h3,p { margin-top:0; }
+h1 {
+  font:700 clamp(30px,5vw,48px)/1.12 "Songti SC",ui-serif,serif;
+  letter-spacing:.02em; margin-bottom:12px;
+}
+h2 { font-size:18px; margin-bottom:14px; }
+h3 { font-size:16px; margin-bottom:8px; }
+.eyebrow {
+  color:var(--blue); font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.hero { padding:0 0 26px 24px; border-left:4px solid var(--blue); }
+.hero-row { display:flex; gap:18px; align-items:flex-start; justify-content:space-between; }
+.status {
+  flex:none; border:1px solid var(--line); border-radius:999px; padding:6px 11px;
+  color:var(--teal); background:#F0FAF8; font-weight:700;
+}
+.status.partial { color:#825C0A; background:#FFF8E4; }
+.status.unavailable { color:var(--rust); background:#FFF0ED; }
+.meta { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:20px; }
+.meta div,.panel { background:var(--card); border:1px solid var(--line); border-radius:4px; }
+.meta div { padding:10px 12px; }
+.label {
+  display:block; color:var(--slate); font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase;
+}
+code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+.spine { position:relative; margin-top:28px; padding-left:31px; }
+.spine:before {
+  content:""; position:absolute; top:7px; bottom:7px; left:7px; width:1px;
+  background:var(--line);
+}
+section {
+  position:relative; margin:0 0 22px; padding:21px 22px; background:var(--card);
+  border:1px solid var(--line); border-radius:4px;
+}
+section:before {
+  content:""; position:absolute; left:-30px; top:25px; width:12px; height:12px;
+  border:3px solid var(--paper); border-radius:50%; background:var(--blue);
+  box-shadow:0 0 0 1px var(--blue);
+}
+section.decision:before { background:var(--teal); box-shadow:0 0 0 1px var(--teal); }
+section.caution:before { background:var(--rust); box-shadow:0 0 0 1px var(--rust); }
+.boundary { color:#213A5B; background:#EEF3F9; border-left:3px solid var(--blue); padding:12px 14px; }
+.grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.metric { padding:11px; border:1px solid var(--line); }
+.metric b { display:block; font-size:14px; }
+.finding,.recommendation { padding:14px 0; border-top:1px solid var(--line); }
+.finding:first-child,.recommendation:first-child { border-top:0; padding-top:0; }
+.finding-head,.rec-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.finding-head h3,.rec-head h3 { margin:0 auto 0 0; }
+.stamp,.priority,.confidence,.chip {
+  display:inline-block; font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  padding:5px 7px; border-radius:2px;
+}
+.severity-critical,.severity-high { background:#FCE8E4; color:#822F22; }
+.severity-medium { background:#FFF4DC; color:#825C0A; }
+.severity-low,.severity-info { background:#EAF5F3; color:#11625B; }
+.confidence { color:var(--slate); background:#F0F2F5; }
+.priority { color:#FFF; background:var(--blue); }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { color:#28496D; background:#EDF3FA; font-weight:500; overflow-wrap:anywhere; }
+ul { margin:0; padding-left:20px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:620px; }
+th,td { padding:9px 10px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
+th { color:var(--slate); font-size:12px; }
+.receipt,.empty { color:var(--slate); }
+@media (max-width:720px) {
+  main { padding:25px 16px 44px; } .meta,.grid { grid-template-columns:1fr; }
+  .hero-row { display:block; } .status { display:inline-block; margin-top:12px; }
+  .spine { padding-left:22px; } section { padding:17px; } section:before { left:-22px; }
+}
+@media print {
+  body { background:#fff; font-size:11pt; } main { max-width:none; padding:0; }
+  .meta div,section { break-inside:avoid; } .spine:before { background:#AAB4C2; }
+}</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">SECMIND · REVERSE ANALYSIS DOSSIER</div>
+    <div class="hero-row"><div><h1>单次逆向分析业务报告</h1>
+      <p>题目 <code>malformed-pe</code> · 版本 <code>current</code>
+      · 独立重复 <code>2</code></p></div>
+      <span class="status partial">部分完成 / partial</span>
+    </div>
+    <div class="meta"><div><span class="label">题集</span><code>secmind-reverse-safe-12-v1</code></div>
+<div><span class="label">样本 SHA256</span><code>8511460ad69b648c17f543daeca8e5acc497cddff0af76e5876fc29bee27d7d0</code></div>
+<div><span class="label">模型回执</span><code>receipt.json</code></div></div>
+  </header>
+  <div class="spine">
+    <section><h2>管理摘要</h2><p>该样本是一个畸形PE文件，静态分析确认其结构异常，无法进行常规解析或动态执行。建议安全团队将其隔离封存，避免在未受控环境中运行，并进一步分析其具体畸形特征以评估潜在风险。</p></section>
+    <section><h2>逆向分析</h2><p>静态分析发现目标PE文件存在结构畸形，导致无法按正常PE格式解析。由于证据包仅包含静态观察结果，未提供运行时行为数据，无法确认该文件是否包含恶意代码或实际可执行性。建议使用专门的PE解析器深入检查文件头、节表及导入导出表，判断畸形是否由截断、损坏或恶意构造引起。</p>
+      <h2>证据边界</h2><p class="boundary">静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。</p>
+      <p><b>导入语义：</b><code>unspecified</code>
+     　<b>来源：</b>static</p>
+    </section>
+    <section><h2>发现与风险</h2><article class="finding"><div class="finding-head"><h3>畸形PE文件无法正常解析</h3><span class="stamp severity-info">高</span><span class="confidence">置信度 中</span></div><p><b>业务影响</b> 畸形PE文件可能导致安全产品误判或漏报，若被恶意利用，可能在特定环境中引起解析器崩溃或绕过安全检查，影响系统安全防护的有效性。</p><p><b>技术说明</b> PE文件的结构异常使静态分析工具无法提取标准字段，如节表偏移、可选头大小等，导致解析流程中断。由于未观察到运行时行为，尚不能确定此畸形是自然损坏还是故意构造的规避手段。</p><div class="chips"></div></article><div class="grid"><div class="metric"><span class="label">总体风险</span><b>中</b></div>
+<div class="metric"><span class="label">影响范围</span><b>影响范围限于处理该文件的系统或安全分析工具，可能造成解析失败或潜在的安全绕过。</b></div>
+<div class="metric"><span class="label">可利用性</span><b>未知</b></div>
+<div class="metric"><span class="label">紧迫度</span><b>中</b></div></div></section>
+    <section class="decision"><h2>给人类决策者的建议</h2><article class="recommendation"><div class="rec-head"><span class="priority">P1</span><h3>隔离该畸形PE文件，并交由专业逆向分析团队进行深入静态解析，确认畸形具体原因及是否包含恶意特征。</h3></div><p><b>适用角色</b> 安全运营负责人</p><p><b>理由</b> 畸形PE文件存在潜在安全风险，需尽快确认其性质，防止在业务环境中引发问题。</p><p><b>预期结果</b> 明确文件畸形原因及安全影响，为后续处置提供依据。</p></article></section>
+    <section class="decision"><h2>后续步骤</h2><ul class=""><li>使用独立PE解析器（如pefile）提取文件头信息，定位具体畸形字段。</li><li>在隔离沙箱中尝试运行，观察是否有异常行为（如崩溃或提权）。</li><li>对比已知恶意样本库，检查文件哈希和结构特征。</li><li>若确认恶意，更新防护规则并排查相关系统。</li></ul></section>
+    <section class="caution"><h2>局限与未知项</h2><div class="grid">
+      <div><h3>局限</h3><ul class=""><li>证据仅包含静态分析结果，无运行时行为数据。</li><li>无法确定畸形是损坏还是恶意构造。</li></ul></div>
+      <div><h3>未知项</h3><ul class=""><li>文件的具体畸形字段细节。</li><li>该PE文件是否可实际执行及能否触发恶意行为。</li><li>文件来源及传播途径。</li></ul></div>
+    </div></section>
+    <section><h2>审计证据与回执</h2><div class="table-wrap"><table>
+      <thead><tr><th>对象</th><th>引用</th></tr></thead><tbody><tr><td>封存证据</td><td>无</td></tr><tr><td>模型回执</td><td class="receipt"><code>receipt.json</code></td></tr></tbody>
+    </table></div></section>
+  </div>
+</main>
+</body>
+</html>

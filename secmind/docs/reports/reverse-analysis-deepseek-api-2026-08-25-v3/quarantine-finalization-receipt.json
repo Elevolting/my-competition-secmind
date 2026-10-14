@@ -1,0 +1,15 @@
+{
+  "binding_sha256": "9b8e0036984aa66859150642ac2b145ee8f0ad6276185ece8c256adba9c8adc2",
+  "core_delivery_sha256": "030a90240c60871d7d7509e39cf6ebaf9bf5c8b2a896f4f2b8c8974564fb7d45",
+  "gate_public_binding_sha256": "75d48aee538a846be67d285446ae326f2502ef92f80ece5c59739507e9ab4fd9",
+  "gate_receipt_path": "docs/reports/reverse-analysis-deepseek-api-2026-08-25-v3/deletion-gate-receipt.json",
+  "gate_receipt_sha256": "87b7188ee536b4817644c42eb9e20484aed24e48d73b175062d2ef471defbf19",
+  "pre_quarantine_core_delivery_sha256": "030a90240c60871d7d7509e39cf6ebaf9bf5c8b2a896f4f2b8c8974564fb7d45",
+  "previous_finalization_binding_sha256": null,
+  "quarantine_receipt_binding_sha256": "efb3d2e831313903aa83a677be9130f25790af6cd56247a0270c33cd5c9af3e0",
+  "quarantine_receipt_path": "docs/reports/.secmind-quarantine-receipt.json",
+  "quarantine_receipt_sha256": "44b3161204a4c8d5d4f7c80b7bc5ecb1b177dd7ca11735ba5d4967d45546e8d5",
+  "schema_version": "3.0",
+  "scoring_receipt_sha256": "77f37c25931599f993c9245e3594a696c49e0a8e86c54405202df5e22d2375f4",
+  "source_inventory_sha256": "7aea93b7ad1a3a85b07e7c8368f363d0331fe6e7570b55852fcc48d3a73febec"
+}

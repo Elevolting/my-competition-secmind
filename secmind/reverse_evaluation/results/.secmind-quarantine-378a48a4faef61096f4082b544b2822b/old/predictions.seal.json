@@ -1,0 +1,22 @@
+{
+  "case_count": 12,
+  "case_ids": [
+    "pe-structure",
+    "pe-imports",
+    "xor-recovery",
+    "dynamic-wrong-token",
+    "dynamic-correct-token",
+    "source-process-hollowing",
+    "source-dll-injection-complete",
+    "source-dll-injection-incomplete",
+    "source-apc-rc4-antidebug",
+    "source-no-signal",
+    "malformed-pe",
+    "dynamic-failure-fallback"
+  ],
+  "case_ids_sha256": "45fda2645a7317a654d486aa2338835c3adbfcc72a583a043c5fcd50013b2da8",
+  "prediction_file": "predictions.json",
+  "prediction_sha256": "9ae12c268cb6dbdd15f6020339bb38cc701d1476bc4f6c79b4f7c4fee1669705",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

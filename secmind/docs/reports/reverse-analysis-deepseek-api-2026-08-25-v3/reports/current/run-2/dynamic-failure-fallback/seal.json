@@ -1,0 +1,13 @@
+{
+  "arm": "current",
+  "case_id": "dynamic-failure-fallback",
+  "receipt_sha256": "8577fa5fe37c6cfef0fe10c5e95f71c802093f1cf9e204ea79d3e504872e8f31",
+  "repeat_id": 2,
+  "report_html_sha256": "000152bb7db0e08bfbc0ed4a75a26a4493e14f939081c33ff7d84ffd88bf1acf",
+  "report_json_sha256": "f5eb67b91400a7aa23aaf362e9eda2b554c65877259f0051b5f1762411682893",
+  "report_md_sha256": "ed545c69bde0bfc21833a7835c20f2f48cb4152885c888b762a1be539215db0b",
+  "request_sha256": "b6735ff91553487883a02d752654532bd4c148313c29dd679b04b78cec2780a1",
+  "response_sha256": "7cd07796f35a1e750353252c1ec4786ca0d838dbf03ede090306c9d892f1147e",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

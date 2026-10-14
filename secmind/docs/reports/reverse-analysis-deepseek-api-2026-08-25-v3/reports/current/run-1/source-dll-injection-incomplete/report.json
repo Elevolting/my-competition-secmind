@@ -1,0 +1,82 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [],
+    "execution_status": "completed",
+    "executive_summary": "基于静态证据，DLL 注入线索不完整，无法形成高置信度结论。仅存在静态观察，未建立完整运行时行为链。",
+    "findings": [
+      {
+        "business_impact": "可能影响系统完整性，但因证据不足，需进一步调查才能确定实际影响。",
+        "confidence": "low",
+        "evidence_refs": [],
+        "severity": "medium",
+        "technical_explanation": "静态分析仅发现潜在注入相关线索，未观测到完整注入行为链，无法确认实际是否发生注入。",
+        "title": "DLL 注入线索不完整"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "开展动态分析或获取额外样本以补全证据链",
+        "decision_role": "security_analyst",
+        "expected_outcome": "补全证据链，明确是否存在 DLL 注入行为。",
+        "priority": "P2",
+        "rationale": "现有证据不足以定性 DLL 注入行为，需进一步调查。"
+      }
+    ],
+    "limitations": [
+      "静态证据局限性",
+      "未观测到运行时行为"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "获取动态运行环境证据",
+      "收集更多相关样本或日志"
+    ],
+    "reverse_analysis": "静态观察显示存在可能与 DLL 注入相关的线索，但证据链不完整，缺少关键运行时行为确认，无法形成完整结论。",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "unknown",
+      "overall_risk": "unknown",
+      "urgency": "low"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": null,
+      "facts": {
+        "mitre": []
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "558012dd9efe83447d56b4a8a6437185b849ea21b7c9e63fd8248aa31d6b00af",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "No complete high-confidence reverse behavior chain was established."
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-dll-injection-incomplete",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "558012dd9efe83447d56b4a8a6437185b849ea21b7c9e63fd8248aa31d6b00af",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

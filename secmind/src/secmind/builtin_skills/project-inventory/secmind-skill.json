@@ -1,0 +1,18 @@
+{
+  "skill_id": "project-inventory",
+  "version": "1.0.0",
+  "description": "Build a deterministic language, dependency and repository structure inventory.",
+  "trigger_terms": ["inventory", "language", "dependency", "structure", "清单", "语言", "依赖"],
+  "supported_languages": [],
+  "scenarios": ["code_audit"],
+  "required_capabilities": ["inventory"],
+  "allowed_agent_profiles": ["repository-scout"],
+  "risk_ceiling": 0,
+  "max_turns": 1,
+  "input_contract": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+  "output_contract": {"type": "object", "required": ["languages", "files"], "properties": {"languages": {"type": "array"}, "files": {"type": "array"}}},
+  "eval_case_ids": ["inventory-mixed-language", "inventory-generated-vendor"],
+  "package_digest": "09260c2d4a370dc9bfd45478a880b4a7d303ec05f0f2bc27d3412402ebb197a0",
+  "signer": "secmind-platform-v1",
+  "signature": "mcT1F3dUJ8JPEhgw8otNCTOn1JEmMZHyFtqcLKg8XrvSDTr8FUzzIt_XgBWDy0g2FbLu07SoqyqqhgACsV7ADw"
+}

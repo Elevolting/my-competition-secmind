@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "docker": {
+    "runner_backend": "docker",
+    "runner_rootless": true,
+    "dedicated_rootless": true,
+    "volume_limit_mode": "container-tmpfs",
+    "production_auth_equivalent": true,
+    "qualification": "dedicated rootless Runner evidence is production-authentic",
+    "policy": {
+      "cpu_cores": 1.0,
+      "image_digest": "sha256:6b20521902e07547cc01560b4e14c7591532dd5501c10f9811b2dc1a5be4a6b5",
+      "memory_bytes": 536870912,
+      "max_artifacts": 128,
+      "max_input_bytes": 67108864,
+      "max_log_tail_bytes": 16384,
+      "max_output_bytes": 16777216,
+      "network": "none",
+      "pids_limit": 64,
+      "read_only": true,
+      "tmpfs_bytes": 67108864,
+      "timeout_seconds": 120,
+      "volume_limit_mode": "container-tmpfs",
+      "input_volume_bytes": 67108864,
+      "output_volume_bytes": 16777216,
+      "input_mount_mode": "write-once-read-only",
+      "output_mount_mode": "bounded-writable",
+      "user": "65532:65532",
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cleanup_confirmed": true,
+      "daemon_host": "tcp://127.0.0.1:23760"
+    },
+    "resources_after_invocation": []
+  },
+  "failures": []
+}

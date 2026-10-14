@@ -1,0 +1,112 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691",
+      "evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87",
+      "evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f",
+      "evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04",
+      "evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c",
+      "evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a",
+      "evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "完整进程镂空链已被识别，涉及创建挂起进程、写入恶意代码、修改入口点并恢复线程。静态证据支持该攻击链。",
+    "findings": [
+      {
+        "business_impact": "攻击者可在合法进程上下文中执行任意代码，绕过安全控制，可能导致数据泄露、系统控制或横向移动。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691",
+          "evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87",
+          "evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f",
+          "evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04",
+          "evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c",
+          "evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a",
+          "evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc"
+        ],
+        "severity": "critical",
+        "technical_explanation": "样本使用进程镂空技术：创建挂起进程，写入恶意代码，修改入口点，恢复线程。静态证据显示相关API调用和内存操作。行为映射到MITRE ATT&CK T1055.012。",
+        "title": "进程镂空攻击链"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "立即隔离受影响系统并进行取证分析",
+        "decision_role": "security_operations",
+        "expected_outcome": "遏制威胁并收集证据",
+        "priority": "P0",
+        "rationale": "进程镂空表明存在活跃恶意活动，需防止进一步损害。"
+      },
+      {
+        "action": "评估并加强端点检测与响应规则",
+        "decision_role": "security_engineering",
+        "expected_outcome": "提高检测覆盖率",
+        "priority": "P1",
+        "rationale": "增强对进程创建和内存操作的监控，防止类似攻击。"
+      }
+    ],
+    "limitations": [
+      "仅静态分析"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "分析恶意代码行为",
+      "检查网络连接",
+      "更新威胁情报"
+    ],
+    "reverse_analysis": "样本通过进程镂空技术（T1055.012）执行恶意代码。静态分析确认了以下链：1) 创建挂起进程；2) 分配并写入恶意载荷；3) 修改目标进程入口点；4) 恢复线程执行。证据包中的文件映射和导入表分析支持该结论。",
+    "risk_assessment": {
+      "exploitability": "medium",
+      "impact_scope": "system",
+      "overall_risk": "high",
+      "urgency": "high"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "process_hollowing"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Process Injection: Process Hollowing",
+          "T1055.012",
+          "process_hollowing"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "恶意代码具体功能",
+      "攻击者身份"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-process-hollowing",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

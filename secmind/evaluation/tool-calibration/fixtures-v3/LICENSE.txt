@@ -1,0 +1,4 @@
+CC0 1.0 Universal
+
+These original-authored calibration fixtures are dedicated to the public
+domain under CC0 1.0 Universal.

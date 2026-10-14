@@ -1,0 +1,32 @@
+{
+  "schema_version": "tool-calibration-release-policy-1.0",
+  "minimum_cases_per_tool": 10,
+  "minimum_positive_cases_per_tool": 3,
+  "minimum_negative_cases_per_tool": 3,
+  "minimum_precision": 0.9,
+  "minimum_recall": 0.9,
+  "minimum_component_completeness": 1.0,
+  "minimum_component_accuracy": 1.0,
+  "required_evidence_completeness": 1.0,
+  "require_toolchain_complete": true,
+  "require_untouched_holdout": true,
+  "strict_assurance_gate": {
+    "require_trusted_signer": true,
+    "require_calibrated_security_claim": true,
+    "require_untouched_holdout": true,
+    "signer_algorithm": "Ed25519",
+    "calibration_manifest_digest_must_match": true,
+    "calibration_report_digest_must_match": true
+  },
+  "independence_gate": {
+    "same_source_report_count": 2,
+    "same_source_independent_count": 1,
+    "source_identity_field": "assurance_lineage.source_id"
+  },
+  "external_tools": {
+    "semgrep_sast": "finding_precision_recall; immutable_rootless_image_and_reviewed_rule_digest_required",
+    "gitleaks_secret_scan": "finding_precision_recall; immutable_rootless_image_and_default_rule_digest_required",
+    "syft_sbom": "component_completeness_and_accuracy; immutable_rootless_image_and_binary_digest_required",
+    "osv_dependency_audit": "finding_precision_recall; immutable_rootless_image_and_offline_database_digest_required"
+  }
+}

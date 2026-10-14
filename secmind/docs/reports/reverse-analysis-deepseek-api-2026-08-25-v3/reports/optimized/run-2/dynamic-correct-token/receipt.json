@@ -1,0 +1,195 @@
+{
+  "attempts": [
+    {
+      "conservative_reserved_usage": {
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 0,
+        "cost_units": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_requests": 0
+      },
+      "duration_ms": 8062,
+      "logical_call_id": "5999607f-1453-432d-950b-cafd89bbf4a2",
+      "ordinal": 1,
+      "provider_reported_usage": {
+        "cache_hit_input_tokens": 8832,
+        "cache_miss_input_tokens": 82,
+        "cost_units": 0.039932,
+        "input_tokens": 8914,
+        "output_tokens": 1069,
+        "provider_requests": 1
+      },
+      "provider_request": true,
+      "provider_request_id": "43145238-6825-4b29-bb54-9fb23d71d341",
+      "request_digest": "32efce1f8367b88d2d6e466a231a245946ac3f77f5e5be6c3dac3e0fbd46564c",
+      "response_digest": "fd747d4079c09bbfa5d2e37ca6de2fdfc0d256834f9ae2f030a09d8f54398e26",
+      "retryable": false,
+      "status_code": 200,
+      "unknown_usage": false,
+      "usage": {
+        "cache_hit_input_tokens": 8832,
+        "cache_miss_input_tokens": 82,
+        "cost_units": 0.039932,
+        "input_tokens": 8914,
+        "output_tokens": 1069,
+        "provider_requests": 1
+      }
+    },
+    {
+      "conservative_reserved_usage": {
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 0,
+        "cost_units": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_requests": 0
+      },
+      "duration_ms": 8719,
+      "logical_call_id": "5cad67f3-e70e-4676-a86f-e164a15c8325",
+      "ordinal": 2,
+      "provider_reported_usage": {
+        "cache_hit_input_tokens": 8832,
+        "cache_miss_input_tokens": 82,
+        "cost_units": 0.040672,
+        "input_tokens": 8914,
+        "output_tokens": 1254,
+        "provider_requests": 1
+      },
+      "provider_request": true,
+      "provider_request_id": "b4a62ade-3a7d-4b47-90b4-bf17846a4024",
+      "request_digest": "32efce1f8367b88d2d6e466a231a245946ac3f77f5e5be6c3dac3e0fbd46564c",
+      "response_digest": "e218245ef5ea908b865a998a6e9604b19e8161576e158220f8a28f7f7f127726",
+      "retryable": false,
+      "status_code": 200,
+      "unknown_usage": false,
+      "usage": {
+        "cache_hit_input_tokens": 8832,
+        "cache_miss_input_tokens": 82,
+        "cost_units": 0.040672,
+        "input_tokens": 8914,
+        "output_tokens": 1254,
+        "provider_requests": 1
+      }
+    },
+    {
+      "conservative_reserved_usage": {
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 0,
+        "cost_units": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_requests": 0
+      },
+      "duration_ms": 12348,
+      "logical_call_id": "2d9399f8-a579-4377-8326-eb9a4cd50e11",
+      "ordinal": 3,
+      "provider_reported_usage": {
+        "cache_hit_input_tokens": 8832,
+        "cache_miss_input_tokens": 82,
+        "cost_units": 0.043512,
+        "input_tokens": 8914,
+        "output_tokens": 1964,
+        "provider_requests": 1
+      },
+      "provider_request": true,
+      "provider_request_id": "2ce5ac43-5ac0-4eb9-9293-83aba9c19742",
+      "request_digest": "32efce1f8367b88d2d6e466a231a245946ac3f77f5e5be6c3dac3e0fbd46564c",
+      "response_digest": "d17bd34ad90e44480ecb4d686517cd4162edceb78bf79769c7a0faff2eff4d1f",
+      "retryable": false,
+      "status_code": 200,
+      "unknown_usage": false,
+      "usage": {
+        "cache_hit_input_tokens": 8832,
+        "cache_miss_input_tokens": 82,
+        "cost_units": 0.043512,
+        "input_tokens": 8914,
+        "output_tokens": 1964,
+        "provider_requests": 1
+      }
+    }
+  ],
+  "base_url": "https://api.deepseek.com",
+  "error_type": null,
+  "execution_status": "completed",
+  "latency_ms": 29129,
+  "model": "deepseek-v4-flash",
+  "model_receipt_id": "2d9399f8-a579-4377-8326-eb9a4cd50e11",
+  "model_request_sha256": "32efce1f8367b88d2d6e466a231a245946ac3f77f5e5be6c3dac3e0fbd46564c",
+  "model_response_sha256": "d17bd34ad90e44480ecb4d686517cd4162edceb78bf79769c7a0faff2eff4d1f",
+  "pricing": {
+    "estimated_cny": 0.0419706,
+    "formula": "(cache_hit_input*rate + cache_miss_input*rate + output*rate) / 1000000",
+    "priced_at": "2026-08-25T14:17:46.128506+08:00",
+    "pricing_band": "peak",
+    "snapshot": {
+      "currency": "CNY",
+      "model": "deepseek-v4-flash",
+      "off_peak": {
+        "cache_hit_input": 0.05,
+        "cache_miss_input": 1.5,
+        "output": 4.5
+      },
+      "peak": {
+        "cache_hit_input": 0.1,
+        "cache_miss_input": 3.0,
+        "output": 9.0
+      },
+      "peak_beijing_hours": [
+        "09:00-12:00",
+        "14:00-18:00"
+      ],
+      "retrieved_at": "2026-08-24",
+      "schema_version": "1.0",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing-details-cny/",
+      "unit_tokens": 1000000
+    },
+    "usage_components": {
+      "cache_accounting": "provider_reported",
+      "cache_hit_input_tokens": 26496,
+      "cache_miss_input_tokens": 246,
+      "output_tokens": 4287
+    }
+  },
+  "provider": "deepseek",
+  "public_request_sha256": "05a630c7ef256248172f8e29744135e955d700e08ce00eeed7b1bb4c08948fe4",
+  "retry_count": 2,
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-correct-token",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  },
+  "usage": {
+    "cache_hit_input_tokens": 26496,
+    "cache_miss_input_tokens": 246,
+    "cost_units": 0.124116,
+    "input_tokens": 26742,
+    "output_tokens": 4287,
+    "provider_requests": 3,
+    "total_tokens": 31029
+  },
+  "usage_provenance": {
+    "conservative_reserved_usage": {
+      "cache_hit_input_tokens": 0,
+      "cache_miss_input_tokens": 0,
+      "cost_units": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "provider_requests": 0
+    },
+    "provider_reported_usage": {
+      "cache_hit_input_tokens": 26496,
+      "cache_miss_input_tokens": 246,
+      "cost_units": 0.124116,
+      "input_tokens": 26742,
+      "output_tokens": 4287,
+      "provider_requests": 3
+    },
+    "unknown_usage_attempts": 0
+  }
+}

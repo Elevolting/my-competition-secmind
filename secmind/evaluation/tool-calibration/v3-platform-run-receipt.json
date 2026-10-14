@@ -1,0 +1,49 @@
+{
+  "schema_version": "tool-calibration-platform-run-receipt-1.0",
+  "dataset_id": "secmind-heldout-tools-2026-08-v3",
+  "attempt": 3,
+  "manifest_model_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+  "observations_path": "evaluation/tool-calibration/observations-v3-platform-attempt3.json",
+  "observations_sha256": "5bbafa3937bccf403fef7980e652d418fa1a283fbbffb0180f584f4820a35a78",
+  "observations_digest": "3262fe60ce120b653cd71cf8700c92ac6f90426936b9e87b22e712a6459463be",
+  "report_path": "evaluation/tool-calibration/report-v3-platform-attempt3.json",
+  "report_file_sha256": "cccf1fbb6b35a5ce7f3d872ec152de99037671471763c1dd068e954a2b39ebc4",
+  "report_digest": "08b0e456f3bee73e1f4f18be33e230d87ff0e759f91da8eb58a1d1bfcf306b74",
+  "platform_trust_root": {
+    "path": "evaluation/tool-calibration/v3-platform-trust-root.pub",
+    "file_sha256": "32adbb0c2bbb826bd105110bd6f22b0ca1338b8635d324c12cc50263b9e67ea1",
+    "key_id": "ed25519-3bb6ac5c8bb43e3d",
+    "signature_algorithm": "Ed25519"
+  },
+  "platform_assurance_binding": {
+    "calibration_version": "secmind-heldout-tools-2026-08-v3",
+    "manifest_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+    "report_binding_digest": "8f26827a663be1dd52ac9236a960f98ec10ca84d18cadf9024b66fef48af0df1",
+    "source_id": "heldout-rootless-signed-runner",
+    "independent_source_count": 1,
+    "same_source_report_count": 80,
+    "same_source_double_report": true
+  },
+  "rootless_runner": {
+    "docker_host": "tcp://127.0.0.1:23760",
+    "security_option": "name=rootless",
+    "staging_image": "sha256:cfdf79f9b13a19b55fbbb0dc1eadecb5625da16a958d4eb1ee83a2a55571c985",
+    "external_image": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+    "semgrep_image": "sha256:5c4bc18bfb9bf178afaf3009675f6ba444e967b34b675c9de478aea65d225974",
+    "osv_database_digest": "5dbbb9c04d50448207c3d114670108092876ccc79ea3eddb737a465b0c99f52c"
+  },
+  "tool_results": {
+    "bandit_python_audit": {"precision": 1.0, "recall": 1.0},
+    "python_taint_audit": {"precision": 1.0, "recall": 1.0},
+    "secret_pattern_scan": {"precision": 1.0, "recall": 1.0},
+    "java_semantic_sast": {"precision": 1.0, "recall": 1.0},
+    "semgrep_sast": {"precision": 1.0, "recall": 1.0},
+    "gitleaks_secret_scan": {"precision": 1.0, "recall": 1.0},
+    "osv_dependency_audit": {"precision": 1.0, "recall": 1.0},
+    "syft_sbom": {"component_completeness": 1.0, "component_accuracy": 1.0}
+  },
+  "release_eligible": true,
+  "blockers": [],
+  "fixture_mutation_after_freeze": false,
+  "interpretation": "Attempt 1 and attempt 2 remain immutable historical failures. An initial eligible attempt-3 execution is retained under history/v3-attempt-3-preseal because finalizing the ToolManifest snapshot status changed its binding digest. After that metadata-only finalization, attempt 3 was replayed against the same frozen 80-case manifest through the real platform ToolManifest/ToolResult path and passed the strict metric, signer, calibration-binding, toolchain, untouched-holdout, and same-source gates."
+}

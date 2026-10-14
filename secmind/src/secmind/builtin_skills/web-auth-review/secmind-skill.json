@@ -1,0 +1,18 @@
+{
+  "skill_id": "web-auth-review",
+  "version": "1.0.0",
+  "description": "Review authentication, authorization, sessions and protected routes using pinned local rules.",
+  "trigger_terms": ["authentication", "authorization", "session", "route", "认证", "授权", "会话"],
+  "supported_languages": ["python", "javascript", "typescript", "java", "go"],
+  "scenarios": ["code_audit"],
+  "required_capabilities": ["sast"],
+  "allowed_agent_profiles": ["sast-investigator"],
+  "risk_ceiling": 1,
+  "max_turns": 3,
+  "input_contract": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+  "output_contract": {"type": "object", "required": ["findings", "coverage"], "properties": {"findings": {"type": "array"}, "coverage": {"type": "object"}}},
+  "eval_case_ids": ["auth-route-missing-guard", "auth-route-protected"],
+  "package_digest": "9e94a3656bc354afa7e5f121c36427e575eefe59de0bdb4de629c3ae3b14d05c",
+  "signer": "secmind-platform-v1",
+  "signature": "4vxb5BPxG0PvXY6nGDK2rmSYHHBC1iztt2KzN2wgb_XkwU_cGwWek032sOKnk0r2ZwiBedNJeA0EyEzL-6pKDw"
+}

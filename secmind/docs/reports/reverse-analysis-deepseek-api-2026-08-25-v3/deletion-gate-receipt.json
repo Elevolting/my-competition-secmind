@@ -1,0 +1,30 @@
+{
+  "approved_deletion_targets": [
+    "docs/reports/reverse-analysis-audit-2026-08-24",
+    "reverse_evaluation/results/audit-2026-08-24"
+  ],
+  "approved_target_sha256": [
+    [
+      "docs/reports/reverse-analysis-audit-2026-08-24",
+      "4abcc0eacc9f5c93d18d238767b6686abfb335524021e8fdff188da8734362f1"
+    ],
+    [
+      "reverse_evaluation/results/audit-2026-08-24",
+      "c8692371d9232e59e27a426de85107207f3bfa18dba55f37da2dcc565def0da4"
+    ]
+  ],
+  "artifact_count": 336,
+  "delivery_root": "docs/reports/reverse-analysis-deepseek-api-2026-08-25-v3",
+  "delivery_sha256": "030a90240c60871d7d7509e39cf6ebaf9bf5c8b2a896f4f2b8c8974564fb7d45",
+  "exact_secret_matches": 0,
+  "gold_path": "reverse_evaluation/gold/expected.json",
+  "gold_sha256": "dc92bb93f3ba68d3f8d6887b512a4f51011549b7276a624f60b72406eeea0a32",
+  "pre_action_binding_sha256": "781317484cdd5791dcb4ef19a26cbff85b53561081ddbf8bf3711a3d99fd67aa",
+  "public_binding_sha256": "75d48aee538a846be67d285446ae326f2502ef92f80ece5c59739507e9ab4fd9",
+  "run_root": "reverse_evaluation/api_runs/2026-08-25-reliability-v3",
+  "schema_version": "3.0",
+  "scoring_receipt_path": "docs/reports/reverse-analysis-deepseek-api-2026-08-25-v3/scoring-receipt.json",
+  "scoring_receipt_sha256": "ea31a9813904177d4c8c4798c8a63fe64639e06b14dbdc6dcd942a38dce7ebbd",
+  "slot_count": 48,
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

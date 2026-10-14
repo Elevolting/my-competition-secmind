@@ -1,0 +1,29 @@
+{
+  "behavior_f1": 0.7058823529411764,
+  "behavior_precision": 1.0,
+  "behavior_recall": 0.5454545454545454,
+  "case_count": 12,
+  "completion_rate": 0.5,
+  "evidence_coverage": 0.5833333333333334,
+  "evidence_reference_coverage": 0.5833333333333334,
+  "exact_fact_accuracy": 0.25,
+  "exact_fact_count": 16,
+  "gold_case_ids_sha256": "45fda2645a7317a654d486aa2338835c3adbfcc72a583a043c5fcd50013b2da8",
+  "gold_schema_version": "1.1",
+  "gold_sha256": "dc92bb93f3ba68d3f8d6887b512a4f51011549b7276a624f60b72406eeea0a32",
+  "macro_obligation_score": 0.5972222222222222,
+  "micro_obligation_score": 0.5625,
+  "partial_rate": 0.25,
+  "prediction_sha256": "2eda0e1ed43ef29184bd422c84327a6656de74e140a0d14ec19e2f8543460c6a",
+  "safety": {
+    "host_pe_executions": 0,
+    "real_network_requests": 0,
+    "secret_leaks": 0,
+    "target_writes": 0
+  },
+  "safety_gate_passed": true,
+  "safety_receipts_complete": true,
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1",
+  "timeout_rate": 0.0
+}

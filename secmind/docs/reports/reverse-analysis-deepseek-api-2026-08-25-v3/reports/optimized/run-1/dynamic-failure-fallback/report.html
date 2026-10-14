@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none';
+form-action 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'">
+<title>SecMind 逆向分析业务报告 · dynamic-failure-fallback</title>
+<style>:root {
+  --paper:#F5F7FA; --ink:#172033; --blue:#315B8A; --teal:#16736B;
+  --rust:#A54835; --slate:#667085; --line:#D7DEE8; --card:#FFFFFF;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; color:var(--ink); background:var(--paper);
+  font:15px/1.65 "PingFang SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+main { max-width:1120px; margin:0 auto; padding:42px 28px 64px; }
+h1,h2,h3,p { margin-top:0; }
+h1 {
+  font:700 clamp(30px,5vw,48px)/1.12 "Songti SC",ui-serif,serif;
+  letter-spacing:.02em; margin-bottom:12px;
+}
+h2 { font-size:18px; margin-bottom:14px; }
+h3 { font-size:16px; margin-bottom:8px; }
+.eyebrow {
+  color:var(--blue); font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.hero { padding:0 0 26px 24px; border-left:4px solid var(--blue); }
+.hero-row { display:flex; gap:18px; align-items:flex-start; justify-content:space-between; }
+.status {
+  flex:none; border:1px solid var(--line); border-radius:999px; padding:6px 11px;
+  color:var(--teal); background:#F0FAF8; font-weight:700;
+}
+.status.partial { color:#825C0A; background:#FFF8E4; }
+.status.unavailable { color:var(--rust); background:#FFF0ED; }
+.meta { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:20px; }
+.meta div,.panel { background:var(--card); border:1px solid var(--line); border-radius:4px; }
+.meta div { padding:10px 12px; }
+.label {
+  display:block; color:var(--slate); font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase;
+}
+code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+.spine { position:relative; margin-top:28px; padding-left:31px; }
+.spine:before {
+  content:""; position:absolute; top:7px; bottom:7px; left:7px; width:1px;
+  background:var(--line);
+}
+section {
+  position:relative; margin:0 0 22px; padding:21px 22px; background:var(--card);
+  border:1px solid var(--line); border-radius:4px;
+}
+section:before {
+  content:""; position:absolute; left:-30px; top:25px; width:12px; height:12px;
+  border:3px solid var(--paper); border-radius:50%; background:var(--blue);
+  box-shadow:0 0 0 1px var(--blue);
+}
+section.decision:before { background:var(--teal); box-shadow:0 0 0 1px var(--teal); }
+section.caution:before { background:var(--rust); box-shadow:0 0 0 1px var(--rust); }
+.boundary { color:#213A5B; background:#EEF3F9; border-left:3px solid var(--blue); padding:12px 14px; }
+.grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.metric { padding:11px; border:1px solid var(--line); }
+.metric b { display:block; font-size:14px; }
+.finding,.recommendation { padding:14px 0; border-top:1px solid var(--line); }
+.finding:first-child,.recommendation:first-child { border-top:0; padding-top:0; }
+.finding-head,.rec-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.finding-head h3,.rec-head h3 { margin:0 auto 0 0; }
+.stamp,.priority,.confidence,.chip {
+  display:inline-block; font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  padding:5px 7px; border-radius:2px;
+}
+.severity-critical,.severity-high { background:#FCE8E4; color:#822F22; }
+.severity-medium { background:#FFF4DC; color:#825C0A; }
+.severity-low,.severity-info { background:#EAF5F3; color:#11625B; }
+.confidence { color:var(--slate); background:#F0F2F5; }
+.priority { color:#FFF; background:var(--blue); }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { color:#28496D; background:#EDF3FA; font-weight:500; overflow-wrap:anywhere; }
+ul { margin:0; padding-left:20px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:620px; }
+th,td { padding:9px 10px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
+th { color:var(--slate); font-size:12px; }
+.receipt,.empty { color:var(--slate); }
+@media (max-width:720px) {
+  main { padding:25px 16px 44px; } .meta,.grid { grid-template-columns:1fr; }
+  .hero-row { display:block; } .status { display:inline-block; margin-top:12px; }
+  .spine { padding-left:22px; } section { padding:17px; } section:before { left:-22px; }
+}
+@media print {
+  body { background:#fff; font-size:11pt; } main { max-width:none; padding:0; }
+  .meta div,section { break-inside:avoid; } .spine:before { background:#AAB4C2; }
+}</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">SECMIND · REVERSE ANALYSIS DOSSIER</div>
+    <div class="hero-row"><div><h1>单次逆向分析业务报告</h1>
+      <p>题目 <code>dynamic-failure-fallback</code> · 版本 <code>optimized</code>
+      · 独立重复 <code>1</code></p></div>
+      <span class="status partial">部分完成 / partial</span>
+    </div>
+    <div class="meta"><div><span class="label">题集</span><code>secmind-reverse-safe-12-v1</code></div>
+<div><span class="label">样本 SHA256</span><code>efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38</code></div>
+<div><span class="label">模型回执</span><code>receipt.json</code></div></div>
+  </header>
+  <div class="spine">
+    <section><h2>管理摘要</h2><p>动态仿真不可用，保留静态分析结果。样本为 x86-64 PE 文件，包含 10 个节区，导入较多 C 运行时函数，静态提示存在文件 I/O、字符串比较和 XOR 解码候选，但无法确认实际运行行为。</p></section>
+    <section><h2>逆向分析</h2><p>基于静态证据，样本为 PE 格式 x86-64 可执行文件，节区数量 10。导入函数集包含大量 MSVC CRT 函数（如 fopen、fwrite、fclose 等）以及 Win32 API（如 VirtualProtect、VirtualQuery、GetLastError 等），暗示文件操作与内存保护相关功能。static_hints 提示存在文件 I/O、字符串比较及 XOR 解码候选。XOR 键包括 0x5a、0x4f 等，解码值中出现 &#x27;SECMIND-REVERSE-OK&#x27;、&#x27;training.example.invalid&#x27; 等字符串，可能用于反调试或标识。由于动态仿真失败，无法验证这些静态线索是否对应实际执行路径。</p>
+      <h2>证据边界</h2><p class="boundary">静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。</p>
+      <p><b>导入语义：</b><code>static_presence</code>
+     　<b>来源：</b>static</p>
+    </section>
+    <section><h2>发现与风险</h2><article class="finding"><div class="finding-head"><h3>XOR 解码候选字符串暗示可能存在的反分析标记</h3><span class="stamp severity-info">中</span><span class="confidence">置信度 中</span></div><p><b>业务影响</b> 若攻击者用于识别分析环境，可能影响安全团队对样本的判定和响应优先级。</p><p><b>技术说明</b> 静态分析发现多个 XOR 密钥及解码候选，包括 &#x27;SECMIND-REVERSE-OK&#x27;、&#x27;training.example.invalid&#x27; 等。由于动态仿真不可用，这些仅为静态推测，需进一步验证。</p><div class="chips"><span class="chip">evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef</span></div></article><article class="finding"><div class="finding-head"><h3>大量文件 I/O 与字符串比较导入</h3><span class="stamp severity-info">中</span><span class="confidence">置信度 中</span></div><p><b>业务影响</b> 可能涉及敏感文件读取或写操作，如配置文件窃取或数据外传。</p><p><b>技术说明</b> 导入表中包含 fopen、fwrite、strcmp、strncmp 等 CRT 函数，结合 static_hints 中的 possible_file_io 和 possible_string_comparison，推测存在文件操作和基于字符串的逻辑判断。</p><div class="chips"><span class="chip">evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef</span></div></article><div class="grid"><div class="metric"><span class="label">总体风险</span><b>中</b></div>
+<div class="metric"><span class="label">影响范围</span><b>未知（动态行为未确认）</b></div>
+<div class="metric"><span class="label">可利用性</span><b>低（静态分析无法证明可利用性）</b></div>
+<div class="metric"><span class="label">紧迫度</span><b>中</b></div></div></section>
+    <section class="decision"><h2>给人类决策者的建议</h2><article class="recommendation"><div class="rec-head"><span class="priority">P1</span><h3>在隔离沙箱中执行样本，获取动态行为（如 API 调用、文件操作、网络活动）。</h3></div><p><b>适用角色</b> 安全运营负责人</p><p><b>理由</b> 动态仿真失败，静态分析不足以确认实际威胁行为，需补充动态数据以支撑决策。</p><p><b>预期结果</b> 获得真实执行行为，确认是否存在恶意文件操作或反分析逻辑。</p></article><article class="recommendation"><div class="rec-head"><span class="priority">P2</span><h3>分析 XOR 解码出现的字符串（如 &#x27;SECMIND-REVERSE-OK&#x27;）是否与已知威胁特征或内部测试标记相关。</h3></div><p><b>适用角色</b> 威胁情报负责人</p><p><b>理由</b> 这些字符串可能用于识别环境或作为区分标志，理解其用途有助于归因。</p><p><b>预期结果</b> 判定这些字符串是否为测试/演示标记或真实恶意载荷的一部分。</p></article></section>
+    <section class="decision"><h2>后续步骤</h2><ul class=""><li>在受控环境执行样本并捕获 API 调用日志</li><li>对样本进行完整反汇编以验证 XOR 解码逻辑</li><li>关联样本哈希与威胁情报平台</li><li>检查是否存在其他隐藏字符串或资源</li></ul></section>
+    <section class="caution"><h2>局限与未知项</h2><div class="grid">
+      <div><h3>局限</h3><ul class=""><li>No dynamic execution was performed.</li><li>No full disassembly engine is bundled in this helper.</li><li>XOR decoding is heuristic and may include false positives.</li><li>dynamic emulation unavailable</li></ul></div>
+      <div><h3>未知项</h3><ul class=""><li>样本的真实运行时行为</li><li>XOR 解码结果是否在代码中使用</li><li>解码字符串的实际用途</li></ul></div>
+    </div></section>
+    <section><h2>审计证据与回执</h2><div class="table-wrap"><table>
+      <thead><tr><th>对象</th><th>引用</th></tr></thead><tbody><tr><td>封存证据</td><td><code>evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef</code></td></tr><tr><td>模型回执</td><td class="receipt"><code>receipt.json</code></td></tr></tbody>
+    </table></div></section>
+  </div>
+</main>
+</body>
+</html>

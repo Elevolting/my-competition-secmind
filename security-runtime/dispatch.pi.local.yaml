@@ -1,0 +1,56 @@
+# Default Pi Worker; the platform model page controls its provider and model.
+# The independent PI_* alternative is dispatch.pi.independent.yaml.
+server: "http://127.0.0.1:8000"
+shared_model_config: "../an/data/model-runtime.json"
+
+common_env:
+  TSEC_SERVER_HOST: "127.0.0.1:8000"
+  TSEC_AGENT_TOKEN: "xxx"
+
+runtime:
+  interval: 3
+  max_workers: 4
+  max_running_projects: 3
+  max_project_workers: 1
+  healthcheck_timeout: 30
+  worker_healthcheck: "startup_and_task"
+  execution: "local"
+  prompt_group: "default"
+  # Workbench projects ask the authenticated Planner for every reason round.
+  reason_provider: "workbench"
+
+local:
+  workspace_root: "./datas/dispatcher-workspaces"
+  completed_action: "keep"
+
+tasks:
+  bootstrap:
+    timeout: 900
+    conclude_timeout: 300
+  reason:
+    timeout: 600
+    max_intents: 3
+  explore:
+    timeout: 600
+    conclude_timeout: 420
+
+workers:
+  - name: "pi_planner"
+    type: "pi"
+    shared_model_role: "planner"
+    task_types: [reason]
+    max_running: 1
+    priority: 0
+    env:
+      PI_MODEL_CONTEXT_WINDOW: "131072"
+
+  - name: "pi_default"
+    type: "pi"
+    pi_blackboard_extension: "./security-runtime/src/security_runtime/dispatcher/workers/adapters/pi_blackboard.ts"
+    workbench_url: "http://127.0.0.1:8001"
+    task_types: [bootstrap, explore]
+    max_running: 1
+    priority: 0
+    env:
+      PI_CLI_JS: "D:/tools/pi-cli/node_modules/@mariozechner/pi-coding-agent/dist/cli.js"
+      PI_MODEL_CONTEXT_WINDOW: "131072"

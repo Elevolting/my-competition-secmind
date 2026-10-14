@@ -1,0 +1,243 @@
+{
+  "passed": true,
+  "coverage": {
+    "total": "86.167981",
+    "branch": "76.576766",
+    "total_floor": "85.690000",
+    "branch_floor": "75.280000",
+    "covered_lines": 38803,
+    "num_statements": 43447,
+    "covered_branches": 10903,
+    "num_branches": 14238
+  },
+  "changed_lines": {
+    "status": "measured",
+    "covered": 903,
+    "total": 964,
+    "percent": "93.672199",
+    "floor": "90.000000",
+    "files": [
+      {
+        "file": "src/secmind/__init__.py",
+        "changed_executable_lines": 2,
+        "covered_lines": 2,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/admission.py",
+        "changed_executable_lines": 16,
+        "covered_lines": 10,
+        "missing_lines": [
+          403,
+          404,
+          405,
+          406,
+          1062,
+          1063
+        ]
+      },
+      {
+        "file": "src/secmind/canonical_primary.py",
+        "changed_executable_lines": 7,
+        "covered_lines": 7,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/direct_anchor_pipeline.py",
+        "changed_executable_lines": 23,
+        "covered_lines": 23,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/domain_answers.py",
+        "changed_executable_lines": 12,
+        "covered_lines": 12,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/evidence_gap.py",
+        "changed_executable_lines": 46,
+        "covered_lines": 42,
+        "missing_lines": [
+          376,
+          379,
+          407,
+          410
+        ]
+      },
+      {
+        "file": "src/secmind/integrations/test3.py",
+        "changed_executable_lines": 0,
+        "covered_lines": 0,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/java_security_flows.py",
+        "changed_executable_lines": 131,
+        "covered_lines": 119,
+        "missing_lines": [
+          138,
+          212,
+          213,
+          214,
+          215,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232
+        ]
+      },
+      {
+        "file": "src/secmind/java_semantic_sast.py",
+        "changed_executable_lines": 26,
+        "covered_lines": 25,
+        "missing_lines": [
+          803
+        ]
+      },
+      {
+        "file": "src/secmind/llm.py",
+        "changed_executable_lines": 2,
+        "covered_lines": 2,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/model_gateway/recovery_policy.py",
+        "changed_executable_lines": 19,
+        "covered_lines": 17,
+        "missing_lines": [
+          190,
+          203
+        ]
+      },
+      {
+        "file": "src/secmind/orchestration/orchestrator_projections.py",
+        "changed_executable_lines": 0,
+        "covered_lines": 0,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/primary_claim_gate.py",
+        "changed_executable_lines": 23,
+        "covered_lines": 23,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/python_dataflow.py",
+        "changed_executable_lines": 54,
+        "covered_lines": 52,
+        "missing_lines": [
+          189,
+          191
+        ]
+      },
+      {
+        "file": "src/secmind/schemas.py",
+        "changed_executable_lines": 0,
+        "covered_lines": 0,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/task_specs.py",
+        "changed_executable_lines": 9,
+        "covered_lines": 9,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/tool_affinity.py",
+        "changed_executable_lines": 2,
+        "covered_lines": 2,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/tool_assurance.py",
+        "changed_executable_lines": 0,
+        "covered_lines": 0,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/tool_gain_gate.py",
+        "changed_executable_lines": 208,
+        "covered_lines": 190,
+        "missing_lines": [
+          643,
+          644,
+          673,
+          678,
+          703,
+          778,
+          789,
+          812,
+          883,
+          885,
+          887,
+          1045,
+          1068,
+          1071,
+          1074,
+          1081,
+          1084,
+          1423
+        ]
+      },
+      {
+        "file": "src/secmind/tooling/builtin_java.py",
+        "changed_executable_lines": 0,
+        "covered_lines": 0,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/tooling/builtin_web.py",
+        "changed_executable_lines": 64,
+        "covered_lines": 54,
+        "missing_lines": [
+          68,
+          69,
+          88,
+          92,
+          93,
+          96,
+          97,
+          100,
+          101,
+          102
+        ]
+      },
+      {
+        "file": "src/secmind/tooling/core.py",
+        "changed_executable_lines": 1,
+        "covered_lines": 1,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/tooling/factory.py",
+        "changed_executable_lines": 2,
+        "covered_lines": 2,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/tools.py",
+        "changed_executable_lines": 1,
+        "covered_lines": 1,
+        "missing_lines": []
+      },
+      {
+        "file": "src/secmind/web_static_audit.py",
+        "changed_executable_lines": 316,
+        "covered_lines": 310,
+        "missing_lines": [
+          156,
+          215,
+          219,
+          244,
+          284,
+          287
+        ]
+      }
+    ]
+  },
+  "failures": []
+}

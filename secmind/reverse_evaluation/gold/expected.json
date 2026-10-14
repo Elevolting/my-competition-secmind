@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.1",
+  "suite_id": "secmind-reverse-safe-12-v1",
+  "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+  "cases": [
+    {
+      "id": "pe-structure",
+      "obligations": [
+        {"id": "format", "path": "facts.format", "equals": "PE", "category": "exact_fact"},
+        {"id": "arch", "path": "facts.architecture", "equals": "x86-64", "category": "exact_fact"},
+        {"id": "sections", "path": "facts.section_count", "min": 1, "category": "exact_fact"}
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "pe-imports",
+      "obligations": [
+        {"id": "strcmp", "path": "facts.imports", "contains": "strcmp", "category": "exact_fact"},
+        {"id": "fopen", "path": "facts.imports", "contains": "fopen", "category": "exact_fact"},
+        {"id": "presence-semantics", "path": "facts.import_semantics", "equals": "static_presence", "category": "exact_fact"}
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "xor-recovery",
+      "obligations": [
+        {"id": "token", "path": "facts.xor_values", "contains": "SECMIND-REVERSE-OK", "category": "exact_fact"},
+        {"id": "domain", "path": "facts.xor_values", "contains": "training.example.invalid", "category": "exact_fact"},
+        {"id": "key", "path": "facts.xor_keys", "contains": "0x5a", "category": "exact_fact"}
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "dynamic-wrong-token",
+      "obligations": [
+        {"id": "status", "path": "status", "equals": "completed"},
+        {"id": "exit", "path": "facts.exit_code", "equals": 2, "category": "exact_fact"},
+        {"id": "no-write", "path": "facts.created_files", "length": 0, "category": "exact_fact"}
+      ],
+      "behaviors": ["argument_check", "string_comparison"]
+    },
+    {
+      "id": "dynamic-correct-token",
+      "obligations": [
+        {"id": "status", "path": "status", "equals": "completed"},
+        {"id": "exit", "path": "facts.exit_code", "equals": 0, "category": "exact_fact"},
+        {"id": "write", "path": "facts.created_files", "contains": "reverse_demo_result.txt", "category": "exact_fact"}
+      ],
+      "behaviors": ["argument_check", "string_comparison", "file_io"]
+    },
+    {
+      "id": "source-process-hollowing",
+      "obligations": [
+        {"id": "behavior", "path": "behaviors", "contains": "process_hollowing"},
+        {"id": "mitre", "path": "facts.mitre", "contains": "T1055.012", "category": "exact_fact"}
+      ],
+      "behaviors": ["process_hollowing"]
+    },
+    {
+      "id": "source-dll-injection-complete",
+      "obligations": [
+        {"id": "behavior", "path": "behaviors", "contains": "dll_injection"},
+        {"id": "mitre", "path": "facts.mitre", "contains": "T1055.001", "category": "exact_fact"}
+      ],
+      "behaviors": ["dll_injection"]
+    },
+    {
+      "id": "source-dll-injection-incomplete",
+      "obligations": [
+        {"id": "no-overclaim", "path": "behaviors", "not_contains": "dll_injection"},
+        {"id": "unknown", "path": "unknowns", "min_length": 1}
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "source-apc-rc4-antidebug",
+      "obligations": [
+        {"id": "apc", "path": "behaviors", "contains": "apc_injection"},
+        {"id": "rc4", "path": "behaviors", "contains": "encrypted_payload_decryption"},
+        {"id": "native", "path": "behaviors", "contains": "dynamic_native_api_resolution"},
+        {"id": "debug", "path": "behaviors", "contains": "ntqueryinformationprocess_debug"}
+      ],
+      "behaviors": ["apc_injection", "encrypted_payload_decryption", "dynamic_native_api_resolution", "ntqueryinformationprocess_debug"]
+    },
+    {
+      "id": "source-no-signal",
+      "obligations": [
+        {"id": "no-overclaim", "path": "behaviors", "length": 0},
+        {"id": "unknown", "path": "unknowns", "min_length": 1}
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "malformed-pe",
+      "obligations": [
+        {"id": "partial", "path": "status", "in": ["partial", "unavailable"]},
+        {"id": "error", "path": "error.code", "equals": "MALFORMED_PE"}
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "dynamic-failure-fallback",
+      "obligations": [
+        {"id": "partial", "path": "status", "equals": "partial"},
+        {"id": "static-kept", "path": "facts.format", "equals": "PE", "category": "exact_fact"},
+        {"id": "dynamic-error", "path": "error.code", "equals": "DYNAMIC_UNAVAILABLE"}
+      ],
+      "behaviors": []
+    }
+  ]
+}

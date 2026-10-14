@@ -1,0 +1,166 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-30d2402c34852e89072070604d9828037059e7a42d822b13507d8bcc344d1dbe",
+      "evidence-e51a1c13d4db8a666f12a2fa7d22c0c09501d19dd5adb1f0509daf19e2abeab8",
+      "evidence-e3f688f6b5ce605bfb09e77429d6e5a1516c1425fa117b0b1ca1ef3f379a7760",
+      "evidence-f2771117310e65bbbcf5d245b2e4e0e7f7294558a7eab40c691fd6b6985eff20",
+      "evidence-32b27f1dc8d756944941932bf8df78dbc29fe4a4585119c29a97ef8850455e46",
+      "evidence-a827f8b12a10f9e3ad92375bbded741280963f291c4dce51c565270743488d86",
+      "evidence-3d9e1921fc07544f6af39eb6a55506e78cbcaca2f55806e700bc865433d504f9",
+      "evidence-212d9e4aeaa3fd02155003cdd817ac37719e76df68e763b3cf83e1f5fd5725dc",
+      "evidence-cfb2a607184f9046cdfba2801c0227c13e1e98f4626ba8319a885f9d4f36fec2",
+      "evidence-0faf5ecac9536d95bfd1c391fa52fe84ccfbbb6e4a8e1c679835c75902bbe538",
+      "evidence-808eb00c55e061f053ebb37c2eb0c1317543f061a2db2f62b2d1d598df004a91",
+      "evidence-1c099986b5eee189ca857dcf05dd017614da095e0f5c4afb7958ad7140d21597"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "在封存证据中识别到四项高风险行为：APC 注入、RC4 加密负载解密（动态解析原生加密 API 实现）、原生 API 动态解析以及通过 NtQueryInformationProcess 进行反调试。这些行为共同表明样本具备隐蔽执行和规避检测的能力，对受保护环境构成重大威胁。",
+    "findings": [
+      {
+        "business_impact": "攻击者可借助合法进程上下文执行恶意代码，规避基于进程创建或模块加载的检测，直接威胁终端与服务器安全。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-30d2402c34852e89072070604d9828037059e7a42d822b13507d8bcc344d1dbe",
+          "evidence-e51a1c13d4db8a666f12a2fa7d22c0c09501d19dd5adb1f0509daf19e2abeab8",
+          "evidence-e3f688f6b5ce605bfb09e77429d6e5a1516c1425fa117b0b1ca1ef3f379a7760"
+        ],
+        "severity": "critical",
+        "technical_explanation": "样本使用 APC 将恶意线程函数注入目标进程，结合动态解析 NtQueueApcThread 等原生 API 实现跨进程执行，属于 T1055.004 子技术，可提高隐蔽性并扩大攻击面。",
+        "title": "APC 注入实现隐蔽代码执行"
+      },
+      {
+        "business_impact": "加密载荷可绕过静态特征检测，增加反病毒与 EDR 的分析难度，并可能部署最终恶意功能（如勒索、窃密）。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-f2771117310e65bbbcf5d245b2e4e0e7f7294558a7eab40c691fd6b6985eff20",
+          "evidence-32b27f1dc8d756944941932bf8df78dbc29fe4a4585119c29a97ef8850455e46",
+          "evidence-a827f8b12a10f9e3ad92375bbded741280963f291c4dce51c565270743488d86"
+        ],
+        "severity": "high",
+        "technical_explanation": "样本内置 RC4 密钥及加密数据，在运行时通过动态解析的加密/解密函数完成负载还原（T1027、encrypted_payload_decryption），最终注入内存执行。",
+        "title": "RC4 加密负载解密 (encrypted_payload_decryption)"
+      },
+      {
+        "business_impact": "经由哈希或偏移动态解析 API 可规避导入表静态检测，显著提高分析门槛，并支持无文件攻击。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-3d9e1921fc07544f6af39eb6a55506e78cbcaca2f55806e700bc865433d504f9",
+          "evidence-212d9e4aeaa3fd02155003cdd817ac37719e76df68e763b3cf83e1f5fd5725dc",
+          "evidence-cfb2a607184f9046cdfba2801c0227c13e1e98f4626ba8319a885f9d4f36fec2"
+        ],
+        "severity": "high",
+        "technical_explanation": "样本未直接导入敏感 API，而是通过运行时解析获取如 NtQueueApcThread、RC4 相关函数等地址（T1106、dynamic_native_api_resolution），降低静态暴露面。",
+        "title": "动态原生 API 解析 (dynamic_native_api_resolution)"
+      },
+      {
+        "business_impact": "样本可感知调试环境并改变行为或退出，延长分析时间并降低沙箱检出率。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-0faf5ecac9536d95bfd1c391fa52fe84ccfbbb6e4a8e1c679835c75902bbe538",
+          "evidence-808eb00c55e061f053ebb37c2eb0c1317543f061a2db2f62b2d1d598df004a91",
+          "evidence-1c099986b5eee189ca857dcf05dd017614da095e0f5c4afb7958ad7140d21597"
+        ],
+        "severity": "medium",
+        "technical_explanation": "通过 NtQueryInformationProcess 查询进程调试端口或调试对象句柄（T1622、ntqueryinformationprocess_debug），配合动态 API 解析实现反分析。",
+        "title": "反调试：NtQueryInformationProcess 调试检测 (ntqueryinformationprocess_debug)"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "立即隔离样本以及所有与其关联的进程和网络流量，并展开深度取证",
+        "decision_role": "安全运营负责人",
+        "expected_outcome": "遏制潜在威胁蔓延，保护关键资产并提供初步 IOC。",
+        "priority": "P0",
+        "rationale": "APC 注入、RC4 解密与动态 API 解析组合表明样本具备高级规避与内存执行能力，可能已造成持久化或横向移动。"
+      },
+      {
+        "action": "在受控环境执行动态分析，验证 APC 注入目标与 RC4 解密后的负载功能，并提取完整入侵指标",
+        "decision_role": "研发/分析团队负责人",
+        "expected_outcome": "获得可操作的 IOC、行为时间线及缓解建议，完善检测规则。",
+        "priority": "P1",
+        "rationale": "静态行为需要动态验证才能评估实际影响范围和真实漏洞利用链，以支持精准响应。"
+      }
+    ],
+    "limitations": [
+      "证据为静态/模拟观察，未包含实际运行时的内存状态、网络行为或完整注入链确认",
+      "未提供样本文件的导入表、字符串或反汇编细节，分析深度受限于封存证据包",
+      "RC4 密钥长度及加密负载结构未在证据中明确，动态验证后才能完整还原"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "执行动态沙箱分析，确认 APC 注入的目标进程及解密后载荷行为",
+      "提取并共享样本哈希、域名/IP 等 IOC 至威胁情报平台",
+      "基于动态结果更新端点检测与响应规则，重点覆盖 APC 注入与原生 API 解析模式",
+      "调查样本来源及初始投放渠道，防止同类样本再次进入"
+    ],
+    "reverse_analysis": "静态分析证据（observation_type: static；证据边界为静态或模拟）显示：样本通过异步过程调用（APC）实现进程注入（T1055.004），利用动态解析原生 API（T1106）获取 NtQueueApcThread 等关键函数地址；同时使用 RC4 算法对加密负载进行解密（T1027，行为 ID 为 encrypted_payload_decryption，具体 API 实现通过动态原生 API 解析获得）；对抗分析方面，样本调用 NtQueryInformationProcess 查询 ProcessDebugPort 等调试标志（T1622，行为 ID ntqueryinformationprocess_debug）。这些行为协同可支持无文件执行、内存载荷落地及反调试延迟分析。",
+    "risk_assessment": {
+      "exploitability": "中-高：静态证据明确，但需要动态确认实际利用链；APC 注入与 RC4 解密表明具备成熟利用能力",
+      "impact_scope": "多个进程和系统级安全控制可被绕过，影响终端、服务器及安全监控体系",
+      "overall_risk": "high",
+      "urgency": "高：建议尽快处置，避免在野利用"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "apc_injection",
+        "dynamic_native_api_resolution",
+        "encrypted_payload_decryption",
+        "ntqueryinformationprocess_debug"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Debugger Evasion",
+          "Native API",
+          "Obfuscated Files or Information",
+          "Process Injection: Asynchronous Procedure Call",
+          "T1027",
+          "T1055.004",
+          "T1106",
+          "T1622",
+          "apc_injection",
+          "dynamic_native_api_resolution",
+          "encrypted_payload_decryption",
+          "ntqueryinformationprocess_debug"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "f53d811497dabc026bd05dd40206acb0623a4a7fcd501d60f6ac12f6384f638f",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "APC 注入的确切目标进程及注入时序",
+      "RC4 解密后的具体负载功能与二进制内容",
+      "NtQueryInformationProcess 检测到的具体调试标志及样本应对分支",
+      "样本是否具备额外反虚拟机或持久化机制"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-apc-rc4-antidebug",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "f53d811497dabc026bd05dd40206acb0623a4a7fcd501d60f6ac12f6384f638f",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none';
+form-action 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'">
+<title>SecMind 逆向分析业务报告 · source-process-hollowing</title>
+<style>:root {
+  --paper:#F5F7FA; --ink:#172033; --blue:#315B8A; --teal:#16736B;
+  --rust:#A54835; --slate:#667085; --line:#D7DEE8; --card:#FFFFFF;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; color:var(--ink); background:var(--paper);
+  font:15px/1.65 "PingFang SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+main { max-width:1120px; margin:0 auto; padding:42px 28px 64px; }
+h1,h2,h3,p { margin-top:0; }
+h1 {
+  font:700 clamp(30px,5vw,48px)/1.12 "Songti SC",ui-serif,serif;
+  letter-spacing:.02em; margin-bottom:12px;
+}
+h2 { font-size:18px; margin-bottom:14px; }
+h3 { font-size:16px; margin-bottom:8px; }
+.eyebrow {
+  color:var(--blue); font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.hero { padding:0 0 26px 24px; border-left:4px solid var(--blue); }
+.hero-row { display:flex; gap:18px; align-items:flex-start; justify-content:space-between; }
+.status {
+  flex:none; border:1px solid var(--line); border-radius:999px; padding:6px 11px;
+  color:var(--teal); background:#F0FAF8; font-weight:700;
+}
+.status.partial { color:#825C0A; background:#FFF8E4; }
+.status.unavailable { color:var(--rust); background:#FFF0ED; }
+.meta { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:20px; }
+.meta div,.panel { background:var(--card); border:1px solid var(--line); border-radius:4px; }
+.meta div { padding:10px 12px; }
+.label {
+  display:block; color:var(--slate); font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase;
+}
+code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+.spine { position:relative; margin-top:28px; padding-left:31px; }
+.spine:before {
+  content:""; position:absolute; top:7px; bottom:7px; left:7px; width:1px;
+  background:var(--line);
+}
+section {
+  position:relative; margin:0 0 22px; padding:21px 22px; background:var(--card);
+  border:1px solid var(--line); border-radius:4px;
+}
+section:before {
+  content:""; position:absolute; left:-30px; top:25px; width:12px; height:12px;
+  border:3px solid var(--paper); border-radius:50%; background:var(--blue);
+  box-shadow:0 0 0 1px var(--blue);
+}
+section.decision:before { background:var(--teal); box-shadow:0 0 0 1px var(--teal); }
+section.caution:before { background:var(--rust); box-shadow:0 0 0 1px var(--rust); }
+.boundary { color:#213A5B; background:#EEF3F9; border-left:3px solid var(--blue); padding:12px 14px; }
+.grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.metric { padding:11px; border:1px solid var(--line); }
+.metric b { display:block; font-size:14px; }
+.finding,.recommendation { padding:14px 0; border-top:1px solid var(--line); }
+.finding:first-child,.recommendation:first-child { border-top:0; padding-top:0; }
+.finding-head,.rec-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.finding-head h3,.rec-head h3 { margin:0 auto 0 0; }
+.stamp,.priority,.confidence,.chip {
+  display:inline-block; font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  padding:5px 7px; border-radius:2px;
+}
+.severity-critical,.severity-high { background:#FCE8E4; color:#822F22; }
+.severity-medium { background:#FFF4DC; color:#825C0A; }
+.severity-low,.severity-info { background:#EAF5F3; color:#11625B; }
+.confidence { color:var(--slate); background:#F0F2F5; }
+.priority { color:#FFF; background:var(--blue); }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { color:#28496D; background:#EDF3FA; font-weight:500; overflow-wrap:anywhere; }
+ul { margin:0; padding-left:20px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:620px; }
+th,td { padding:9px 10px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
+th { color:var(--slate); font-size:12px; }
+.receipt,.empty { color:var(--slate); }
+@media (max-width:720px) {
+  main { padding:25px 16px 44px; } .meta,.grid { grid-template-columns:1fr; }
+  .hero-row { display:block; } .status { display:inline-block; margin-top:12px; }
+  .spine { padding-left:22px; } section { padding:17px; } section:before { left:-22px; }
+}
+@media print {
+  body { background:#fff; font-size:11pt; } main { max-width:none; padding:0; }
+  .meta div,section { break-inside:avoid; } .spine:before { background:#AAB4C2; }
+}</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">SECMIND · REVERSE ANALYSIS DOSSIER</div>
+    <div class="hero-row"><div><h1>单次逆向分析业务报告</h1>
+      <p>题目 <code>source-process-hollowing</code> · 版本 <code>current</code>
+      · 独立重复 <code>1</code></p></div>
+      <span class="status completed">已完成 / completed</span>
+    </div>
+    <div class="meta"><div><span class="label">题集</span><code>secmind-reverse-safe-12-v1</code></div>
+<div><span class="label">样本 SHA256</span><code>5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56</code></div>
+<div><span class="label">模型回执</span><code>receipt.json</code></div></div>
+  </header>
+  <div class="spine">
+    <section><h2>管理摘要</h2><p>已识别完整进程镂空链（Process Hollowing, T1055.012）。恶意样本通过创建挂起进程、卸载原镜像、写入恶意代码并恢复线程，实现代码执行与隐蔽驻留。建议立即隔离主机并溯源入侵路径。</p></section>
+    <section><h2>逆向分析</h2><p>静态分析确认样本包含完整的进程镂空（Process Hollowing）实现链：1) 使用CreateProcessA创建挂起状态的合法进程；2) 通过NtUnmapViewOfSection卸载目标进程内存中的原始镜像；3) 分配新内存区域并写入恶意载荷；4) 修改线程上下文（如EAX寄存器）指向新入口点；5) 调用ResumeThread恢复执行。证据显示该技术符合MITRE ATT&amp;CK T1055.012，属于进程注入的子技术，用于规避安全检测并隐蔽执行恶意代码。</p>
+      <h2>证据边界</h2><p class="boundary">静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。</p>
+      <p><b>导入语义：</b><code>unspecified</code>
+     　<b>来源：</b>static</p>
+    </section>
+    <section><h2>发现与风险</h2><article class="finding"><div class="finding-head"><h3>进程镂空注入技术</h3><span class="stamp severity-critical">critical</span><span class="confidence">置信度 high</span></div><p><b>业务影响</b> 攻击者可在受感染主机上以合法进程身份执行任意代码，绕过基于进程白名单的防御，可能导致数据泄露、勒索软件部署或横向移动，对业务连续性和数据机密性构成严重威胁。</p><p><b>技术说明</b> 样本通过Windows API组合实现进程镂空：CreateProcessA以CREATE_SUSPENDED标志创建合法进程；NtUnmapViewOfSection卸载原始可执行映像；VirtualAllocEx分配新内存并写入恶意代码；SetThreadContext修改入口点；ResumeThread启动恶意线程。该链完全匹配T1055.012，静态证据充分，无运行时观测。</p><div class="chips"><span class="chip">evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691</span><span class="chip">evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87</span><span class="chip">evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f</span><span class="chip">evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04</span><span class="chip">evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c</span><span class="chip">evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a</span><span class="chip">evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc</span></div></article><div class="grid"><div class="metric"><span class="label">总体风险</span><b>high</b></div>
+<div class="metric"><span class="label">影响范围</span><b>entire_endpoint_environment</b></div>
+<div class="metric"><span class="label">可利用性</span><b>high</b></div>
+<div class="metric"><span class="label">紧迫度</span><b>immediate</b></div></div></section>
+    <section class="decision"><h2>给人类决策者的建议</h2><article class="recommendation"><div class="rec-head"><span class="priority">P0</span><h3>立即隔离受影响主机并终止可疑进程树</h3></div><p><b>适用角色</b> security_operations</p><p><b>理由</b> 进程镂空高度隐蔽且可执行任意载荷，可能已造成未授权代码执行。</p><p><b>预期结果</b> 遏制恶意代码运行，防止进一步横向扩散和数据外泄。</p></article><article class="recommendation"><div class="rec-head"><span class="priority">P1</span><h3>采集内存镜像与进程调用栈以确认载荷内容</h3></div><p><b>适用角色</b> incident_response</p><p><b>理由</b> 需确认写入的恶意载荷及其功能，评估影响范围。</p><p><b>预期结果</b> 获取可操作的IOC和攻击者意图，支撑后续取证与清除。</p></article><article class="recommendation"><div class="rec-head"><span class="priority">P2</span><h3>审查端点检测与响应规则以增强对进程镂空链的告警</h3></div><p><b>适用角色</b> security_engineering</p><p><b>理由</b> 现有防线被绕过，需要补齐针对挂起进程创建、内存写入、线程恢复的检测。</p><p><b>预期结果</b> 提升对类似T1055.012手法的识别率，减少未来事件失察风险。</p></article></section>
+    <section class="decision"><h2>后续步骤</h2><ul class=""><li>分析内存转储以提取注入的恶意代码样本</li><li>检查同一主机上其他进程的内存区域是否包含异常代码</li><li>将样本哈希和IOC发布到威胁情报平台</li><li>开展端点检测日志回溯以识别最早攻击时间点</li><li>评估关联的网络流量以确认命令与控制通信</li></ul></section>
+    <section class="caution"><h2>局限与未知项</h2><div class="grid">
+      <div><h3>局限</h3><ul class=""><li>仅基于静态分析，未验证运行时行为</li><li>未获取样本原始二进制文件，无法进行深度逆向</li><li>不排除其他进程注入技术同时存在的可能</li></ul></div>
+      <div><h3>未知项</h3><ul class=""><li>注入的具体恶意载荷功能未知</li><li>样本最终投递的C2地址与通信协议未知</li><li>攻击的初始入侵向量（入口点）未知</li></ul></div>
+    </div></section>
+    <section><h2>审计证据与回执</h2><div class="table-wrap"><table>
+      <thead><tr><th>对象</th><th>引用</th></tr></thead><tbody><tr><td>封存证据</td><td><code>evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691</code></td></tr><tr><td>封存证据</td><td><code>evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87</code></td></tr><tr><td>封存证据</td><td><code>evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f</code></td></tr><tr><td>封存证据</td><td><code>evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04</code></td></tr><tr><td>封存证据</td><td><code>evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c</code></td></tr><tr><td>封存证据</td><td><code>evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a</code></td></tr><tr><td>封存证据</td><td><code>evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc</code></td></tr><tr><td>模型回执</td><td class="receipt"><code>receipt.json</code></td></tr></tbody>
+    </table></div></section>
+  </div>
+</main>
+</body>
+</html>

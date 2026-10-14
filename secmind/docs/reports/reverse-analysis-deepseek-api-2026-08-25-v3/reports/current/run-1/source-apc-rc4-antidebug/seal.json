@@ -1,0 +1,13 @@
+{
+  "arm": "current",
+  "case_id": "source-apc-rc4-antidebug",
+  "receipt_sha256": "eddd908d316f48e5dc164247dc6602130b327147de8cc70c853c5ed9272a5aaf",
+  "repeat_id": 1,
+  "report_html_sha256": "84036361bf5eb0a3c69e7b0324f04cead6bc0286f0e432c1f5c12518a7f99a4a",
+  "report_json_sha256": "a22e5aec8431625bacb8106d25b99de4efe113cee3043087a27754d432b7f9ac",
+  "report_md_sha256": "9336f2798caac2e659ae3b64672a83819b6c31521f05746fb344fe59a78ea607",
+  "request_sha256": "8d74bf51290efc98a45e0c376eba03243a4f027618fc71b7ec8331a751a70a4d",
+  "response_sha256": "246d38861230ecd18ceb88688bb7dc86e9cc620a685031a843007ec949e69380",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

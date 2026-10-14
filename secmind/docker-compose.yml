@@ -1,0 +1,264 @@
+services:
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:-secmind_dev}@postgres:5432/secmind
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+
+  api:
+    build: .
+    environment:
+      SECMIND_ALLOWED_HOSTS: api,secmind-api-1
+      SECMIND_ENV: development
+      SECMIND_RUNTIME_ROLE: api
+      SECMIND_DEMO_MODE: ${SECMIND_DEMO_MODE:-true}
+      SECMIND_MODEL_MODE: ${SECMIND_MODEL_MODE:-offline}
+      SECMIND_ALLOW_LIVE_MODELS: ${SECMIND_ALLOW_LIVE_MODELS:-false}
+      SECMIND_MAX_MODEL_TIER: ${SECMIND_MAX_MODEL_TIER:-5.4}
+      SECMIND_TRUSTED_MODEL_BASE_URLS: ${SECMIND_TRUSTED_MODEL_BASE_URLS:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      SECMIND_MODEL_BASE_URL_PROVIDER: ${SECMIND_MODEL_BASE_URL_PROVIDER:-auto}
+      SECMIND_MODEL_THINKING_ENABLED: ${SECMIND_MODEL_THINKING_ENABLED:-false}
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:-secmind_dev}@postgres:5432/secmind
+      SECMIND_CHECKPOINT_DATABASE_URL: postgresql://secmind:${POSTGRES_PASSWORD:-secmind_dev}@postgres:5432/secmind
+      SECMIND_INPUT_ROOT: /app/data/inputs
+      SECMIND_UPLOAD_ROOT: /app/data/uploads
+      SECMIND_RUN_ROOT: /app/data/runs
+      SECMIND_ARTIFACT_ROOT: /app/data/artifacts
+      SECMIND_QWEN_BASE_URL: ${SECMIND_QWEN_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      SECMIND_QWEN_API_KEY: ${SECMIND_QWEN_API_KEY:-}
+      SECMIND_DEEPSEEK_API_KEY: ${SECMIND_DEEPSEEK_API_KEY:-}
+      SECMIND_PLANNER_MODEL: ${SECMIND_PLANNER_MODEL:-qwen-plus}
+      SECMIND_WORKER_MODEL: ${SECMIND_WORKER_MODEL:-qwen-turbo}
+      SECMIND_FALLBACK_MODEL: ${SECMIND_FALLBACK_MODEL:-qwen-turbo}
+      SECMIND_EMBEDDING_MODEL: ${SECMIND_EMBEDDING_MODEL:-text-embedding-v3}
+      SECMIND_BINARY_LOG_PARSERS_ENABLED: ${SECMIND_BINARY_LOG_PARSERS_ENABLED:-true}
+      SECMIND_HYBRID_KNOWLEDGE_ENABLED: ${SECMIND_HYBRID_KNOWLEDGE_ENABLED:-true}
+      SECMIND_SEMGREP_CANDIDATE_RULES_ENABLED: ${SECMIND_SEMGREP_CANDIDATE_RULES_ENABLED:-true}
+      SECMIND_SEMGREP_SAST_RULE_BUNDLE_DIGEST: ${SECMIND_SEMGREP_SAST_RULE_BUNDLE_DIGEST:-}
+      SECMIND_QDRANT_URL: ${SECMIND_QDRANT_URL:-http://qdrant:6333}
+      SECMIND_KNOWLEDGE_QUERY_VECTORS_PATH: ${SECMIND_KNOWLEDGE_QUERY_VECTORS_PATH:-}
+      SECMIND_KNOWLEDGE_VECTOR_CORPUS_DIGEST: ${SECMIND_KNOWLEDGE_VECTOR_CORPUS_DIGEST:-}
+      SECMIND_QDRANT_VECTOR_SIZE: ${SECMIND_QDRANT_VECTOR_SIZE:-1024}
+      SECMIND_HYBRID_KNOWLEDGE_TIMEOUT_SECONDS: ${SECMIND_HYBRID_KNOWLEDGE_TIMEOUT_SECONDS:-0.5}
+      SECMIND_MAX_UPLOAD_TOTAL_BYTES: ${SECMIND_MAX_UPLOAD_TOTAL_BYTES:-524288000}
+      SECMIND_UPLOAD_TTL_SECONDS: ${SECMIND_UPLOAD_TTL_SECONDS:-86400}
+      SECMIND_SANDBOX_RUNNER_URL: http://sandbox-runner:8010
+      SECMIND_SANDBOX_CONTROL_TOKEN: ${SECMIND_SANDBOX_CONTROL_TOKEN:?Set-control-token}
+      SECMIND_SANDBOX_TOKEN: ${SECMIND_SANDBOX_TOKEN:?Set SECMIND_SANDBOX_TOKEN in .env}
+      SECMIND_SANDBOX_SEMGREP_IMAGE: ${SECMIND_SANDBOX_SEMGREP_IMAGE:-}
+      SECMIND_SANDBOX_GITLEAKS_IMAGE: ${SECMIND_SANDBOX_GITLEAKS_IMAGE:-}
+      SECMIND_SANDBOX_SYFT_IMAGE: ${SECMIND_SANDBOX_SYFT_IMAGE:-}
+      SECMIND_SANDBOX_OSV_IMAGE: ${SECMIND_SANDBOX_OSV_IMAGE:-}
+    ports:
+      # Keep SecMind separate from the Security Runtime blackboard on host port 8000.
+      - "127.0.0.1:8002:8000"
+    volumes:
+      - secmind_data:/app/data
+      - artifact_data:/app/data/artifacts
+      - ./data/knowledge:/app/data/knowledge:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      sandbox-runner:
+        condition: service_healthy
+      outbox-projector:
+        condition: service_started
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: ["/app/scripts/start-worker.sh"]
+    environment:
+      SECMIND_ENV: development
+      SECMIND_RUNTIME_ROLE: worker
+      SECMIND_DEMO_MODE: ${SECMIND_DEMO_MODE:-true}
+      SECMIND_MODEL_MODE: ${SECMIND_MODEL_MODE:-offline}
+      SECMIND_ALLOW_LIVE_MODELS: ${SECMIND_ALLOW_LIVE_MODELS:-false}
+      SECMIND_MAX_MODEL_TIER: ${SECMIND_MAX_MODEL_TIER:-5.4}
+      SECMIND_TRUSTED_MODEL_BASE_URLS: ${SECMIND_TRUSTED_MODEL_BASE_URLS:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      SECMIND_MODEL_BASE_URL_PROVIDER: ${SECMIND_MODEL_BASE_URL_PROVIDER:-auto}
+      SECMIND_MODEL_THINKING_ENABLED: ${SECMIND_MODEL_THINKING_ENABLED:-false}
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:-secmind_dev}@postgres:5432/secmind
+      SECMIND_CHECKPOINT_DATABASE_URL: postgresql://secmind:${POSTGRES_PASSWORD:-secmind_dev}@postgres:5432/secmind
+      SECMIND_INPUT_ROOT: /app/data/inputs
+      SECMIND_UPLOAD_ROOT: /app/data/uploads
+      SECMIND_RUN_ROOT: /app/data/runs
+      SECMIND_ARTIFACT_ROOT: /app/data/artifacts
+      SECMIND_QWEN_BASE_URL: ${SECMIND_QWEN_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      SECMIND_QWEN_API_KEY: ${SECMIND_QWEN_API_KEY:-}
+      SECMIND_DEEPSEEK_API_KEY: ${SECMIND_DEEPSEEK_API_KEY:-}
+      SECMIND_PLANNER_MODEL: ${SECMIND_PLANNER_MODEL:-qwen-plus}
+      SECMIND_WORKER_MODEL: ${SECMIND_WORKER_MODEL:-qwen-turbo}
+      SECMIND_FALLBACK_MODEL: ${SECMIND_FALLBACK_MODEL:-qwen-turbo}
+      SECMIND_EMBEDDING_MODEL: ${SECMIND_EMBEDDING_MODEL:-text-embedding-v3}
+      SECMIND_BINARY_LOG_PARSERS_ENABLED: ${SECMIND_BINARY_LOG_PARSERS_ENABLED:-true}
+      SECMIND_HYBRID_KNOWLEDGE_ENABLED: ${SECMIND_HYBRID_KNOWLEDGE_ENABLED:-true}
+      SECMIND_SEMGREP_CANDIDATE_RULES_ENABLED: ${SECMIND_SEMGREP_CANDIDATE_RULES_ENABLED:-true}
+      SECMIND_SEMGREP_SAST_RULE_BUNDLE_DIGEST: ${SECMIND_SEMGREP_SAST_RULE_BUNDLE_DIGEST:-}
+      SECMIND_QDRANT_URL: ${SECMIND_QDRANT_URL:-http://qdrant:6333}
+      SECMIND_KNOWLEDGE_QUERY_VECTORS_PATH: ${SECMIND_KNOWLEDGE_QUERY_VECTORS_PATH:-}
+      SECMIND_KNOWLEDGE_VECTOR_CORPUS_DIGEST: ${SECMIND_KNOWLEDGE_VECTOR_CORPUS_DIGEST:-}
+      SECMIND_QDRANT_VECTOR_SIZE: ${SECMIND_QDRANT_VECTOR_SIZE:-1024}
+      SECMIND_HYBRID_KNOWLEDGE_TIMEOUT_SECONDS: ${SECMIND_HYBRID_KNOWLEDGE_TIMEOUT_SECONDS:-0.5}
+      SECMIND_SANDBOX_RUNNER_URL: http://sandbox-runner:8010
+      SECMIND_SANDBOX_CONTROL_TOKEN: ${SECMIND_SANDBOX_CONTROL_TOKEN:?Set-control-token}
+      SECMIND_SANDBOX_TOKEN: ${SECMIND_SANDBOX_TOKEN:?Set SECMIND_SANDBOX_TOKEN in .env}
+      SECMIND_SANDBOX_SEMGREP_IMAGE: ${SECMIND_SANDBOX_SEMGREP_IMAGE:-}
+      SECMIND_SANDBOX_GITLEAKS_IMAGE: ${SECMIND_SANDBOX_GITLEAKS_IMAGE:-}
+      SECMIND_SANDBOX_SYFT_IMAGE: ${SECMIND_SANDBOX_SYFT_IMAGE:-}
+      SECMIND_SANDBOX_OSV_IMAGE: ${SECMIND_SANDBOX_OSV_IMAGE:-}
+    volumes:
+      - secmind_data:/app/data
+      - artifact_data:/app/data/artifacts
+      - ./data/knowledge:/app/data/knowledge:ro
+    depends_on:
+      api:
+        condition: service_healthy
+      sandbox-runner:
+        condition: service_healthy
+      outbox-projector:
+        condition: service_started
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    healthcheck:
+      disable: true
+
+  outbox-projector:
+    build: .
+    command: ["secmind-projector"]
+    environment:
+      SECMIND_ENV: development
+      SECMIND_RUNTIME_ROLE: projector
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:-secmind_dev}@postgres:5432/secmind
+      SECMIND_WORKER_ID: secmind-projector-1
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    # The projector is a background process and does not expose HTTP on port 8000.
+    # Disable the API image's inherited HTTP healthcheck; liveness is its process state.
+    healthcheck:
+      disable: true
+
+  sandbox-runner:
+    build:
+      context: .
+      dockerfile: docker/sandbox/Dockerfile
+    environment:
+      SECMIND_ENV: development
+      SECMIND_SANDBOX_CONTROL_TOKEN: ${SECMIND_SANDBOX_CONTROL_TOKEN:?Set-control-token}
+      SECMIND_SANDBOX_TOKEN: ${SECMIND_SANDBOX_TOKEN:?Set SECMIND_SANDBOX_TOKEN in .env}
+      SECMIND_SANDBOX_BANDIT_IMAGE: ${SECMIND_SANDBOX_BANDIT_IMAGE:?Build the Bandit image and set its immutable sha256 ID}
+      SECMIND_SANDBOX_STAGING_IMAGE: ${SECMIND_SANDBOX_STAGING_IMAGE:?Build the staging image and set its immutable sha256 ID}
+      SECMIND_SANDBOX_SEMGREP_IMAGE: ${SECMIND_SANDBOX_SEMGREP_IMAGE:-}
+      SECMIND_SANDBOX_GITLEAKS_IMAGE: ${SECMIND_SANDBOX_GITLEAKS_IMAGE:-}
+      SECMIND_SANDBOX_SYFT_IMAGE: ${SECMIND_SANDBOX_SYFT_IMAGE:-}
+      SECMIND_SANDBOX_OSV_IMAGE: ${SECMIND_SANDBOX_OSV_IMAGE:-}
+      SECMIND_ARTIFACT_ROOT: /var/lib/secmind/artifacts
+      SECMIND_SANDBOX_REPLAY_DB: /var/lib/secmind/state/capability-replay.db
+      SECMIND_SANDBOX_DOCKER_HOST: unix:///run/secmind/docker.sock
+    volumes:
+      # Development CI may explicitly point this at the host daemon.
+      # Competition replaces it with a dedicated rootless socket.
+      - ${SECMIND_DOCKER_SOCKET:?Set the Docker socket explicitly}:/run/secmind/docker.sock
+      - artifact_data:/var/lib/secmind/artifacts
+      - runner_state:/var/lib/secmind/state
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/health/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    stop_grace_period: 10s
+    restart: unless-stopped
+
+  bandit-tool:
+    build:
+      context: .
+      dockerfile: docker/tools/bandit/Dockerfile
+    image: secmind-bandit:local
+    profiles: ["build-only"]
+
+  staging-tool:
+    build:
+      context: .
+      dockerfile: docker/sandbox/staging.Dockerfile
+    image: secmind-staging:local
+    profiles: ["build-only"]
+
+  semgrep-tool:
+    build:
+      context: .
+      dockerfile: docker/tools/semgrep/Dockerfile
+    image: secmind-semgrep:local
+    profiles: ["build-only"]
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.4
+    profiles: ["knowledge"]
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: secmind
+      POSTGRES_USER: secmind
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secmind_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U secmind -d secmind"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  secmind_data:
+  postgres_data:
+  artifact_data:
+  runner_state:
+  qdrant_data:

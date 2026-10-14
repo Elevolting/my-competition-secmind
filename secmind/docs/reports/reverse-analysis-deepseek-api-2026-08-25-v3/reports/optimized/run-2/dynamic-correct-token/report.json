@@ -1,0 +1,223 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-4dfd8096b17049c6aa48a39f23d09392bd0d4559a5d2eb49566e194a6005bcd5",
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "The binary performs a hardcoded token comparison (SECMIND-REVERSE-OK) and, when the token matches, writes a report to reverse_demo_result.txt with details of the validation, then exits with code 0. The evidence confirms correct-token behavior and local file write.",
+    "findings": [
+      {
+        "business_impact": "The token is hardcoded in the binary, so anyone with access to the binary can learn the expected value and bypass authentication.",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-4dfd8096b17049c6aa48a39f23d09392bd0d4559a5d2eb49566e194a6005bcd5"
+        ],
+        "severity": "low",
+        "technical_explanation": "The emulated run shows a strcmp call with arguments 'SECMIND-REVERSE-OK' and 'SECMIND-REVERSE-OK' returning 0, indicating successful match. This confirms the token is static and not dynamically derived from user input or environment.",
+        "title": "Hardcoded token and matching exit behavior"
+      },
+      {
+        "business_impact": "When the correct token is provided, the program writes a report file, which could be a concern if the file contains sensitive information or is used for exfiltration.",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-4dfd8096b17049c6aa48a39f23d09392bd0d4559a5d2eb49566e194a6005bcd5"
+        ],
+        "severity": "low",
+        "technical_explanation": "fopen was called with 'reverse_demo_result.txt' in write mode, followed by a series of fputc calls writing the text 'safe reverse testing', 'test domain: training.example.invalid', and 'network access disabled'. The file is closed with fclose before exit.",
+        "title": "Local file write on successful token match"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "Replace hardcoded token with environment-based or hashed credentials and enforce secure storage.",
+        "decision_role": "Cybersecurity负责人",
+        "expected_outcome": "Reduced likelihood of token leakage and unauthorized access.",
+        "priority": "P2",
+        "rationale": "Hardcoded secrets in binaries are easily extracted and compromised; moving to external validation reduces risk of unauthorized access."
+      },
+      {
+        "action": "Review and monitor the report file creation for potential information disclosure or tampering.",
+        "decision_role": "DevSecOps主管",
+        "expected_outcome": "Awareness and mitigation of any sensitive data exposure.",
+        "priority": "P3",
+        "rationale": "The file contains test domain and network status that could aid an attacker in reconnaissance."
+      }
+    ],
+    "limitations": [
+      "Analysis is based on emulated execution, not live runtime.",
+      "Static XOR hints were not fully explored; they may indicate obfuscated strings elsewhere.",
+      "The binary's full control flow was not disassembled; only the observed path was analyzed."
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "Confirm the token is not used for any privileged operations beyond logging.",
+      "Audit the binary for other hardcoded strings or secrets.",
+      "Implement runtime token validation using secure inputs."
+    ],
+    "reverse_analysis": "Emulated execution shows the program initializes, copies the expected token from static data, calls strcmp with the supplied token (which matches 'SECMIND-REVERSE-OK'), then opens reverse_demo_result.txt for writing and writes a multiline report containing 'safe reverse testing', 'test domain: training.example.invalid', and 'network access disabled'. After closing the file, it prints 'token accepted; local report created' and exits via exit(0). The file write is performed using fputc calls in a loop.",
+    "risk_assessment": {
+      "exploitability": "Low; requires knowledge of hardcoded token",
+      "impact_scope": "Local only; no network activity observed",
+      "overall_risk": "low",
+      "urgency": "Low"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "argument_check",
+        "file_io",
+        "string_comparison"
+      ],
+      "error": null,
+      "facts": {
+        "architecture": "x86-64",
+        "created_files": [
+          "reverse_demo_result.txt"
+        ],
+        "exit_code": 0,
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "Origin of the input token (e.g., command line, environment variable) is not determined from evidence.",
+      "What happens if the token is incorrect is not shown in this evidence packet."
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "static_presence",
+    "sources": [
+      "emulated"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-correct-token",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

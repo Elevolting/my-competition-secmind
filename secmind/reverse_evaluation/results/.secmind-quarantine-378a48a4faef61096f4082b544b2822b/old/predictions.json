@@ -1,0 +1,629 @@
+{
+  "arm": "old",
+  "cases": [
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "raw_strings": [
+          "\t!\u0001L!This program cannot be run in DOS mode.\r\r\n$",
+          ".\u0002\u000b\u0002\u0002%",
+          "`.data",
+          ".rdata",
+          "@.pdata",
+          "@.xdata",
+          ".idata",
+          ".reloc",
+          "ff.\u000f\u001f",
+          "H(H\u00055",
+          "f8MZu\u000fHcP<H\u00018PE",
+          "tiH\u0005",
+          "tF\u0002",
+          "\u0012\u0010\u0017j",
+          "\u0012\u0010\u0005",
+          "8\u0001tS1H(\u000f\u001f@",
+          "\u000fP\u0018f\u000b\u0001tEf\u000b\u0002u",
+          "\u000e\u000fx",
+          "1\u000ff\u000f\u001f",
+          "1H(\u000f\u001fD",
+          "xt\u000e\u000f=D",
+          "1E\u000f)fH8H\u0005",
+          "HD$ H\u0005e",
+          "D\bb",
+          "H8\u000f\u001f",
+          "AUATUWVSH",
+          "1LD$ LHH=x",
+          "D\u000fE\u000f\u0002",
+          "eH\u0004%0",
+          "Hp\b1L%c",
+          "H9\u000f\u0017\u0002",
+          "AHH\u000f3HuH5c",
+          "1\u0006\u0001\u000f\u0005\u0002",
+          "\u0006\u000fl\u0002",
+          "\u0006\u0001\u000f\u0001",
+          "\u000f\u0014\u0002",
+          "Ht\fE1\u0002",
+          "1\u0007",
+          "H\rH\u0002<g",
+          "Hu\u001cX\u000f\u001f",
+          "tE\u0001t'\u0001",
+          "H\u0001\u000f\u0010 ~AA\u0001\"A\u000fDf\u000f\u001fD",
+          "t\u0015\u000f\u001f@",
+          "\u000fP\u0001H\u0001t\u0005 ~H\u0005\b",
+          "D\u0007Et\u0016\n",
+          "D$\\\u0001\u000f",
+          "De\u0001McI\u0003Lh`",
+          "H~B1\u000f\u001f",
+          "Hp\u0001H:`",
+          "IH\u0004IT"
+        ],
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      },
+      "id": "pe-structure",
+      "limitations": [
+        "PE parser unavailable in this implementation"
+      ],
+      "status": "partial",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "raw_strings": [
+          "\t!\u0001L!This program cannot be run in DOS mode.\r\r\n$",
+          ".\u0002\u000b\u0002\u0002%",
+          "`.data",
+          ".rdata",
+          "@.pdata",
+          "@.xdata",
+          ".idata",
+          ".reloc",
+          "ff.\u000f\u001f",
+          "H(H\u00055",
+          "f8MZu\u000fHcP<H\u00018PE",
+          "tiH\u0005",
+          "tF\u0002",
+          "\u0012\u0010\u0017j",
+          "\u0012\u0010\u0005",
+          "8\u0001tS1H(\u000f\u001f@",
+          "\u000fP\u0018f\u000b\u0001tEf\u000b\u0002u",
+          "\u000e\u000fx",
+          "1\u000ff\u000f\u001f",
+          "1H(\u000f\u001fD",
+          "xt\u000e\u000f=D",
+          "1E\u000f)fH8H\u0005",
+          "HD$ H\u0005e",
+          "D\bb",
+          "H8\u000f\u001f",
+          "AUATUWVSH",
+          "1LD$ LHH=x",
+          "D\u000fE\u000f\u0002",
+          "eH\u0004%0",
+          "Hp\b1L%c",
+          "H9\u000f\u0017\u0002",
+          "AHH\u000f3HuH5c",
+          "1\u0006\u0001\u000f\u0005\u0002",
+          "\u0006\u000fl\u0002",
+          "\u0006\u0001\u000f\u0001",
+          "\u000f\u0014\u0002",
+          "Ht\fE1\u0002",
+          "1\u0007",
+          "H\rH\u0002<g",
+          "Hu\u001cX\u000f\u001f",
+          "tE\u0001t'\u0001",
+          "H\u0001\u000f\u0010 ~AA\u0001\"A\u000fDf\u000f\u001fD",
+          "t\u0015\u000f\u001f@",
+          "\u000fP\u0001H\u0001t\u0005 ~H\u0005\b",
+          "D\u0007Et\u0016\n",
+          "D$\\\u0001\u000f",
+          "De\u0001McI\u0003Lh`",
+          "H~B1\u000f\u001f",
+          "Hp\u0001H:`",
+          "IH\u0004IT"
+        ],
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      },
+      "id": "pe-imports",
+      "limitations": [
+        "PE parser unavailable in this implementation"
+      ],
+      "status": "partial",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "raw_strings": [
+          "\t!\u0001L!This program cannot be run in DOS mode.\r\r\n$",
+          ".\u0002\u000b\u0002\u0002%",
+          "`.data",
+          ".rdata",
+          "@.pdata",
+          "@.xdata",
+          ".idata",
+          ".reloc",
+          "ff.\u000f\u001f",
+          "H(H\u00055",
+          "f8MZu\u000fHcP<H\u00018PE",
+          "tiH\u0005",
+          "tF\u0002",
+          "\u0012\u0010\u0017j",
+          "\u0012\u0010\u0005",
+          "8\u0001tS1H(\u000f\u001f@",
+          "\u000fP\u0018f\u000b\u0001tEf\u000b\u0002u",
+          "\u000e\u000fx",
+          "1\u000ff\u000f\u001f",
+          "1H(\u000f\u001fD",
+          "xt\u000e\u000f=D",
+          "1E\u000f)fH8H\u0005",
+          "HD$ H\u0005e",
+          "D\bb",
+          "H8\u000f\u001f",
+          "AUATUWVSH",
+          "1LD$ LHH=x",
+          "D\u000fE\u000f\u0002",
+          "eH\u0004%0",
+          "Hp\b1L%c",
+          "H9\u000f\u0017\u0002",
+          "AHH\u000f3HuH5c",
+          "1\u0006\u0001\u000f\u0005\u0002",
+          "\u0006\u000fl\u0002",
+          "\u0006\u0001\u000f\u0001",
+          "\u000f\u0014\u0002",
+          "Ht\fE1\u0002",
+          "1\u0007",
+          "H\rH\u0002<g",
+          "Hu\u001cX\u000f\u001f",
+          "tE\u0001t'\u0001",
+          "H\u0001\u000f\u0010 ~AA\u0001\"A\u000fDf\u000f\u001fD",
+          "t\u0015\u000f\u001f@",
+          "\u000fP\u0001H\u0001t\u0005 ~H\u0005\b",
+          "D\u0007Et\u0016\n",
+          "D$\\\u0001\u000f",
+          "De\u0001McI\u0003Lh`",
+          "H~B1\u000f\u001f",
+          "Hp\u0001H:`",
+          "IH\u0004IT"
+        ],
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      },
+      "id": "xor-recovery",
+      "limitations": [
+        "PE parser unavailable in this implementation"
+      ],
+      "status": "partial",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "raw_strings": [
+          "\t!\u0001L!This program cannot be run in DOS mode.\r\r\n$",
+          ".\u0002\u000b\u0002\u0002%",
+          "`.data",
+          ".rdata",
+          "@.pdata",
+          "@.xdata",
+          ".idata",
+          ".reloc",
+          "ff.\u000f\u001f",
+          "H(H\u00055",
+          "f8MZu\u000fHcP<H\u00018PE",
+          "tiH\u0005",
+          "tF\u0002",
+          "\u0012\u0010\u0017j",
+          "\u0012\u0010\u0005",
+          "8\u0001tS1H(\u000f\u001f@",
+          "\u000fP\u0018f\u000b\u0001tEf\u000b\u0002u",
+          "\u000e\u000fx",
+          "1\u000ff\u000f\u001f",
+          "1H(\u000f\u001fD",
+          "xt\u000e\u000f=D",
+          "1E\u000f)fH8H\u0005",
+          "HD$ H\u0005e",
+          "D\bb",
+          "H8\u000f\u001f",
+          "AUATUWVSH",
+          "1LD$ LHH=x",
+          "D\u000fE\u000f\u0002",
+          "eH\u0004%0",
+          "Hp\b1L%c",
+          "H9\u000f\u0017\u0002",
+          "AHH\u000f3HuH5c",
+          "1\u0006\u0001\u000f\u0005\u0002",
+          "\u0006\u000fl\u0002",
+          "\u0006\u0001\u000f\u0001",
+          "\u000f\u0014\u0002",
+          "Ht\fE1\u0002",
+          "1\u0007",
+          "H\rH\u0002<g",
+          "Hu\u001cX\u000f\u001f",
+          "tE\u0001t'\u0001",
+          "H\u0001\u000f\u0010 ~AA\u0001\"A\u000fDf\u000f\u001fD",
+          "t\u0015\u000f\u001f@",
+          "\u000fP\u0001H\u0001t\u0005 ~H\u0005\b",
+          "D\u0007Et\u0016\n",
+          "D$\\\u0001\u000f",
+          "De\u0001McI\u0003Lh`",
+          "H~B1\u000f\u001f",
+          "Hp\u0001H:`",
+          "IH\u0004IT"
+        ],
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      },
+      "id": "dynamic-wrong-token",
+      "limitations": [
+        "PE parser unavailable in this implementation",
+        "dynamic emulation not implemented"
+      ],
+      "status": "unavailable",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "raw_strings": [
+          "\t!\u0001L!This program cannot be run in DOS mode.\r\r\n$",
+          ".\u0002\u000b\u0002\u0002%",
+          "`.data",
+          ".rdata",
+          "@.pdata",
+          "@.xdata",
+          ".idata",
+          ".reloc",
+          "ff.\u000f\u001f",
+          "H(H\u00055",
+          "f8MZu\u000fHcP<H\u00018PE",
+          "tiH\u0005",
+          "tF\u0002",
+          "\u0012\u0010\u0017j",
+          "\u0012\u0010\u0005",
+          "8\u0001tS1H(\u000f\u001f@",
+          "\u000fP\u0018f\u000b\u0001tEf\u000b\u0002u",
+          "\u000e\u000fx",
+          "1\u000ff\u000f\u001f",
+          "1H(\u000f\u001fD",
+          "xt\u000e\u000f=D",
+          "1E\u000f)fH8H\u0005",
+          "HD$ H\u0005e",
+          "D\bb",
+          "H8\u000f\u001f",
+          "AUATUWVSH",
+          "1LD$ LHH=x",
+          "D\u000fE\u000f\u0002",
+          "eH\u0004%0",
+          "Hp\b1L%c",
+          "H9\u000f\u0017\u0002",
+          "AHH\u000f3HuH5c",
+          "1\u0006\u0001\u000f\u0005\u0002",
+          "\u0006\u000fl\u0002",
+          "\u0006\u0001\u000f\u0001",
+          "\u000f\u0014\u0002",
+          "Ht\fE1\u0002",
+          "1\u0007",
+          "H\rH\u0002<g",
+          "Hu\u001cX\u000f\u001f",
+          "tE\u0001t'\u0001",
+          "H\u0001\u000f\u0010 ~AA\u0001\"A\u000fDf\u000f\u001fD",
+          "t\u0015\u000f\u001f@",
+          "\u000fP\u0001H\u0001t\u0005 ~H\u0005\b",
+          "D\u0007Et\u0016\n",
+          "D$\\\u0001\u000f",
+          "De\u0001McI\u0003Lh`",
+          "H~B1\u000f\u001f",
+          "Hp\u0001H:`",
+          "IH\u0004IT"
+        ],
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      },
+      "id": "dynamic-correct-token",
+      "limitations": [
+        "PE parser unavailable in this implementation",
+        "dynamic emulation not implemented"
+      ],
+      "status": "unavailable",
+      "unknowns": []
+    },
+    {
+      "behaviors": [
+        "process_hollowing"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "0967a844-fdf5-5043-aafa-125fdac12019",
+        "359270e5-2e26-5ebf-b7c2-105dfd6cf05b",
+        "40b646c0-7fcc-5f6f-9161-c956260f6c4b",
+        "5e6a3180-6240-5630-89a8-a7ae857cab09",
+        "637b2ff0-85d9-531e-a9ee-558c20b93996",
+        "8919a814-679d-5552-9e3d-a802ff760764",
+        "e9c8df96-62b1-5cea-8a06-86e3e61492c5"
+      ],
+      "facts": {
+        "mitre": [
+          "Process Injection: Process Hollowing",
+          "T1055.012",
+          "process_hollowing"
+        ]
+      },
+      "id": "source-process-hollowing",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [
+        "dll_injection"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "230fff25-58da-5595-8ef7-b42b3e05de25",
+        "4663c07e-e2ac-53c2-9206-9764200ddc88",
+        "7d9130ba-7ca2-5cf6-919d-120dc1204976",
+        "e08eec6a-c689-5ba8-bebc-db8c2225837b",
+        "e0e77ebc-11c8-5b70-950b-0a27fff04c01"
+      ],
+      "facts": {
+        "mitre": [
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001",
+          "dll_injection"
+        ]
+      },
+      "id": "source-dll-injection-complete",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [],
+      "facts": {
+        "mitre": []
+      },
+      "id": "source-dll-injection-incomplete",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": [
+        "No complete high-confidence reverse behavior chain was established."
+      ]
+    },
+    {
+      "behaviors": [
+        "apc_injection",
+        "dynamic_native_api_resolution",
+        "encrypted_payload_decryption",
+        "ntqueryinformationprocess_debug"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "12bc8463-3291-5d6a-bb4d-927bb6d3b26f",
+        "1b62de96-c0b1-5f76-aa83-cf41b03fe06f",
+        "1ba7e735-8f7d-5d36-9ca0-9e2a8869189c",
+        "27946fd1-c6e1-5f10-9d45-611dab93a951",
+        "2fcc9630-27e5-5dc4-ae6d-0007f6f9a7c0",
+        "4c2ed949-710e-5b51-97f2-6832dbbf0eb2",
+        "58881659-51e6-57e1-89ac-f3b4497fb008",
+        "75cf4b71-8b79-5999-a39b-5ca708a5ba99",
+        "7833b315-36ff-5a38-8904-c52b13da5917",
+        "85d43dcd-b942-5378-bcd0-d7106c3e55ec",
+        "8b5746d4-080f-57f4-bcfd-5cc20ff1f477",
+        "966512c4-79e5-544a-9ac1-9725c280fc17",
+        "9897d6ef-9d84-56b3-8845-77a6a3aeb739",
+        "bc80127b-6cda-5818-b2e6-5e2673d33d84",
+        "c44063d7-589e-53a3-954e-1c3872a34d10",
+        "e3c0acb5-9c64-5315-b54b-3e079f62b052",
+        "ebad707f-17df-5114-83b2-f47d1832266c",
+        "ff75daa5-cf7c-5599-8dcd-405b94cc9271"
+      ],
+      "facts": {
+        "mitre": [
+          "Debugger Evasion",
+          "Native API",
+          "Obfuscated Files or Information",
+          "Process Injection: Asynchronous Procedure Call",
+          "T1027",
+          "T1055.004",
+          "T1106",
+          "T1622",
+          "apc_injection",
+          "dynamic_native_api_resolution",
+          "encrypted_payload_decryption",
+          "ntqueryinformationprocess_debug"
+        ]
+      },
+      "id": "source-apc-rc4-antidebug",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [],
+      "facts": {
+        "mitre": []
+      },
+      "id": "source-no-signal",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": [
+        "No complete high-confidence reverse behavior chain was established."
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:aa8bda44562ba5c9b7fca4823775c6ecbf2538f1a86de0acc971de5960449fa1"
+      ],
+      "facts": {
+        "raw_strings": [
+          "MZ synthetic malformed PE fixture; never execute.\n"
+        ],
+        "sha256": "aa8bda44562ba5c9b7fca4823775c6ecbf2538f1a86de0acc971de5960449fa1"
+      },
+      "id": "malformed-pe",
+      "limitations": [
+        "PE parser unavailable in this implementation"
+      ],
+      "status": "partial",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "raw_strings": [
+          "\t!\u0001L!This program cannot be run in DOS mode.\r\r\n$",
+          ".\u0002\u000b\u0002\u0002%",
+          "`.data",
+          ".rdata",
+          "@.pdata",
+          "@.xdata",
+          ".idata",
+          ".reloc",
+          "ff.\u000f\u001f",
+          "H(H\u00055",
+          "f8MZu\u000fHcP<H\u00018PE",
+          "tiH\u0005",
+          "tF\u0002",
+          "\u0012\u0010\u0017j",
+          "\u0012\u0010\u0005",
+          "8\u0001tS1H(\u000f\u001f@",
+          "\u000fP\u0018f\u000b\u0001tEf\u000b\u0002u",
+          "\u000e\u000fx",
+          "1\u000ff\u000f\u001f",
+          "1H(\u000f\u001fD",
+          "xt\u000e\u000f=D",
+          "1E\u000f)fH8H\u0005",
+          "HD$ H\u0005e",
+          "D\bb",
+          "H8\u000f\u001f",
+          "AUATUWVSH",
+          "1LD$ LHH=x",
+          "D\u000fE\u000f\u0002",
+          "eH\u0004%0",
+          "Hp\b1L%c",
+          "H9\u000f\u0017\u0002",
+          "AHH\u000f3HuH5c",
+          "1\u0006\u0001\u000f\u0005\u0002",
+          "\u0006\u000fl\u0002",
+          "\u0006\u0001\u000f\u0001",
+          "\u000f\u0014\u0002",
+          "Ht\fE1\u0002",
+          "1\u0007",
+          "H\rH\u0002<g",
+          "Hu\u001cX\u000f\u001f",
+          "tE\u0001t'\u0001",
+          "H\u0001\u000f\u0010 ~AA\u0001\"A\u000fDf\u000f\u001fD",
+          "t\u0015\u000f\u001f@",
+          "\u000fP\u0001H\u0001t\u0005 ~H\u0005\b",
+          "D\u0007Et\u0016\n",
+          "D$\\\u0001\u000f",
+          "De\u0001McI\u0003Lh`",
+          "H~B1\u000f\u001f",
+          "Hp\u0001H:`",
+          "IH\u0004IT"
+        ],
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      },
+      "id": "dynamic-failure-fallback",
+      "limitations": [
+        "PE parser unavailable in this implementation",
+        "dynamic emulation unavailable"
+      ],
+      "status": "partial",
+      "unknowns": []
+    }
+  ],
+  "implementation_root": "/Users/shuolv/Desktop/Code/my-competition-secmind",
+  "platform": {
+    "machine": "arm64",
+    "python": "3.13.13",
+    "system": "Darwin"
+  },
+  "run_identity": {
+    "evaluator_digest": "dbc468ecf9006c374d59932865f2b3ed31ab21749f87e35be51eef24e2fa6cf3",
+    "gold_isolation": "macos-sandbox-exec-deny-gold-plus-public-suite-copy",
+    "implementation_commit": "dfff9aaf2e7b0f77dbb90c5258e6486b28d091a3",
+    "implementation_digest": "3b35b3f7dcd422912c3eee96da166f2110bafd77dc681fce9e205eda9d49a891",
+    "launch_argv_sha256": "7eb54164facb3073ef37f2e4adc62ada461a6fdf493d5ede2a9ef23dd30925f4",
+    "manifest_sha256": "d87eca58b1cbdd3ee1f75deabfebfaf7bb6741034a3821a521589226dda44d8e",
+    "model_budget": "offline-no-model-calls",
+    "prompt_contract": "public-manifest-only",
+    "sandbox_executable": "/usr/bin/sandbox-exec",
+    "sandbox_profile_sha256": "ceeb690c788918de9ca22d9542d0e943f3bf8f2ddb6ab0f1c25862080ed2402f"
+  },
+  "safety": {
+    "host_pe_executions": 0,
+    "real_network_requests": 0,
+    "secret_leaks": 0,
+    "target_writes": 0
+  },
+  "safety_receipts": {
+    "host_pe_executions": {
+      "count": 0,
+      "evidence": [
+        "launch-contract:python-worker-and-api-emulator",
+        "launch-argv-sha256:7eb54164facb3073ef37f2e4adc62ada461a6fdf493d5ede2a9ef23dd30925f4"
+      ],
+      "status": "verified"
+    },
+    "real_network_requests": {
+      "count": 0,
+      "evidence": [
+        "sandbox-profile-sha256:ceeb690c788918de9ca22d9542d0e943f3bf8f2ddb6ab0f1c25862080ed2402f",
+        "launch-argv-sha256:7eb54164facb3073ef37f2e4adc62ada461a6fdf493d5ede2a9ef23dd30925f4"
+      ],
+      "sandbox_executable": "/usr/bin/sandbox-exec",
+      "status": "verified"
+    },
+    "secret_leaks": {
+      "count": 0,
+      "evidence": [
+        "serialized-output-secret-marker-scan-v1",
+        "f96ae8c5eb67d44a2493290020b9e3a447a0211e879716014a352473fccb1348"
+      ],
+      "status": "verified"
+    },
+    "target_writes": {
+      "count": 0,
+      "evidence": [
+        "target-hash-before:50374f8f22c77560d217126cfac19cf4eece267831379a4b0b60e3b4f174046b",
+        "target-hash-after:50374f8f22c77560d217126cfac19cf4eece267831379a4b0b60e3b4f174046b"
+      ],
+      "status": "verified"
+    }
+  },
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

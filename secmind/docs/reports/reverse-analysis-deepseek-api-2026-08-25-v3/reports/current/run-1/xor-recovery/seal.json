@@ -1,0 +1,13 @@
+{
+  "arm": "current",
+  "case_id": "xor-recovery",
+  "receipt_sha256": "654cd43ea2171cbfa9ca507d8fc45c0c4067e143b3e238198612e25c54092d57",
+  "repeat_id": 1,
+  "report_html_sha256": "b21031df9961ddefec61ede0027df7b49dc51c00680b5b047bcf19c84a833937",
+  "report_json_sha256": "864103fbefa4b60ad02f0e63987515712a421c2b09ea304d41485e8508e3157f",
+  "report_md_sha256": "797d4e859326c3f9bf19da965c8fe6ad32aad1b4b672dcda66e87271785b927c",
+  "request_sha256": "27fbf0d54a87bf4e10a0efd9c74dfc619a910c924230c1c63ac79bb16fecf16c",
+  "response_sha256": "064db87886aa60ddc8ce0f6f14607721e90e30e755c9d00d16961ceea5f1cca5",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

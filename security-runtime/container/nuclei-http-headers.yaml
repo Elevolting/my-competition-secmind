@@ -1,0 +1,23 @@
+id: secmind-http-security-headers
+info:
+  name: HTTP security header inventory
+  author: SecMind
+  severity: info
+  description: Reports missing common response security headers using one GET request.
+  tags: secmind,headers
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    redirects: false
+    max-redirects: 0
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: missing-content-type-options
+        dsl:
+          - "!contains(to_lower(all_headers), 'x-content-type-options:')"
+      - type: dsl
+        name: missing-frame-options
+        dsl:
+          - "!contains(to_lower(all_headers), 'x-frame-options:')"

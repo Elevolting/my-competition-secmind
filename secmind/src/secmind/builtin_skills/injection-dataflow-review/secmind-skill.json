@@ -1,0 +1,18 @@
+{
+  "skill_id": "injection-dataflow-review",
+  "version": "1.0.0",
+  "description": "Trace SQL, command and template injection candidates from untrusted sources to dangerous sinks.",
+  "trigger_terms": ["sql injection", "command injection", "template injection", "dataflow", "注入", "数据流"],
+  "supported_languages": ["python", "javascript", "typescript", "java", "go"],
+  "scenarios": ["code_audit"],
+  "required_capabilities": ["sast"],
+  "allowed_agent_profiles": ["sast-investigator"],
+  "risk_ceiling": 1,
+  "max_turns": 3,
+  "input_contract": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+  "output_contract": {"type": "object", "required": ["findings", "flows"], "properties": {"findings": {"type": "array"}, "flows": {"type": "array"}}},
+  "eval_case_ids": ["injection-cross-file", "injection-sanitized-negative"],
+  "package_digest": "9baa7ce4d5631b25082c4e123874cacc9fa37d231f02de9dfb4d66014d7f6d7e",
+  "signer": "secmind-platform-v1",
+  "signature": "XAA2WO-hyvwTKF5F67HACiAY20u-IbDn_NY6oi6os1K8cG8hNYMxnkkhvZUSY0vu5zjonuA1VPgq8Kpi_gawBw"
+}

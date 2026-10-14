@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "coverage": {
+    "total": "85.807188",
+    "branch": "75.657584",
+    "total_floor": "85.690000",
+    "branch_floor": "75.280000",
+    "covered_lines": 35519,
+    "num_statements": 39892,
+    "covered_branches": 9607,
+    "num_branches": 12698
+  },
+  "changed_lines": {
+    "status": "not_applicable",
+    "covered": 0,
+    "total": 0,
+    "percent": "100.000000",
+    "floor": "90.000000",
+    "files": []
+  },
+  "failures": []
+}

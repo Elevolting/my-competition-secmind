@@ -1,0 +1,89 @@
+{
+  "execution_status": "completed",
+  "model_response_sha256": "e9ed2497dec397053a4af3d68d2727e198daf93fae0922519acdf5829af6aeb2",
+  "report": {
+    "evidence_refs": [
+      "evidence-937686b53fcd89a436e301b73df4f2907393c14241fc73b2b211febfe6cdf25d",
+      "evidence-18d6f448a0cc75e27fc20c8235a4ba18bcb8d4660b1e08ade978011f959ac576",
+      "evidence-414cf2a19b50ce82d591693872db8f92e1e55696e8762121aaf52fad6b233f79",
+      "evidence-c4fb882bfdaf44cf52e52710d51ec7f6d6ccc2475466439a299caf5397491994",
+      "evidence-623e4a48111edb792c4fa38d3318ab00585e9b8f98c5f7d9c9cd43e264030b11"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "识别到完整的DLL注入链，攻击者通过动态链接库注入技术（T1055.001）在目标进程中加载恶意DLL，实现了代码执行和持久化。",
+    "findings": [
+      {
+        "business_impact": "攻击者可能在目标系统上执行任意代码，获取敏感数据，破坏系统完整性，导致业务中断和数据泄露。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-937686b53fcd89a436e301b73df4f2907393c14241fc73b2b211febfe6cdf25d",
+          "evidence-18d6f448a0cc75e27fc20c8235a4ba18bcb8d4660b1e08ade978011f959ac576",
+          "evidence-414cf2a19b50ce82d591693872db8f92e1e55696e8762121aaf52fad6b233f79",
+          "evidence-c4fb882bfdaf44cf52e52710d51ec7f6d6ccc2475466439a299caf5397491994",
+          "evidence-623e4a48111edb792c4fa38d3318ab00585e9b8f98c5f7d9c9cd43e264030b11"
+        ],
+        "severity": "critical",
+        "technical_explanation": "样本通过DLL注入技术，在目标进程中加载恶意动态链接库，从而获取代码执行能力。该行为符合MITRE ATT&CK的T1055.001技术，属于进程注入范畴。",
+        "title": "完整DLL注入链识别"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "立即隔离受感染系统并调查DLL注入行为，更新端点检测响应规则以识别T1055.001",
+        "decision_role": "安全负责人",
+        "expected_outcome": "遏制攻击，防止进一步扩散，保护关键资产",
+        "priority": "P0",
+        "rationale": "DLL注入可导致远程代码执行和数据泄露，需立即响应"
+      }
+    ],
+    "limitations": [],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "深入分析注入的DLL内容",
+      "评估受感染系统范围",
+      "实施针对性检测规则",
+      "开展威胁狩猎活动"
+    ],
+    "reverse_analysis": "通过静态分析确认存在DLL注入链，涉及进程注入手法，符合MITRE ATT&CK框架中的Process Injection: Dynamic-link Library Injection (T1055.001)。",
+    "risk_assessment": {
+      "exploitability": "高",
+      "impact_scope": "系统级",
+      "overall_risk": "critical",
+      "urgency": "高"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "dll_injection"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001",
+          "dll_injection"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": []
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "source-dll-injection-complete",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

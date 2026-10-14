@@ -1,0 +1,9 @@
+{
+  "info": {"id": 42, "version": "fixture-only"},
+  "target": {"file": {"name": "reverse_demo.exe", "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"}},
+  "behavior": {
+    "processes": [{"process_name": "reverse_demo.exe", "calls": [{"api": "strcmp", "arguments": {"left": "SECMIND-REVERSE-OK", "right": "SECMIND-REVERSE-OK"}}, {"api": "fopen", "arguments": {"filename": "reverse_demo_result.txt", "mode": "w"}}]}],
+    "summary": {"files": ["C:\\Users\\analyst\\reverse_demo_result.txt"]}
+  },
+  "network": {"hosts": [], "http": [], "dns": []}
+}

@@ -1,0 +1,906 @@
+{
+  "schema_version": "tool-calibration-manifest-1.0",
+  "dataset_id": "secmind-heldout-tools-2026-08-v3",
+  "split": "heldout",
+  "frozen": true,
+  "qualification_only": false,
+  "dataset_license": "CC0-1.0",
+  "non_leakage_attestation": "Release holdout v3: 80 newly authored CC0 fixtures have unique bytes disjoint from v1/v2. Labels, case paths, and fixture digests were committed before any scanner invocation. This manifest is the immutable release snapshot; any failed case must be handled by scanner implementation changes and replay against this same digest.",
+  "fixture_tree_digest": "999a4bc8adc636ab0e602c6ba18a0e383195976888d9cee21278241792b8d0dc",
+  "cases": [
+    {
+      "case_id": "v3-bandit_python_audit-bandit-positive-pickle",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "e4bfb2e9e1892d858de84cb120435e5a4961f061324a1bd659ee540fccc33272",
+      "expected_rule_ids": [
+        "CWE-502"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-positive-pickle.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "4115ae006a7ab2e4a187d7db5d83525dd6f7c7fbc9f8a01cda9e82aa2241b638"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-positive-dynamic-eval",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "2754a46e8c6e7b2c53392fb01ff73c0d65b96fc2fbeffdfced12a4b87d9fcd97",
+      "expected_rule_ids": [
+        "CWE-95"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-positive-dynamic-eval.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e092fab89f595b8000d89690daca3a1fba48c31f2db11ada2db29e4753fb3181"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-positive-shell",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "1cb5f35d6d400cdd806d40da9525da59e376ad0ce7cf7f7b64f33b6a541cd0cb",
+      "expected_rule_ids": [
+        "CWE-78"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-positive-shell.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "9157bc1742eacf52216541fde9dbd982fb6af52b28e017866d39e81745f0b23a"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-positive-sql",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "2e9b78dbe8959c187a7ff4939cf4339b3aa027afc545d0850a5ab4e45cef0568",
+      "expected_rule_ids": [
+        "CWE-89"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-positive-sql.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "00764cd570c4616a2007275d750d74da11a33f1ad4c3e7b4eb2c79aa1306f786"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-positive-password",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "e2ac747f90d1777cf503102528b6e28215a2de9e67be5c3c4e648696351c5791",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-positive-password.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "5215730f3e092e064576500358ce69de268394ef12d3c7805366795e28130fae"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-negative-sha256",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "a30a59e65a5d0c070e1c762ad56badb09806e228b541dc2154b07743285ad8eb",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-negative-sha256.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "5a7698d3d17cb7f33690b2ba378b4cc7bdd77e83d60402471d788bb1b76ec90f"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-negative-env",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "b27bb44bf3cf42eaf7296cea6dcdaf9083646e24a6358a6df37bc6265d25bd43",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-negative-env.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "f2d9425c905f5d380bc4e48b50f560757fee114c9f473322d33567ab0aeb946a"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-negative-json",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "5e6e8a600bea31abac9a05719d3719515eacc3e10bb091cd61f01f62653a4113",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-negative-json.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "76afd6eeeb8f1b830de3a8a6dc8ec18b5cdcf2956c73eefc4afc956b83d8e880"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-negative-parameterized",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "ae3331ffbafa9ccebd4abf7daef7f6f884aad4ca7dc2655616c3bc49b37e1108",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-negative-parameterized.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "96a04e0a14ad76c4bb0dcfd6788e3789e36f8c8a48bfe068945aedcf6477db78"
+    },
+    {
+      "case_id": "v3-bandit_python_audit-bandit-negative-argv",
+      "tool_name": "bandit_python_audit",
+      "input_sha256": "35fe576412fc9f08ca7f7f563923bcb07fdbdd29594f9a3ce4c9d4e5ce3f816a",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/bandit-negative-argv.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "85c72e557dc4fdbdb0e4a6f471988513275b91febb8153523b4a94ab3a49a82e"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-positive-subprocess",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "b1f5f68fdf1f3193812e54f90a31d401e6986a623d6efbf00c6a79fbcdbe547e",
+      "expected_rule_ids": [
+        "CWE-78"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-positive-subprocess.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "3aa8ac45b1f2e458d8cf0085e496c55a9911c06f2a720fe1d0c53f0177db1fd3"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-positive-eval",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "277a7aad4d9f7e43685141bb6f6b050ad9e41c9340b4a429db272c23c2ae264b",
+      "expected_rule_ids": [
+        "CWE-95"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-positive-eval.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "76c35a500304a622b676471cc3ace9aafe3a693d796148e4224d75e2b28b2420"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-positive-open",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "662b78880c031b1e6f19050d6e36fc9f0bc09a8a801c5e3b7bcde1a9672ab6cc",
+      "expected_rule_ids": [
+        "CWE-22"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-positive-open.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "3fc5b11fc358d54551b26aba19beea827f8722ac28708782d0d6f05f0be8b6ea"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-positive-sql",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "06b5ab1373210f55ecef7df3c57791de06451cbac01ca64fc080bced831f0a69",
+      "expected_rule_ids": [
+        "CWE-89"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-positive-sql.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "8d3917da4ea206797b6c4ff38519bfb84468960a839c9e6397c55416151398d0"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-positive-xml",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "d12547f2d8138355cb2bf12e7c2254d533af87a2f6c8d43595db6b91245b6efc",
+      "expected_rule_ids": [
+        "CWE-611"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-positive-xml.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "86be193f7c0b077cccde539f286a5b0f6691b6708da61f1da6fcff5df4a4c861"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-negative-fixed-command",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "6aee1f39483ed5a44bbb239b26cd8fd3dee73a76639e360bf4dbcbc067a00152",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-negative-fixed-command.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "61f550799b193ba85699fe06d88bdedd78cfbd4384ca064f471450f23eca0597"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-negative-fixed-xml",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "2c1857c6d445ac8b78444ef0a48c70545b43862a86fa7d579f1fd9adb512fdbc",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-negative-fixed-xml.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "01370cc2da57089e92f066b8774843f45d25d4da309a20c7bbb4781e19c8a2fe"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-negative-bound-sql",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "18532579846a5cb5020957017ebd2cc72c9747d5d83d3028c0012c218a9e02a5",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-negative-bound-sql.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "451412f2ba0438073e4abc7acdd51105e1a98539771a29aa5120550637b72980"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-negative-literal-eval",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "8d30f3c3d99b51960b4411f69ccbf5a839220be6cfea1b82f3beed844286b6c1",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-negative-literal-eval.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "aaedd53641f26a936d71b3601a78c38c2626a1cec225b576df9a4d2d577505b4"
+    },
+    {
+      "case_id": "v3-python_taint_audit-flow-negative-fixed-url",
+      "tool_name": "python_taint_audit",
+      "input_sha256": "1d2d09b5b3e125cd9df3e4d99aaef848cfc14b58c5d13657787b6b2e292511a8",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/flow-negative-fixed-url.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "862f36683c70faff9caa4c6cecc26274a93a50e9a5eaa27c4c5c9c0c160fe96e"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-positive-access",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "944b8aa0a547129248276ec557361c163b31be3f3a9c3d9beb22b85a409d200b",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-positive-access.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "50cb8184323b05923ae33c7b011db3e8f439b0c7c133a51ef105ef9b9b2a4bbc"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-positive-api",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "497ebb59cc045c7e8ea230841e1c721d86a999d47810d40f709c06757088dfd4",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-positive-api.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e02da811c9631ebb94813d840c205aa3610bce069e69d73a82304fbbe4953569"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-positive-client",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "1d6ce8ddc6d77e79d69372bda18131a4ac2954ba8c9207d4bc04834dad665578",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-positive-client.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "c7fe7049df9d2ce1440a46d0f745e54af6eb6d3e03d104b24b95912fe5d8a71b"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-positive-password",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "cfc61711d29351c6a84de7d632391613d14d16936696a7cb235a0d3895ed07c7",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-positive-password.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "ec928a7ee45049dc8fd23ef4075f09a9235d8841894b7133abdc2b71c764ec44"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-positive-private",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "1df795d9f42e58cccf273cbee7921c1ebfe31250bcf44a6ca5497506e16d8c67",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-positive-private.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "60a5ee4429ae239f008c78938a6f4b1ede1aba66cd7aedabd86510553025a6ee"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-negative-comment",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "cc7935b75cb74881b8e966ac158a3acf1cfcd14e35b3e8e07cf904406d7de167",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-negative-comment.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e293472efabe89920e43f8aab671652df6f5ca4c63ad35d11fb325033169eaed"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-negative-env",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "9b4adc98e6af5c6acf06041c9ffd3c0abdf64ba61dbceb6351bafb548d5eaa17",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-negative-env.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "80bdaa3bfbb67805d5eebf97a40cab4e5e0349583edb0de93677937e49a35a2a"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-negative-placeholder",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "d348c32ea5f0bb8eb9c874e6baafa813c15c50b18bd9eb00ea571306a30f6fe8",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-negative-placeholder.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "7129fd12d9c5b22f35b270edacf3d6de5a8c8f821a00859a0cb628ac6b760a25"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-negative-short",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "2238133d93fc20b4fd99f565779b753f83bd602342f193ab5c9a8b55b61d57b5",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-negative-short.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e14c13b6c6ed9d0e636c504cb74178cca98e35d1e038575a1250454c9003fce3"
+    },
+    {
+      "case_id": "v3-secret_pattern_scan-secret-negative-constructor",
+      "tool_name": "secret_pattern_scan",
+      "input_sha256": "f9c8f40d4fe9cec95ca318e0f47a3b97814105924fd796e37b225d04afad81b1",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/secret-negative-constructor.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "5f4a402f3e5f1b09e53257ba557ed8f79f3b3fb9c0c01a3a94b447a9b3f438b1"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-positive-token",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "40316188e14518d3207340fc0c3cbd192f93d0badf47b2fa42c226476058cef7",
+      "expected_rule_ids": [
+        "CWE-328"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-positive-token.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "60bc986c6b1618ea9f8c03df11f3e68fdb24bec95a5bd45ade17c2ed768786e5"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-positive-secret",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "cd821761d4a9dd1b8d46bc4443e5fb58fc8e4e478839eccd170a96a8cdd8fe43",
+      "expected_rule_ids": [
+        "CWE-328"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-positive-secret.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "5a2dfaaffe733b6506d15ce3e45398debeace5a865897e5433aaaca7aad3fd3c"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-positive-password",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "13e5b482a22114b6ad1568ebe4af91ce64bb9f423b4a12ea75358dbf487bb50d",
+      "expected_rule_ids": [
+        "CWE-328"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-positive-password.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "9203e655e68b5f5604e4771b32938259a039132f0624b5ac67de1d593adeec33"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-positive-credential",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "67e5d0eca517288353879cb3af72c16b4f3ef901c81dd64a2f0291d23d91ad68",
+      "expected_rule_ids": [
+        "CWE-328"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-positive-credential.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "de54b7d173d9e75451447d458ef52a27382e659a785c0594ccf89ecff45b5783"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-positive-auth",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "622c6906ca389f97861ec6cbc875af13a7fc0b82ab8ac0756b28dfa28923e368",
+      "expected_rule_ids": [
+        "CWE-328"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-positive-auth.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "07d2e998c749a07a113195b57d748fcd426182c815a0b9b45c0cafbe1e9bc3a1"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-negative-cache",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "adaa01fe7b0642cabaa0fb8050b9f0a33e1f367f02ce5e4774e7c5f44f956229",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-negative-cache.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e8ec8add91061eaa493ef001321b46238cafaa2728db3d1bdb887e3668bccc8f"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-negative-checksum",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "9e62306b0aed08c82964e00219354b120ffa5cb37ad112ca4977091b93a442f3",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-negative-checksum.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "0ef3fabcacaf099fddd80039d9dbf5cab4f384dfed47f819bd0634dddb18b265"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-negative-doc",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "d76e6571f399ed4a1c5558bb0c5d86e174a2b008ec99b25f2b26cb90b481b58d",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-negative-doc.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "0aaf870a2678eef45c20f64ba7ae383e3d3fcc825b60707ee78c33a09a0716b3"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-negative-etag",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "55f3e0dd6bfa6cecd9e3ae8f38765ff036558d705cf31508b62b48206febb917",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-negative-etag.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "f25788e7bc022751e3369b30a814d71dab4346df921e696658d8b1f73084b687"
+    },
+    {
+      "case_id": "v3-java_semantic_sast-java-negative-strong",
+      "tool_name": "java_semantic_sast",
+      "input_sha256": "da05794fee08a5d65c9201161c7ec33ed818303bf2c600ae622fd5d564a609de",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/java-negative-strong.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "a519a2647203c75db17fdd2fdcf07896962f296d81288ec366d3869f9316baf1"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-positive-flask",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "a405dc7a47b5c1b59d5a21a6e07ac5b45241ececa94beac5ac97a0165c9a6ffd",
+      "expected_rule_ids": [
+        "CWE-78"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-positive-flask.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "f696d6b890ff01fe4fc1bf00665b6f379fb8f1b80b83c8247df8ec5ca6d67d3c"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-positive-path",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "b8457c26ed39b84b49945b6fece6649f5990b45f40e92b12c887234940cf591a",
+      "expected_rule_ids": [
+        "CWE-22"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-positive-path.js",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "ee011022bbd958fa08c37e45d261c244a281b90a766dc1e89918655f0042f70f"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-positive-java",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "d2d06468c29fb9e38b235a7b5147bdc307e55b3e477471f0b44797a629f5b295",
+      "expected_rule_ids": [
+        "CWE-78"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-positive-java.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "58e7fc88bb7fc58ceabe3456889a0c71f3eeb795fddc24e5632699f1af4485dd"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-positive-command",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "46ce48549bdf66cc45dc846906bc21b534e5c6d65935bc83a25b78ccedd73a27",
+      "expected_rule_ids": [
+        "CWE-78"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-positive-command.ts",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "7a77ded9bb0f42959b60c77c89ccbbbef1f29f54256888c84e6cb827feb143c9"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-positive-python-shell",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "97dc27b3aca504fbc8a72ff0d9e18549e9dc132d72373263abe4fb3ca073f7f5",
+      "expected_rule_ids": [
+        "CWE-78"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-positive-python-shell.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "1ffae88b20e2f9c723aebf491bb0d0a2c6bb04d5355906e1e5bc11823a269f3b"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-negative-python-fixed",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "10f810f3a38f4456190b7406d4cbd6b824f237f534b4664d3e97cba91a70c19d",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-negative-python-fixed.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "4d1fc95efefc4432fc260b2136e50297f8cec4bff3b03f6d83fdcd3ecf9e5e9f"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-negative-path-fixed",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "203239cd8a8ce2373482119e7e46d6da037cf741da123096ebaf6edd35ae2f32",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-negative-path-fixed.js",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "0cb1ac3c02257766b9a1911fd07d4575a500b21fe8aedc5a868b8a57b7b89c85"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-negative-java-constant",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "fecaa6ad53ccfdd546afd2848baa3d1e3dc018e5347092e57265be07af1d4a8d",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-negative-java-constant.java",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "accd685021248554133c3ac4eec15d426fb360227503fe2fd4b96710ace52569"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-negative-command",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "b355f66f2b367f682cab0ecfaa97d147525a048b73680afdf0791b76815152d2",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-negative-command.ts",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "3ccd7b3a55cd370e0ded2a1aa51726d081300e74056970a47721ab33924f18b0"
+    },
+    {
+      "case_id": "v3-semgrep_sast-semgrep-negative-python-list",
+      "tool_name": "semgrep_sast",
+      "input_sha256": "88533a9d5a94fbca795d9cb55ddcf056a935bbdc01d362116a103cb34bb6fdd8",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/semgrep-negative-python-list.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "3acb6fcfe29fdc918f3ad44fe4cd79ec7bb4056651f1649b17ff73c903ed393b"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-positive-aws",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "0ded65f1c0f61a9b75cf4291d68f35e6984427b4726067eb8db5b74cd7f1f02a",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-positive-aws.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "9ed81b089d5da9f0d61267a131c30c77731e8d54f5b5781f16f94f23d3c46c85"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-positive-github",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "93d2ebb505cec644d94d5d76a1ddbf504bdcaf14e645586d2a891d6d01816840",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-positive-github.env",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "0b438a25c68b355857d895477d8a9c7fc43db5451d7cbc6abf5cb9b2116cbfe9"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-positive-slack",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "3b6528f96e092542c13cef870b19ba924e69c318af56518deab43e352e11791b",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-positive-slack.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "db58521fb641ecd8ca5d63df2edb3dfa7a7986f9b76974c3e8b8a409cd3efdc5"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-positive-private",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "3c83626c411e0cfb7f85e1525dd29ed3de676d0f334d7b03df76fedea1839f3c",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-positive-private.pem",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "13cfb9b4b6704df5fe34c54177daf5123441fac3c910dd6b06554c994e96dbf7"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-positive-password",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "ac0f84b7431f9628af966e92b8a2ab338152318136c49d64e37fddb6dda61582",
+      "expected_rule_ids": [
+        "CWE-798"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-positive-password.yml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "8250dc3123f8afc1513f7c17297a86521913e212785caa8d7430025f54bb0ef2"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-negative-env",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "85ac280f24d5b24a52d9fff9cfc8a7f37768614f1531f5209e10b7f58aec92c9",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-negative-env.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "04c482e9fdb4a8a81d8b8cf870b326c9509eddc8664e7ebfcddf9cec995c9a78"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-negative-doc",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "6a2a6d97205998bb440727e0938e274a34a8457cd9df92c5f1cc7bd976e75a0d",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-negative-doc.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "5e60f2c943a2046132ce2f03243aa119a6ccc971d58898d818bafc57af7a40ff"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-negative-short",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "4cda653018d9b74bf74b2f307e58e00c2eef2dc82ea93c82308dbb6ae59ee20d",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-negative-short.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "b08e43b2f0cb4535349ecd2de61a74a7dd12a39a99dc6daa024e7360b919b959"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-negative-example",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "f02db9ddca1bf4809ea73bb9a9052e7d18efc518524cc904f275360967391646",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-negative-example.json",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "cbe33504da42718cb8c23998059bd83403b70b2c5444b35160a8036c25e1d0c7"
+    },
+    {
+      "case_id": "v3-gitleaks_secret_scan-gitleaks-negative-comment",
+      "tool_name": "gitleaks_secret_scan",
+      "input_sha256": "83636519ee62fc29678ebee4c0a1f8e90de0c5edc60b0febb4dfc845aca6b3ac",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/gitleaks-negative-comment.py",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e6cf0d1fd6c6da497dbb8979eac571b1b81185a2c7ea57e3413dcfbf0851f61c"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-positive-requests",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "f50a4d4be9cbd800bc388636e1836294756ebe1ebe7303679ecaae99e5b61ac2",
+      "expected_rule_ids": [
+        "CWE-1104"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-positive-requests.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "526d2d16efc8ab5a58b38a6994545fcf16bfc1cdbb3e736e70341e41b6c7f930"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-positive-django",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "fa20b06f89df2b9eaf9004dba84d8a127964c905862b2fd5c0febbc31cf6208f",
+      "expected_rule_ids": [
+        "CWE-1104"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-positive-django.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "7b7236d7b61fccd82212cd72e7b8389d25d0ecf3dd355651d2820168432c6a5f"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-positive-lodash-lock",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "bc8bbdcf4d3ed4ccf9149184f705e425efb3cd9cc34f0eba3701b57090a6f530",
+      "expected_rule_ids": [
+        "CWE-1104"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-positive-lodash-lock.json",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "650cf37e54b24c86b182dd05ac741a63760e68ffba631322d73479c1a63b0347"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-positive-log4j",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "2d9e72cc687603be166df03ec2d96bbd89909fdba08baef78571ccbdd1ca2bca",
+      "expected_rule_ids": [
+        "CWE-1104"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-positive-log4j.xml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "ed64c59f788868f77526659914c4699eb3e2cf78c022ab9f7adb2f05bd0d9621"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-positive-urllib3",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "75e4a752c3c582098e55ba6973c6c42400ff8f183c23c175dc916c8ed88ad366",
+      "expected_rule_ids": [
+        "CWE-1104"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-positive-urllib3.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "bd2b75fb13b597dc340869cacea5da8c73342a35ded1e3ecd8b0d917f6128e6f"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-negative-requests",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "d376fe255d8caef378882f3eddd1d62b95aff9f071103a8bc1d02423774caf31",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-negative-requests.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "12467ba185729ce3d19c048cd4465f4a0788f8c515e8768abd9ae54842218c83"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-negative-django",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "0fb67276cc4f6c65ccbeb8a05e8cac518015e0d360e53fa9af076e830af42ec1",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-negative-django.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "2cd6b375dfe14811fe3879dc13743ba8ab06537a2d450f05c8652a30e73e5f02"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-negative-lodash-lock",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "6421257ff3ffc22d0c6c527293c8a610999833882c7bed7b5383b096805b134f",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-negative-lodash-lock.json",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "92d9a7aacfbee12fe8b2e5f1e38b1f6aaab6a4d06005235d61e9d1b4851abb93"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-negative-log4j",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "730bc1c519168bb30f59b19dccb9d5bff6ad3cf821612ad0647ba8b0f1b085c4",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-negative-log4j.xml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "e245d5056fddc1dd91da607558a57d83026ed1960e51abdfbab44f8721c25d62"
+    },
+    {
+      "case_id": "v3-osv_dependency_audit-osv-negative-urllib3",
+      "tool_name": "osv_dependency_audit",
+      "input_sha256": "89ff0edbeb1b5ab95f8ae5c5ec905a3fc57821de6b7e811d917e5af43ea8949e",
+      "expected_rule_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/osv-negative-urllib3.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "4ebd16f67044d26f4125eec7df622d3e526195828e8975647064aa06786649fc"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-positive-python",
+      "tool_name": "syft_sbom",
+      "input_sha256": "f27c273fca6680e7b6c47c4e9c083fea676d0344d8e927eb6117537e6cdde9c3",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [
+        "pkg:pypi/httpx@0.27.2",
+        "pkg:pypi/certifi@2024.8.30"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-positive-python.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "25628a73e328acc5759f3cbd301d70b14dbc5c9a118183a388b802bbca4e03b5"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-positive-node-lock",
+      "tool_name": "syft_sbom",
+      "input_sha256": "6a3fe511970ad054eec6f7047c084bb736cfa396dceff1193f90b3e4955b2c9d",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [
+        "pkg:npm/axios@1.7.9",
+        "pkg:npm/qs@6.13.0"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-positive-node-lock.json",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "b90c5fc15cb70697cab9c6c8b42c544e7db0064a82eb65d0a3520ea440afc996"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-positive-java",
+      "tool_name": "syft_sbom",
+      "input_sha256": "8335d95657b8e72a0023e6456fac40c1b74ccbdd572210e2dfdbbf1c1fd14b68",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [
+        "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.17.2"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-positive-java.xml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "a9525d2503c6503146b42db5b93dfe7910ba89519ccc0a1b06407ce18a96e5b1"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-positive-go",
+      "tool_name": "syft_sbom",
+      "input_sha256": "68839f19bd53b4688fea632177bedd6ddb2dbb7a1a41e30e70e067085a9ff89f",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [
+        "pkg:golang/github.com/google/uuid@v1.6.0",
+        "pkg:golang/golang.org/x/sys@v0.28.0"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-positive-go.mod",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "d6ba3f8a4e7c97a734cd49b9c9c9d26655c063dbcc5979239272d36c8f4657cd"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-positive-rust",
+      "tool_name": "syft_sbom",
+      "input_sha256": "930e4174f1d1c422a3b0dee93c4b276ebfdd4b3d4f4ea29fb3ab818d91b8bf05",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [
+        "pkg:cargo/serde@1.0.215",
+        "pkg:cargo/thiserror@1.0.69"
+      ],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-positive-rust.toml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "7235285a440bc7a1f8ca08e10bdee978e6083a993aff13833190af6e479caba5"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-negative-python",
+      "tool_name": "syft_sbom",
+      "input_sha256": "de4484205a98d940642b229553decacaa79a06d076180374a1000b85ad8752dd",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-negative-python.txt",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "0761d1be3601d6fa883824df910677b5be5b5af865c4503a9a05579fed364604"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-negative-node-lock",
+      "tool_name": "syft_sbom",
+      "input_sha256": "6083a4bf9887a141235db736a33349d41ff65391629b5b088a6a863fc8c3228c",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-negative-node-lock.json",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "ca565a527352d8b0398aa9779a413fe859ffeabb75a21693bbff4e50e8514676"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-negative-java",
+      "tool_name": "syft_sbom",
+      "input_sha256": "c73e9d9e2b2fbc01d5cb764d936c3737f723ddfcdbb115def4e6c8aab902968d",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-negative-java.xml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "64ed40379aeb1b44d502a32277063f35d71ccea4cabbf0ce2e9ed835012de048"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-negative-go",
+      "tool_name": "syft_sbom",
+      "input_sha256": "eddefe700bd55e654d4af58360be21ed23babb2af08f3945a0f814fe05bbf9ff",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-negative-go.mod",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "673938ff8703a6d02318eb0cc198dd8b39895dd7187ad67af0d7c2896cd48f74"
+    },
+    {
+      "case_id": "v3-syft_sbom-syft-negative-rust",
+      "tool_name": "syft_sbom",
+      "input_sha256": "55ddaef48ee5730f8bcdaaf8fe48ac2de9f483f922e618aff75426b4b936a4b6",
+      "evaluation_kind": "sbom",
+      "expected_component_ids": [],
+      "fixture_path": "evaluation/tool-calibration/fixtures-v3/syft-negative-rust.toml",
+      "source_kind": "original_authored",
+      "license_id": "CC0-1.0",
+      "label_commitment": "aa66af3ef1150757b5e84765daedafe88a247d7e813104d7502db6b456cfc084"
+    }
+  ]
+}

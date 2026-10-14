@@ -1,0 +1,39 @@
+{
+  "schema_version": "secmind-ablation-matrix-v0.8.2",
+  "minimum_randomized_blocks": 5,
+  "primary_capability_task_count": 22,
+  "engineering_quality_task_count": 60,
+  "arms": [
+    {"id": "v0.8.1-A", "workers": 20, "timeout_seconds": 45, "model_profile": "ae65c0f-fixed"},
+    {"id": "v0.8.1-B", "workers": 20, "timeout_seconds": 180, "model_profile": "ae65c0f-read-idle"},
+    {"id": "v0.8.2-default", "workers": 6, "timeout_seconds": 180, "model_profile": "v0.8.2-full-flags"}
+  ],
+  "required_views": [
+    "end_to_end_reliability",
+    "success_conditional_semantics",
+    "verified_precision",
+    "evidence_completeness",
+    "evidence_grounded_f1",
+    "bootstrap_ci",
+    "paired_sign_test",
+    "paired_permutation_test"
+  ],
+  "provenance_fields": [
+    "candidate_id",
+    "candidate_version",
+    "agent_git_sha",
+    "agent_git_dirty",
+    "bridge_sha",
+    "adapter_sha",
+    "python_version",
+    "os_name",
+    "dependency_digest",
+    "lockfile_digest",
+    "effective_env_digest",
+    "workers",
+    "model_profile",
+    "prompt_digest",
+    "schema_digest",
+    "rule_digest"
+  ]
+}

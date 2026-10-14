@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2020-07-09T19:47:00.719124+00:00",
+    "event_type": "windows_event:104",
+    "Provider": "Microsoft-Windows-RemoteDesktopServices-RdpCoreTS",
+    "TimezoneBiasHour": "[1]"
+  },
+  {
+    "timestamp": "2020-07-09T20:06:31.770397+00:00",
+    "event_type": "windows_event:104",
+    "Provider": "Microsoft-Windows-RemoteDesktopServices-RdpCoreTS",
+    "TimezoneBiasHour": "[1]"
+  },
+  {
+    "timestamp": "2020-07-10T10:20:33.560541+00:00",
+    "event_type": "windows_event:104",
+    "Provider": "Microsoft-Windows-RemoteDesktopServices-RdpCoreTS",
+    "TimezoneBiasHour": "[1]"
+  }
+]

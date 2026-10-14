@@ -1,0 +1,13 @@
+case_id,status,obligations_passed,obligations_total,obligation_score,behavior_tp,behavior_fp,behavior_fn,evidence_count
+pe-structure,completed,3,3,1.0,0,0,0,1
+pe-imports,completed,2,3,0.6666666666666666,0,0,0,1
+xor-recovery,completed,1,3,0.3333333333333333,0,0,0,1
+dynamic-wrong-token,unavailable,0,3,0.0,0,0,2,1
+dynamic-correct-token,unavailable,0,3,0.0,0,0,3,1
+source-process-hollowing,completed,2,2,1.0,1,0,0,7
+source-dll-injection-complete,completed,2,2,1.0,1,0,0,5
+source-dll-injection-incomplete,completed,2,2,1.0,0,0,0,0
+source-apc-rc4-antidebug,completed,4,4,1.0,4,0,0,18
+source-no-signal,completed,2,2,1.0,0,0,0,0
+malformed-pe,partial,2,2,1.0,0,0,0,0
+dynamic-failure-fallback,partial,3,3,1.0,0,0,0,1

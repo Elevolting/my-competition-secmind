@@ -1,0 +1,82 @@
+{
+  "schema_version": "agent-adapter-1.0",
+  "candidate": {
+    "candidate_id": "secmind-v0.8.4-deepseek-v4-flash",
+    "display_name": "SecMind v0.8.4 (DeepSeek V4 Flash)",
+    "version": "0.8.4",
+    "provider": "deepseek",
+    "model_id": "deepseek-v4-flash",
+    "budget_profile": "live-deepseek-v084"
+  },
+  "adapter": {
+    "type": "command_json",
+    "command": [
+      "python",
+      "{agent_root}/scripts/secmind_test3_v084_bridge.py",
+      "--platform-bridge",
+      "{platform_root}/onboarding/bridges/secmind_v1_api_bridge.py",
+      "--agent-root",
+      "{agent_root}",
+      "--request",
+      "{request}",
+      "--output",
+      "{result}",
+      "--model-mode",
+      "live"
+    ],
+    "agent_root_env": "SECMIND_V084_AGENT_ROOT",
+    "working_directory": "{agent_root}",
+    "max_parallelism": 6,
+    "pass_env": [
+      "SECMIND_DEEPSEEK_API_KEY"
+    ],
+    "environment": {
+      "SECMIND_RUNTIME_PROFILE": "competition-full",
+      "SECMIND_AUDIT_KERNEL_MODE": "authoritative",
+      "SECMIND_AUDIT_CRITIC_ENABLED": "true",
+      "SECMIND_AUDIT_PROFILE": "extended",
+      "SECMIND_AUDIT_PRIMARY_CONCURRENCY": "3",
+      "SECMIND_AUDIT_CRITIC_CONCURRENCY": "2",
+      "SECMIND_PROMPT_MODE": "adaptive",
+      "SECMIND_PROMPT_OPTIMIZER_ENABLED": "true",
+      "SECMIND_PROMPT_ADAPTIVE_POLICY_APPROVED": "true",
+      "SECMIND_PROMPT_REVIEWED_AUTHORITATIVE_ENABLED": "true",
+      "SECMIND_PROMPT_OPTIMIZER_TRIGGER_RATE_LIMIT": "1.0",
+      "SECMIND_MODEL_MAX_OUTPUT_TOKENS": "16000",
+      "SECMIND_MODEL_FALLBACK_MAX_OUTPUT_TOKENS": "12000",
+      "SECMIND_MODEL_TIMEOUT_SECONDS": "180",
+      "SECMIND_MODEL_PRIMARY_SOFT_TIMEOUT_SECONDS": "300",
+      "SECMIND_MODEL_TASK_HARD_TIMEOUT_SECONDS": "540",
+      "SECMIND_MODEL_RECOVERY_RESERVE_SECONDS": "120",
+      "SECMIND_MODEL_STREAM_MAX_SECONDS": "360",
+      "SECMIND_MODEL_CONNECT_TIMEOUT_SECONDS": "10",
+      "SECMIND_MODEL_POOL_TIMEOUT_SECONDS": "10",
+      "SECMIND_MODEL_WRITE_TIMEOUT_SECONDS": "30",
+      "SECMIND_MODEL_READ_IDLE_TIMEOUT_SECONDS": "120",
+      "SECMIND_MODEL_MAX_ATTEMPTS": "3",
+      "SECMIND_MAX_RUNTIME_SECONDS": "1800",
+      "SECMIND_MAX_INPUT_TOKENS": "2000000",
+      "SECMIND_MAX_OUTPUT_TOKENS": "200000",
+      "SECMIND_MAX_PROVIDER_REQUESTS": "80",
+      "SECMIND_MAX_TOOL_CALLS": "100",
+      "SECMIND_MODEL_STRUCTURED_REPAIR_ATTEMPTS": "1",
+      "SECMIND_MODEL_PRIMARY_FALLBACK_ENABLED": "true",
+      "SECMIND_PRIMARY_ADVISORY_CONTEXT_BYTES": "128000",
+      "SECMIND_SOURCE_TRIAGE_MODE": "rank_and_signed_skill",
+      "SECMIND_BINARY_LOG_PARSERS_ENABLED": "true",
+      "SECMIND_HYBRID_KNOWLEDGE_ENABLED": "true",
+      "SECMIND_HYBRID_KNOWLEDGE_OFFLINE_FALLBACK_ENABLED": "true",
+      "SECMIND_SEMGREP_CANDIDATE_RULES_ENABLED": "true",
+      "SECMIND_SEMGREP_SAST_RULE_BUNDLE_DIGEST": "358d2fdefe8949bdfe0fc02e616f904a4d59a3baf88380d90552107004a09ac1",
+      "SECMIND_ENABLE_LOG_ANALYSIS": "true",
+      "SECMIND_ENABLE_INCIDENT_DRY_RUN": "true",
+      "SECMIND_ENABLE_API_STATIC_ASSESSMENT": "true"
+    },
+    "service_profile": "secmind-v1-full"
+  },
+  "limits": {
+    "task_timeout_seconds": 2220,
+    "log_max_bytes": 262144,
+    "result_max_bytes": 8388608
+  }
+}

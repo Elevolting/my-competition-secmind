@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "model": "deepseek-v4-flash",
+  "task_count": 12,
+  "repetitions": 1,
+  "concurrency": 2,
+  "timeout_seconds_per_task": 420,
+  "api_key_stored": false,
+  "baseline": {
+    "source_commit": "2f9071975f5aafa1900ad66c3f965246f4a88f79",
+    "source_tree_oid": "e982d724cb32c53e8f3bcd815fb81d41a67c0244",
+    "overall_score": 0.808333,
+    "exact_cwe_f1": 0.666667,
+    "exact_cwe": {"tp": 7, "fp": 5, "fn": 2, "tn": 2},
+    "strict_success_rate": 0.25,
+    "live_provider_success_rate": 1.0,
+    "provider_attempts": 14,
+    "failed_provider_attempts": 0,
+    "total_tokens": 134991,
+    "finding_count": 12,
+    "finding_evidence_complete": 12,
+    "ledger_valid_rate": 1.0,
+    "prediction_commitment_sha256": "b6e4b73b43c0db53845ede06e1a3b5ee84e9e91978bd598bf2f2a0cb14fd9c12",
+    "envelope_commitment_sha256": "dade2c1426046bb7829e2067738201eaf393eb6dfb9ce8cafdf10a683ba8890d"
+  },
+  "fusion": {
+    "source_commit": "49bbefa1db469d9f8f74af1070312322fedcbea8",
+    "source_tree_oid": "2982387515a6a9e395bd9cd3b90d1f133ad684e8",
+    "overall_score": 0.916667,
+    "exact_cwe_f1": 0.782609,
+    "exact_cwe": {"tp": 9, "fp": 5, "fn": 0, "tn": 2},
+    "strict_success_rate": 0.083333,
+    "live_provider_success_rate": 0.916667,
+    "provider_attempts": 13,
+    "failed_provider_attempts": 1,
+    "total_tokens": 112044,
+    "finding_count": 14,
+    "finding_evidence_complete": 14,
+    "ledger_valid_rate": 1.0,
+    "prediction_commitment_sha256": "d8070e4437cd03f20a7b64532f7071ce7ddf8d9a0dc8cd7bec3acf8933e241d8",
+    "envelope_commitment_sha256": "0e6df486079c0ab8715d83b44589f1133f3e50b086a0eb1223b8d20f75d78ac5"
+  },
+  "delta": {
+    "overall_score": 0.108334,
+    "exact_cwe_f1": 0.115942,
+    "strict_success_rate": -0.166667,
+    "total_tokens": -22947
+  },
+  "non_regression_passed": false,
+  "failed_checks": [
+    "operational_success_rate_non_regression",
+    "baseline_operational_success_rate",
+    "fusion_operational_success_rate",
+    "fusion_live_provider_success_rate"
+  ],
+  "artifact_hashes": {
+    "scores_json": "0a52fc108b29a38b0684d5ac7eef5070c46a9147626c8b124bad294188d60df1",
+    "non_regression_json": "1450a59cadb31173c0985926da9e7d65276a186ce7630814bf8b746a0b550a58",
+    "task_scores_csv": "551c99db6e67fa15d77de4606a3b9c407a555955d57a5b3df15abf13c2e4768e"
+  },
+  "conclusion": "quality_gain_observed_but_release_gate_failed"
+}

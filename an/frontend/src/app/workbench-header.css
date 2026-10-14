@@ -1,0 +1,107 @@
+.conversation-panel {
+  min-width: 0;
+}
+
+.conversation-panel .module-flow-node {
+  flex: 0 0 auto;
+}
+
+.conversation-panel .module-flow-arrow {
+  flex: 0 0 auto;
+}
+
+.run-heading {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(135, 177, 195, .13);
+}
+
+.run-heading-top {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.run-heading-title {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.run-heading-title .panel-kicker {
+  display: block;
+  white-space: nowrap;
+}
+
+.run-heading-title h4 {
+  margin: 5px 0 4px !important;
+  overflow: hidden;
+  font-size: 20px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.run-heading-id {
+  display: block;
+  overflow: hidden;
+  color: #71818a;
+  font-size: 11px;
+  line-height: 1.6;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.run-heading-primary,
+.run-heading-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.run-heading-primary {
+  flex: 0 0 auto;
+  padding-top: 3px;
+}
+
+.run-heading-primary .ant-tag {
+  margin: 0;
+}
+
+.run-view-tabs {
+  max-width: 100%;
+  margin-top: 16px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.run-view-tabs .ant-segmented {
+  width: max-content;
+  max-width: none;
+}
+
+.run-view-tabs .ant-segmented-item-label,
+.run-heading .ant-btn {
+  white-space: nowrap;
+}
+
+.run-heading-actions {
+  margin-top: 10px;
+}
+
+body.light-theme .run-heading {
+  border-color: #d8e1ea;
+}
+
+body.light-theme .run-heading-id {
+  color: #5c6c7d;
+}
+
+@media (max-width: 600px) {
+  .run-heading {
+    padding: 14px;
+  }
+}

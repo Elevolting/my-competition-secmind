@@ -1,0 +1,30 @@
+{
+  "schema_version": "tool-calibration-platform-readiness-1.0",
+  "dataset_id": "secmind-heldout-tools-2026-08-v3",
+  "captured_env": {
+    "trusted_public_key_file": "evaluation/tool-calibration/v3-platform-trust-root.pub",
+    "public_key_file_configured": true,
+    "private_key_file_configured": false,
+    "heldout_version": "secmind-heldout-tools-2026-08-v3",
+    "heldout_manifest_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+    "heldout_report_digest": "8f26827a663be1dd52ac9236a960f98ec10ca84d18cadf9024b66fef48af0df1"
+  },
+  "readiness": {
+    "status": "not_ready",
+    "required": true,
+    "signature_algorithm": "Ed25519",
+    "private_key_configured": false,
+    "trusted_public_key_configured": true,
+    "private_public_key_match": false,
+    "trusted_public_key_source": "public_key",
+    "heldout_calibration_version": "secmind-heldout-tools-2026-08-v3",
+    "heldout_calibration_manifest_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+    "heldout_calibration_report_digest": "8f26827a663be1dd52ac9236a960f98ec10ca84d18cadf9024b66fef48af0df1",
+    "heldout_calibration_digest": null,
+    "signer_id_configured": false,
+    "reasons": [
+      "private_key_unconfigured"
+    ]
+  },
+  "interpretation": "Fail-closed platform readiness evidence captured before any v3 scanner invocation; the public key alone cannot sign ToolResult assurance contracts."
+}

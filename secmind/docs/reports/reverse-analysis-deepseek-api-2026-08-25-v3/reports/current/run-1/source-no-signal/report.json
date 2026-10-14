@@ -1,0 +1,84 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [],
+    "execution_status": "completed",
+    "executive_summary": "逆向分析未发现明确的恶意行为链或高置信度风险信号。基于静态封存证据，样本未展现出可证实的安全威胁，但存在分析盲区。建议保持监控，不构成紧急处置依据。",
+    "findings": [],
+    "human_decision_recommendations": [
+      {
+        "action": "维持现有安全监控策略，不发起紧急处置。",
+        "decision_role": "安全负责人",
+        "expected_outcome": "降低误报风险，保留分析资源用于确实威胁。",
+        "priority": "P3",
+        "rationale": "缺乏明确恶意信号，证据不足以下达高优先级响应，应避免误报造成资源浪费。"
+      },
+      {
+        "action": "在获得更多动态或源码证据后重新评估。",
+        "decision_role": "研发负责人",
+        "expected_outcome": "更新风险评估，确认或排除潜在威胁。",
+        "priority": "P2",
+        "rationale": "静态盲区可能掩盖运行时恶意行为，需补充分析以消除未知。"
+      }
+    ],
+    "limitations": [
+      "证据包中未包含动态观察数据。",
+      "未见完整源码或反编译结果，仅凭封存静态信号。",
+      "无法验证样本在真实环境中的行为。"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "扩大证据收集范围，包括动态沙箱行为日志和网络流量。",
+      "请求提供源码或反编译中间表示以补充静态分析。",
+      "在隔离环境执行样本并记录运行时API调用序列。"
+    ],
+    "reverse_analysis": "封存证据包中未包含完整、高置信度的逆向行为链。静态观察未提取到可明确判定为恶意的API调用、持久化机制、网络信标或代码混淆特征。证据边界限定为静态或模拟，未观察到运行时行为。因此，无法形成恶意功能的时间顺序或因果链条。结论应克制，避免推测证据之外的运行时活动。",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "unknown",
+      "overall_risk": "unknown",
+      "urgency": "low"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": null,
+      "facts": {
+        "mitre": []
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "c5e3ba81dc533b7218456b35f45213c332456b8fb774971d9c98ddd780535bd8",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "样本运行时网络通信内容。",
+      "样本是否包含隐蔽持久化机制。",
+      "样本与已知恶意家族的关联性。"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-no-signal",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "c5e3ba81dc533b7218456b35f45213c332456b8fb774971d9c98ddd780535bd8",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

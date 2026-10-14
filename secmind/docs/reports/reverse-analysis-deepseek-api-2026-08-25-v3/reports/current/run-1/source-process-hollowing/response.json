@@ -1,0 +1,116 @@
+{
+  "execution_status": "completed",
+  "model_response_sha256": "5f9debe5bad799505212b9d978dae6ec83a362a8c41529aaa89614099181db3a",
+  "report": {
+    "evidence_refs": [
+      "evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691",
+      "evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87",
+      "evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f",
+      "evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04",
+      "evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c",
+      "evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a",
+      "evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "已识别完整进程镂空链（Process Hollowing, T1055.012）。恶意样本通过创建挂起进程、卸载原镜像、写入恶意代码并恢复线程，实现代码执行与隐蔽驻留。建议立即隔离主机并溯源入侵路径。",
+    "findings": [
+      {
+        "business_impact": "攻击者可在受感染主机上以合法进程身份执行任意代码，绕过基于进程白名单的防御，可能导致数据泄露、勒索软件部署或横向移动，对业务连续性和数据机密性构成严重威胁。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691",
+          "evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87",
+          "evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f",
+          "evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04",
+          "evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c",
+          "evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a",
+          "evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc"
+        ],
+        "severity": "critical",
+        "technical_explanation": "样本通过Windows API组合实现进程镂空：CreateProcessA以CREATE_SUSPENDED标志创建合法进程；NtUnmapViewOfSection卸载原始可执行映像；VirtualAllocEx分配新内存并写入恶意代码；SetThreadContext修改入口点；ResumeThread启动恶意线程。该链完全匹配T1055.012，静态证据充分，无运行时观测。",
+        "title": "进程镂空注入技术"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "立即隔离受影响主机并终止可疑进程树",
+        "decision_role": "security_operations",
+        "expected_outcome": "遏制恶意代码运行，防止进一步横向扩散和数据外泄。",
+        "priority": "P0",
+        "rationale": "进程镂空高度隐蔽且可执行任意载荷，可能已造成未授权代码执行。"
+      },
+      {
+        "action": "采集内存镜像与进程调用栈以确认载荷内容",
+        "decision_role": "incident_response",
+        "expected_outcome": "获取可操作的IOC和攻击者意图，支撑后续取证与清除。",
+        "priority": "P1",
+        "rationale": "需确认写入的恶意载荷及其功能，评估影响范围。"
+      },
+      {
+        "action": "审查端点检测与响应规则以增强对进程镂空链的告警",
+        "decision_role": "security_engineering",
+        "expected_outcome": "提升对类似T1055.012手法的识别率，减少未来事件失察风险。",
+        "priority": "P2",
+        "rationale": "现有防线被绕过，需要补齐针对挂起进程创建、内存写入、线程恢复的检测。"
+      }
+    ],
+    "limitations": [
+      "仅基于静态分析，未验证运行时行为",
+      "未获取样本原始二进制文件，无法进行深度逆向",
+      "不排除其他进程注入技术同时存在的可能"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "分析内存转储以提取注入的恶意代码样本",
+      "检查同一主机上其他进程的内存区域是否包含异常代码",
+      "将样本哈希和IOC发布到威胁情报平台",
+      "开展端点检测日志回溯以识别最早攻击时间点",
+      "评估关联的网络流量以确认命令与控制通信"
+    ],
+    "reverse_analysis": "静态分析确认样本包含完整的进程镂空（Process Hollowing）实现链：1) 使用CreateProcessA创建挂起状态的合法进程；2) 通过NtUnmapViewOfSection卸载目标进程内存中的原始镜像；3) 分配新内存区域并写入恶意载荷；4) 修改线程上下文（如EAX寄存器）指向新入口点；5) 调用ResumeThread恢复执行。证据显示该技术符合MITRE ATT&CK T1055.012，属于进程注入的子技术，用于规避安全检测并隐蔽执行恶意代码。",
+    "risk_assessment": {
+      "exploitability": "high",
+      "impact_scope": "entire_endpoint_environment",
+      "overall_risk": "high",
+      "urgency": "immediate"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "process_hollowing"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Process Injection: Process Hollowing",
+          "T1055.012",
+          "process_hollowing"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "注入的具体恶意载荷功能未知",
+      "样本最终投递的C2地址与通信协议未知",
+      "攻击的初始入侵向量（入口点）未知"
+    ]
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-process-hollowing",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

@@ -1,0 +1,2 @@
+API_ENDPOINT=https://service.example.invalid
+LOG_LEVEL=info

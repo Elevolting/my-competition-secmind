@@ -1,0 +1,93 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-13237dbcad65e2fc748a1ab737c255aceb0bf2489ab31fd39088e348de9c7e4e",
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "在仿真环境中输入错误口令，进程比较后拒绝令牌，打印拒绝消息并退出，未创建文件。",
+    "findings": [
+      {
+        "business_impact": "错误口令路径未创建文件，行为可预测，无数据写入风险。",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-13237dbcad65e2fc748a1ab737c255aceb0bf2489ab31fd39088e348de9c7e4e"
+        ],
+        "severity": "Info",
+        "technical_explanation": "strcmp 返回 1，puts 输出 'token rejected; no file was created'，exit(2) 终止进程。",
+        "title": "错误口令拒绝并退出"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "无需响应",
+        "decision_role": "Security Engineer",
+        "expected_outcome": "保持现有行为，无需修改。",
+        "priority": "P3",
+        "rationale": "错误口令路径安全，未泄露敏感信息或写入文件。"
+      }
+    ],
+    "limitations": [
+      "无动态执行；模拟路径。",
+      "无完整反汇编。",
+      "XOR 解码为启发式。"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "无进一步动作"
+    ],
+    "reverse_analysis": "程序启动后初始化，读取参数并比较输入（NOT-THE-TOKEN）与硬编码令牌（SECMIND-REVERSE-OK），strcmp 返回非零，输出拒绝信息，调用 exit(2)。",
+    "risk_assessment": {
+      "exploitability": "Low",
+      "impact_scope": "Local",
+      "overall_risk": "Low",
+      "urgency": "Low"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "argument_check",
+        "string_comparison"
+      ],
+      "error": null,
+      "facts": {
+        "architecture": "x86-64",
+        "created_files": [],
+        "exit_code": 2,
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "section_count": 10
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": []
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "static_presence",
+    "sources": [
+      "emulated"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-wrong-token",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

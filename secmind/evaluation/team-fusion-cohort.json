@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "dataset_version": "2026.07-comprehensive-2",
+  "arm": "v080",
+  "model": "deepseek-v4-flash",
+  "repetitions": 1,
+  "ordered_task_ids": [
+    "SMX-5D4B585AB4",
+    "SMX-6870A04DC2",
+    "SMX-6F65D85841",
+    "SMX-81CAB53DB2",
+    "SMX-8E2633D74F",
+    "SMX-B09927F4A3",
+    "SMX-B381EDE438",
+    "SMX-B8620BD68A",
+    "SMX-CC1C07DA6C",
+    "SMX-CEBE74F420",
+    "SMX-F82ECCD8E5",
+    "SMX-F83F864457"
+  ]
+}

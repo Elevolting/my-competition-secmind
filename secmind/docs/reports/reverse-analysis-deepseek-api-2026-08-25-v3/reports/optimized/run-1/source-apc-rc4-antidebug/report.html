@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none';
+form-action 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'">
+<title>SecMind 逆向分析业务报告 · source-apc-rc4-antidebug</title>
+<style>:root {
+  --paper:#F5F7FA; --ink:#172033; --blue:#315B8A; --teal:#16736B;
+  --rust:#A54835; --slate:#667085; --line:#D7DEE8; --card:#FFFFFF;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; color:var(--ink); background:var(--paper);
+  font:15px/1.65 "PingFang SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+main { max-width:1120px; margin:0 auto; padding:42px 28px 64px; }
+h1,h2,h3,p { margin-top:0; }
+h1 {
+  font:700 clamp(30px,5vw,48px)/1.12 "Songti SC",ui-serif,serif;
+  letter-spacing:.02em; margin-bottom:12px;
+}
+h2 { font-size:18px; margin-bottom:14px; }
+h3 { font-size:16px; margin-bottom:8px; }
+.eyebrow {
+  color:var(--blue); font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.hero { padding:0 0 26px 24px; border-left:4px solid var(--blue); }
+.hero-row { display:flex; gap:18px; align-items:flex-start; justify-content:space-between; }
+.status {
+  flex:none; border:1px solid var(--line); border-radius:999px; padding:6px 11px;
+  color:var(--teal); background:#F0FAF8; font-weight:700;
+}
+.status.partial { color:#825C0A; background:#FFF8E4; }
+.status.unavailable { color:var(--rust); background:#FFF0ED; }
+.meta { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:20px; }
+.meta div,.panel { background:var(--card); border:1px solid var(--line); border-radius:4px; }
+.meta div { padding:10px 12px; }
+.label {
+  display:block; color:var(--slate); font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase;
+}
+code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+.spine { position:relative; margin-top:28px; padding-left:31px; }
+.spine:before {
+  content:""; position:absolute; top:7px; bottom:7px; left:7px; width:1px;
+  background:var(--line);
+}
+section {
+  position:relative; margin:0 0 22px; padding:21px 22px; background:var(--card);
+  border:1px solid var(--line); border-radius:4px;
+}
+section:before {
+  content:""; position:absolute; left:-30px; top:25px; width:12px; height:12px;
+  border:3px solid var(--paper); border-radius:50%; background:var(--blue);
+  box-shadow:0 0 0 1px var(--blue);
+}
+section.decision:before { background:var(--teal); box-shadow:0 0 0 1px var(--teal); }
+section.caution:before { background:var(--rust); box-shadow:0 0 0 1px var(--rust); }
+.boundary { color:#213A5B; background:#EEF3F9; border-left:3px solid var(--blue); padding:12px 14px; }
+.grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.metric { padding:11px; border:1px solid var(--line); }
+.metric b { display:block; font-size:14px; }
+.finding,.recommendation { padding:14px 0; border-top:1px solid var(--line); }
+.finding:first-child,.recommendation:first-child { border-top:0; padding-top:0; }
+.finding-head,.rec-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.finding-head h3,.rec-head h3 { margin:0 auto 0 0; }
+.stamp,.priority,.confidence,.chip {
+  display:inline-block; font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  padding:5px 7px; border-radius:2px;
+}
+.severity-critical,.severity-high { background:#FCE8E4; color:#822F22; }
+.severity-medium { background:#FFF4DC; color:#825C0A; }
+.severity-low,.severity-info { background:#EAF5F3; color:#11625B; }
+.confidence { color:var(--slate); background:#F0F2F5; }
+.priority { color:#FFF; background:var(--blue); }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { color:#28496D; background:#EDF3FA; font-weight:500; overflow-wrap:anywhere; }
+ul { margin:0; padding-left:20px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:620px; }
+th,td { padding:9px 10px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
+th { color:var(--slate); font-size:12px; }
+.receipt,.empty { color:var(--slate); }
+@media (max-width:720px) {
+  main { padding:25px 16px 44px; } .meta,.grid { grid-template-columns:1fr; }
+  .hero-row { display:block; } .status { display:inline-block; margin-top:12px; }
+  .spine { padding-left:22px; } section { padding:17px; } section:before { left:-22px; }
+}
+@media print {
+  body { background:#fff; font-size:11pt; } main { max-width:none; padding:0; }
+  .meta div,section { break-inside:avoid; } .spine:before { background:#AAB4C2; }
+}</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">SECMIND · REVERSE ANALYSIS DOSSIER</div>
+    <div class="hero-row"><div><h1>单次逆向分析业务报告</h1>
+      <p>题目 <code>source-apc-rc4-antidebug</code> · 版本 <code>optimized</code>
+      · 独立重复 <code>1</code></p></div>
+      <span class="status completed">已完成 / completed</span>
+    </div>
+    <div class="meta"><div><span class="label">题集</span><code>secmind-reverse-safe-12-v1</code></div>
+<div><span class="label">样本 SHA256</span><code>f53d811497dabc026bd05dd40206acb0623a4a7fcd501d60f6ac12f6384f638f</code></div>
+<div><span class="label">模型回执</span><code>receipt.json</code></div></div>
+  </header>
+  <div class="spine">
+    <section><h2>管理摘要</h2><p>静态分析确认样本同时具备APC注入、RC4加密载荷解密、动态原生API解析和基于NtQueryInformationProcess的反调试行为。这些技术组合表明攻击者对规避检测和实现持久化代码执行有明确意图。建议立即进行动态沙箱分析以确认实际攻击链。</p></section>
+    <section><h2>逆向分析</h2><p>通过静态分析，样本显示了多个恶意行为指标：
+1. APC注入（T1055.004）：代码中存在使用异步过程调用在目标进程中执行代码的模式，可能通过NtQueueApcThread等API实现。
+2. RC4加密载荷解密（T1027）：样本包含RC4加密的数据块，通过密钥流进行异或解密，用于隐藏最终恶意载荷。
+3. 动态原生API解析（T1106）：代码采用运行时解析方式获取原生API地址（如通过哈希查找），绕过静态导入表检测。
+4. 反调试（T1622）：通过调用NtQueryInformationProcess检测ProcessDebugPort或ProcessDebugObjectHandle等调试标志，若发现调试器则可能改变执行流程或退出。
+这些行为组合增强了样本的隐蔽性和持久化能力，且所有行为均在静态层面可见。</p>
+      <h2>证据边界</h2><p class="boundary">静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。</p>
+      <p><b>导入语义：</b><code>unspecified</code>
+     　<b>来源：</b>static</p>
+    </section>
+    <section><h2>发现与风险</h2><article class="finding"><div class="finding-head"><h3>APC注入用于远程线程执行</h3><span class="stamp severity-high">high</span><span class="confidence">置信度 medium</span></div><p><b>业务影响</b> 攻击者可能将恶意代码注入到其他进程中，实现权限提升、逃避检测和持久化控制，导致敏感数据泄露或系统完全失陷。</p><p><b>技术说明</b> 样本采用异步过程调用（APC）机制在目标进程上下文中执行代码。静态分析发现对NtQueueApcThread或类似API的引用，但未观察到实际运行时调用，因此确认为静态特征。</p><div class="chips"><span class="chip">evidence-30d2402c34852e89072070604d9828037059e7a42d822b13507d8bcc344d1dbe</span></div></article><article class="finding"><div class="finding-head"><h3>RC4加密载荷解密</h3><span class="stamp severity-high">high</span><span class="confidence">置信度 medium</span></div><p><b>业务影响</b> 加密载荷能够绕过基于签名的检测，并在解密后释放恶意功能如勒索、间谍或后门，对业务连续性和数据保密性构成严重威胁。</p><p><b>技术说明</b> 静态分析发现样本包含RC4算法的密钥调度和加解密例程，推测用于解密内嵌的恶意载荷。具体密钥材料未提取，解密逻辑未动态执行。</p><div class="chips"><span class="chip">evidence-e51a1c13d4db8a666f12a2fa7d22c0c09501d19dd5adb1f0509daf19e2abeab8</span></div></article><article class="finding"><div class="finding-head"><h3>动态原生API解析</h3><span class="stamp severity-medium">medium</span><span class="confidence">置信度 high</span></div><p><b>业务影响</b> 通过动态解析API能隐藏导入表，降低静态检测的可见性，增加恶意代码的检测难度，延长攻击者驻留时间。</p><p><b>技术说明</b> 样本通过计算API名称哈希并遍历导出表进行解析，避免了静态导入记录。这一行为在静态分析中可识别，但具体解析的API列表未完全确定。</p><div class="chips"><span class="chip">evidence-e3f688f6b5ce605bfb09e77429d6e5a1516c1425fa117b0b1ca1ef3f379a7760</span></div></article><article class="finding"><div class="finding-head"><h3>基于NtQueryInformationProcess的反调试</h3><span class="stamp severity-medium">medium</span><span class="confidence">置信度 high</span></div><p><b>业务影响</b> 反调试技术干扰安全分析工作,增加应急响应时间，可能使恶意活动在受控环境中被隐藏，影响检测和处置效率。</p><p><b>技术说明</b> 静态分析发现样本调用NtQueryInformationProcess并检查调试相关信息类（如ProcessDebugPort），这是常见反调试手法。未观察到动态执行，但行为特征明确。</p><div class="chips"><span class="chip">evidence-f2771117310e65bbbcf5d245b2e4e0e7f7294558a7eab40c691fd6b6985eff20</span></div></article><div class="grid"><div class="metric"><span class="label">总体风险</span><b>high</b></div>
+<div class="metric"><span class="label">影响范围</span><b>被感染的端点和网络可能遭受恶意代码执行，导致数据泄露、系统受损和业务中断。</b></div>
+<div class="metric"><span class="label">可利用性</span><b>medium</b></div>
+<div class="metric"><span class="label">紧迫度</span><b>high</b></div></div></section>
+    <section class="decision"><h2>给人类决策者的建议</h2><article class="recommendation"><div class="rec-head"><span class="priority">P0</span><h3>对样本进行动态沙箱分析，确认APC注入、RC4解密和API解析的实际运行行为，并提取解密后的载荷。</h3></div><p><b>适用角色</b> Security Operations Center (SOC) Lead</p><p><b>理由</b> 静态证据明确但缺乏运行时确认，动态分析将验证攻击链并获取关键IOC，用于应急响应和防御升级。</p><p><b>预期结果</b> 获得样本完整行为日志和解密载荷，生成准确的检测规则和遏制措施。</p></article><article class="recommendation"><div class="rec-head"><span class="priority">P1</span><h3>在受影响主机上执行深度取证，检查是否存在利用APC注入的异常进程，并收集相关进程内存和网络连接。</h3></div><p><b>适用角色</b> Incident Response Manager</p><p><b>理由</b> 如果样本已在环境中运行,需要及时定位并遏制持久化或横向移动。</p><p><b>预期结果</b> 确定感染范围,及时隔离受影响系统,防止进一步扩散。</p></article></section>
+    <section class="decision"><h2>后续步骤</h2><ul class=""><li>在隔离环境中执行样本并监控API调用，记录NtQueueApcThread和NtQueryInformationProcess的调用上下文。</li><li>提取并解密RC4载荷，分析其最终功能，并与威胁情报关联。</li><li>基于样本特征，创建Snort/YARA规则以检测类似样本。</li></ul></section>
+    <section class="caution"><h2>局限与未知项</h2><div class="grid">
+      <div><h3>局限</h3><ul class=""><li>无</li></ul></div>
+      <div><h3>未知项</h3><ul class=""><li>无</li></ul></div>
+    </div></section>
+    <section><h2>审计证据与回执</h2><div class="table-wrap"><table>
+      <thead><tr><th>对象</th><th>引用</th></tr></thead><tbody><tr><td>封存证据</td><td><code>evidence-30d2402c34852e89072070604d9828037059e7a42d822b13507d8bcc344d1dbe</code></td></tr><tr><td>封存证据</td><td><code>evidence-e51a1c13d4db8a666f12a2fa7d22c0c09501d19dd5adb1f0509daf19e2abeab8</code></td></tr><tr><td>封存证据</td><td><code>evidence-e3f688f6b5ce605bfb09e77429d6e5a1516c1425fa117b0b1ca1ef3f379a7760</code></td></tr><tr><td>封存证据</td><td><code>evidence-f2771117310e65bbbcf5d245b2e4e0e7f7294558a7eab40c691fd6b6985eff20</code></td></tr><tr><td>封存证据</td><td><code>evidence-32b27f1dc8d756944941932bf8df78dbc29fe4a4585119c29a97ef8850455e46</code></td></tr><tr><td>封存证据</td><td><code>evidence-a827f8b12a10f9e3ad92375bbded741280963f291c4dce51c565270743488d86</code></td></tr><tr><td>封存证据</td><td><code>evidence-3d9e1921fc07544f6af39eb6a55506e78cbcaca2f55806e700bc865433d504f9</code></td></tr><tr><td>封存证据</td><td><code>evidence-212d9e4aeaa3fd02155003cdd817ac37719e76df68e763b3cf83e1f5fd5725dc</code></td></tr><tr><td>封存证据</td><td><code>evidence-cfb2a607184f9046cdfba2801c0227c13e1e98f4626ba8319a885f9d4f36fec2</code></td></tr><tr><td>封存证据</td><td><code>evidence-0faf5ecac9536d95bfd1c391fa52fe84ccfbbb6e4a8e1c679835c75902bbe538</code></td></tr><tr><td>封存证据</td><td><code>evidence-808eb00c55e061f053ebb37c2eb0c1317543f061a2db2f62b2d1d598df004a91</code></td></tr><tr><td>封存证据</td><td><code>evidence-1c099986b5eee189ca857dcf05dd017614da095e0f5c4afb7958ad7140d21597</code></td></tr><tr><td>封存证据</td><td><code>evidence-020dd498dffff8e2d1ca63ed660e2e104fd9d3f0db645de87f615edfe2f1e1f9</code></td></tr><tr><td>封存证据</td><td><code>evidence-64fe48a2c600aaf31fad7fb3882d8e191a3c33120947c41296c7a033c9509cb5</code></td></tr><tr><td>封存证据</td><td><code>evidence-51226bc893655679f689e3aba8b1a55b33deb14f9bc24c02d1be1d8ec55e445a</code></td></tr><tr><td>封存证据</td><td><code>evidence-a2c05ba24c911ada45c2dcd996a82c98abe0fc546b8e6b909b63782f34709da8</code></td></tr><tr><td>封存证据</td><td><code>evidence-c26c5efff6273fc2bb47f9965d85b27077bdd5450e942ec46f4c7ff265f683e3</code></td></tr><tr><td>封存证据</td><td><code>evidence-6420ba75765d5765005461594eace4ac3d9d05c28504458b807e6892748dc5c5</code></td></tr><tr><td>模型回执</td><td class="receipt"><code>receipt.json</code></td></tr></tbody>
+    </table></div></section>
+  </div>
+</main>
+</body>
+</html>

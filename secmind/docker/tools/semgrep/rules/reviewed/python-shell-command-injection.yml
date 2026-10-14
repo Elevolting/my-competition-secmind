@@ -1,0 +1,23 @@
+rules:
+  - id: secmind.python.flask-shell-command-injection
+    languages: [python]
+    mode: taint
+    message: User-controlled Flask request data reaches a subprocess shell command.
+    severity: ERROR
+    metadata:
+      cwe: CWE-78
+      confidence: HIGH
+      license: CC-BY-SA-4.0
+      remediation: Pass a fixed executable and validated arguments as a list with shell disabled.
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.values.get(...)
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: subprocess.run($CMD, ..., shell=True, ...)
+              - pattern: subprocess.call($CMD, ..., shell=True, ...)
+              - pattern: subprocess.Popen($CMD, ..., shell=True, ...)
+              - pattern: os.system($CMD)

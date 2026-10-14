@@ -1,0 +1,13 @@
+{
+  "arm": "current",
+  "case_id": "dynamic-wrong-token",
+  "receipt_sha256": "77984c2fcacda2d78e0853cf9239d9db0bfe91e30ea545fbc479b277f4dc8080",
+  "repeat_id": 1,
+  "report_html_sha256": "29a04e15788d28e56f6d721000a5afdcb93e9648eaddd2a244b794465c54fd84",
+  "report_json_sha256": "fa5b8953450a9a26f85b36200989ab6035850ff4adc54c65a7cb13df469d6c61",
+  "report_md_sha256": "d17cf0d4bd0c97604ed52665c50a1299e3a6f55529541820760bb5d0dbbbbb4d",
+  "request_sha256": "02ab968e47a8d1f413e2cb541cca851e5fe8e73a8cc285b84169bc375f14067f",
+  "response_sha256": "a34c172c7316be079f7aee639898e0ada8e2e22ea81d8dc11c94a78abed291fb",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

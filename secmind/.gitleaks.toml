@@ -1,0 +1,6 @@
+[allowlist]
+description = "Golden digests and the frozen invalid-key calibration fixture contain no usable credentials."
+paths = [
+  '''^contracts/golden-v1\.2\.json$''',
+  '''^evaluation/tool-calibration/fixtures-v3/gitleaks-positive-private\.pem$''',
+]

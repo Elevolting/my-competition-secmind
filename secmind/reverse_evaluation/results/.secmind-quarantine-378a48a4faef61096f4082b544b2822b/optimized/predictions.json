@@ -1,0 +1,2241 @@
+{
+  "arm": "optimized",
+  "cases": [
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "id": "pe-structure",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "id": "pe-imports",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "id": "xor-recovery",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [
+        "argument_check",
+        "string_comparison"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "evidence-084b99d1f180c7e879c3ff7e"
+      ],
+      "extensions": {
+        "reverse_analysis": {
+          "artifacts": {
+            "created_files": [],
+            "exit_code": 2,
+            "file_open_attempts": []
+          },
+          "coverage": {
+            "architecture": "x64",
+            "content_addressed_copy": true,
+            "events_retained": 16,
+            "events_total": 16,
+            "host_pe_executions": 0,
+            "real_network_requests": 0,
+            "runtime_calls_observed": true,
+            "sandbox_enforced": true,
+            "sandbox_profile_sha256": "ba48013b01ac36f64f75d0c19b688b2590acffded4899ad74c6a736d963b6a8b",
+            "sandbox_scope": "evaluation_parent_attested",
+            "truncated": false
+          },
+          "error": null,
+          "events": [
+            {
+              "api_name": "kernel32.InitializeCriticalSection",
+              "args": [
+                "0x14000c120"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "msvcrt._initterm",
+              "args": [
+                "0x14000e018",
+                "0x14000e030"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "msvcrt._initterm",
+              "args": [
+                "0x14000e000",
+                "0x14000e010"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "kernel32.SetUnhandledExceptionFilter",
+              "args": [
+                "0x140001d10"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "msvcrt.malloc",
+              "args": [
+                "0x18"
+              ],
+              "event": "api",
+              "ret_val": "0x8bd0"
+            },
+            {
+              "api_name": "msvcrt.strlen",
+              "args": [
+                "reverse_demo.exe"
+              ],
+              "event": "api",
+              "ret_val": "0x10"
+            },
+            {
+              "api_name": "msvcrt.malloc",
+              "args": [
+                "0x11"
+              ],
+              "event": "api",
+              "ret_val": "0x8bf0"
+            },
+            {
+              "api_name": "msvcrt.memcpy",
+              "args": [
+                "0x8bf0",
+                "0x1058",
+                "0x11"
+              ],
+              "event": "api",
+              "ret_val": "0x8bf0"
+            },
+            {
+              "api_name": "msvcrt.strlen",
+              "args": [
+                "NOT-THE-TOKEN"
+              ],
+              "event": "api",
+              "ret_val": "0xd"
+            },
+            {
+              "api_name": "msvcrt.malloc",
+              "args": [
+                "0xe"
+              ],
+              "event": "api",
+              "ret_val": "0x8c10"
+            },
+            {
+              "api_name": "msvcrt.memcpy",
+              "args": [
+                "0x8c10",
+                "0x1069",
+                "0xe"
+              ],
+              "event": "api",
+              "ret_val": "0x8c10"
+            },
+            {
+              "api_name": "msvcrt._onexit",
+              "args": [
+                "0x140001530"
+              ],
+              "event": "api",
+              "ret_val": "0x140001530"
+            },
+            {
+              "api_name": "msvcrt._onexit",
+              "args": [
+                "0x140001570"
+              ],
+              "event": "api",
+              "ret_val": "0x140001570"
+            },
+            {
+              "api_name": "msvcrt.strcmp",
+              "args": [
+                "NOT-THE-TOKEN",
+                "SECMIND-REVERSE-OK"
+              ],
+              "event": "api",
+              "ret_val": "0x1"
+            },
+            {
+              "api_name": "msvcrt.puts",
+              "args": [
+                "token rejected; no file was created"
+              ],
+              "event": "api",
+              "ret_val": "0x23"
+            },
+            {
+              "api_name": "msvcrt.exit",
+              "args": [
+                "0x2"
+              ],
+              "event": "api",
+              "ret_val": null
+            }
+          ],
+          "evidence_refs": [
+            "evidence-084b99d1f180c7e879c3ff7e"
+          ],
+          "profile_id": "wrong_token",
+          "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+          "source": "speakeasy",
+          "status": "completed",
+          "tool_identity": {
+            "commit": "b364d53ce9364e1f8aa898b9ed53597be39b23cb",
+            "name": "speakeasy",
+            "version": "2.0.0b6"
+          }
+        }
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "created_files": [],
+        "exit_code": 2,
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "id": "dynamic-wrong-token",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [
+        "argument_check",
+        "file_io",
+        "string_comparison"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "evidence-59fd5c3f8a650c87f44f12de"
+      ],
+      "extensions": {
+        "reverse_analysis": {
+          "artifacts": {
+            "created_files": [
+              "reverse_demo_result.txt"
+            ],
+            "exit_code": 0,
+            "file_open_attempts": [
+              "reverse_demo_result.txt"
+            ]
+          },
+          "coverage": {
+            "architecture": "x64",
+            "content_addressed_copy": true,
+            "events_retained": 120,
+            "events_total": 120,
+            "host_pe_executions": 0,
+            "real_network_requests": 0,
+            "runtime_calls_observed": true,
+            "sandbox_enforced": true,
+            "sandbox_profile_sha256": "ba48013b01ac36f64f75d0c19b688b2590acffded4899ad74c6a736d963b6a8b",
+            "sandbox_scope": "evaluation_parent_attested",
+            "truncated": false
+          },
+          "error": null,
+          "events": [
+            {
+              "api_name": "kernel32.InitializeCriticalSection",
+              "args": [
+                "0x14000c120"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "msvcrt._initterm",
+              "args": [
+                "0x14000e018",
+                "0x14000e030"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "msvcrt._initterm",
+              "args": [
+                "0x14000e000",
+                "0x14000e010"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "kernel32.SetUnhandledExceptionFilter",
+              "args": [
+                "0x140001d10"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "msvcrt.malloc",
+              "args": [
+                "0x18"
+              ],
+              "event": "api",
+              "ret_val": "0x8bd0"
+            },
+            {
+              "api_name": "msvcrt.strlen",
+              "args": [
+                "reverse_demo.exe"
+              ],
+              "event": "api",
+              "ret_val": "0x10"
+            },
+            {
+              "api_name": "msvcrt.malloc",
+              "args": [
+                "0x11"
+              ],
+              "event": "api",
+              "ret_val": "0x8bf0"
+            },
+            {
+              "api_name": "msvcrt.memcpy",
+              "args": [
+                "0x8bf0",
+                "0x1068",
+                "0x11"
+              ],
+              "event": "api",
+              "ret_val": "0x8bf0"
+            },
+            {
+              "api_name": "msvcrt.strlen",
+              "args": [
+                "SECMIND-REVERSE-OK"
+              ],
+              "event": "api",
+              "ret_val": "0x12"
+            },
+            {
+              "api_name": "msvcrt.malloc",
+              "args": [
+                "0x13"
+              ],
+              "event": "api",
+              "ret_val": "0x8c10"
+            },
+            {
+              "api_name": "msvcrt.memcpy",
+              "args": [
+                "0x8c10",
+                "0x1079",
+                "0x13"
+              ],
+              "event": "api",
+              "ret_val": "0x8c10"
+            },
+            {
+              "api_name": "msvcrt._onexit",
+              "args": [
+                "0x140001530"
+              ],
+              "event": "api",
+              "ret_val": "0x140001530"
+            },
+            {
+              "api_name": "msvcrt._onexit",
+              "args": [
+                "0x140001570"
+              ],
+              "event": "api",
+              "ret_val": "0x140001570"
+            },
+            {
+              "api_name": "msvcrt.strcmp",
+              "args": [
+                "SECMIND-REVERSE-OK",
+                "SECMIND-REVERSE-OK"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "msvcrt.fopen",
+              "args": [
+                "reverse_demo_result.txt",
+                "w"
+              ],
+              "event": "api",
+              "ret_val": "0x8c30"
+            },
+            {
+              "api_name": "msvcrt.__iob_func",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8c40"
+            },
+            {
+              "api_name": "kernel32.EnterCriticalSection",
+              "args": [
+                "0x8c60"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "msvcrt._errno",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8ce0"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x66",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x66"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x72",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x72"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x76",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x76"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x74",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x74"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x72",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x72"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x69",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x69"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x67",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x67"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6d",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6d"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x70",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x70"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6c",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6c"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0xa",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0xa"
+            },
+            {
+              "api_name": "msvcrt.__iob_func",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8c40"
+            },
+            {
+              "api_name": "kernel32.LeaveCriticalSection",
+              "args": [
+                "0x8c60"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "kernel32.EnterCriticalSection",
+              "args": [
+                "0x8c60"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "msvcrt._errno",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8ce0"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x72",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x72"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x76",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x76"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x64",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x64"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x74",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x74"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x64",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x64"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6f",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6f"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6d",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6d"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x69",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x69"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x3a",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x3a"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.strlen",
+              "args": [
+                "training.example.invalid"
+              ],
+              "event": "api",
+              "ret_val": "0x18"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x74",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x74"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x72",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x72"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x69",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x69"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x67",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x67"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x2e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x2e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x78",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x78"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6d",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6d"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x70",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x70"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6c",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6c"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x2e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x2e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x69",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x69"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x76",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x76"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6c",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6c"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x69",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x69"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x64",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x64"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0xa",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0xa"
+            },
+            {
+              "api_name": "msvcrt.__iob_func",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8c40"
+            },
+            {
+              "api_name": "kernel32.LeaveCriticalSection",
+              "args": [
+                "0x8c60"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "kernel32.EnterCriticalSection",
+              "args": [
+                "0x8c60"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "msvcrt._errno",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8ce0"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6e",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6e"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x74",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x74"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x77",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x77"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6f",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6f"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x72",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x72"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6b",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6b"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x63",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x63"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x3a",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x3a"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x20",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x20"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x64",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x64"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x69",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x69"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x73",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x73"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x61",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x61"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x62",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x62"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x6c",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x6c"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x65",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x65"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0x64",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x64"
+            },
+            {
+              "api_name": "msvcrt.fputc",
+              "args": [
+                "0xa",
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0xa"
+            },
+            {
+              "api_name": "msvcrt.__iob_func",
+              "args": [],
+              "event": "api",
+              "ret_val": "0x8c40"
+            },
+            {
+              "api_name": "kernel32.LeaveCriticalSection",
+              "args": [
+                "0x8c60"
+              ],
+              "event": "api",
+              "ret_val": null
+            },
+            {
+              "api_name": "msvcrt.fclose",
+              "args": [
+                "0x8c30"
+              ],
+              "event": "api",
+              "ret_val": "0x0"
+            },
+            {
+              "api_name": "msvcrt.puts",
+              "args": [
+                "token accepted; local report created"
+              ],
+              "event": "api",
+              "ret_val": "0x24"
+            },
+            {
+              "api_name": "msvcrt.exit",
+              "args": [
+                "0x0"
+              ],
+              "event": "api",
+              "ret_val": null
+            }
+          ],
+          "evidence_refs": [
+            "evidence-59fd5c3f8a650c87f44f12de"
+          ],
+          "profile_id": "correct_token",
+          "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+          "source": "speakeasy",
+          "status": "completed",
+          "tool_identity": {
+            "commit": "b364d53ce9364e1f8aa898b9ed53597be39b23cb",
+            "name": "speakeasy",
+            "version": "2.0.0b6"
+          }
+        }
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "created_files": [
+          "reverse_demo_result.txt"
+        ],
+        "exit_code": 0,
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "id": "dynamic-correct-token",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [
+        "process_hollowing"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "0967a844-fdf5-5043-aafa-125fdac12019",
+        "359270e5-2e26-5ebf-b7c2-105dfd6cf05b",
+        "40b646c0-7fcc-5f6f-9161-c956260f6c4b",
+        "5e6a3180-6240-5630-89a8-a7ae857cab09",
+        "637b2ff0-85d9-531e-a9ee-558c20b93996",
+        "8919a814-679d-5552-9e3d-a802ff760764",
+        "e9c8df96-62b1-5cea-8a06-86e3e61492c5"
+      ],
+      "facts": {
+        "mitre": [
+          "Process Injection: Process Hollowing",
+          "T1055.012",
+          "process_hollowing"
+        ]
+      },
+      "id": "source-process-hollowing",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [
+        "dll_injection"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "230fff25-58da-5595-8ef7-b42b3e05de25",
+        "4663c07e-e2ac-53c2-9206-9764200ddc88",
+        "7d9130ba-7ca2-5cf6-919d-120dc1204976",
+        "e08eec6a-c689-5ba8-bebc-db8c2225837b",
+        "e0e77ebc-11c8-5b70-950b-0a27fff04c01"
+      ],
+      "facts": {
+        "mitre": [
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001",
+          "dll_injection"
+        ]
+      },
+      "id": "source-dll-injection-complete",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [],
+      "facts": {
+        "mitre": []
+      },
+      "id": "source-dll-injection-incomplete",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": [
+        "No complete high-confidence reverse behavior chain was established."
+      ]
+    },
+    {
+      "behaviors": [
+        "apc_injection",
+        "dynamic_native_api_resolution",
+        "encrypted_payload_decryption",
+        "ntqueryinformationprocess_debug"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "12bc8463-3291-5d6a-bb4d-927bb6d3b26f",
+        "1b62de96-c0b1-5f76-aa83-cf41b03fe06f",
+        "1ba7e735-8f7d-5d36-9ca0-9e2a8869189c",
+        "27946fd1-c6e1-5f10-9d45-611dab93a951",
+        "2fcc9630-27e5-5dc4-ae6d-0007f6f9a7c0",
+        "4c2ed949-710e-5b51-97f2-6832dbbf0eb2",
+        "58881659-51e6-57e1-89ac-f3b4497fb008",
+        "75cf4b71-8b79-5999-a39b-5ca708a5ba99",
+        "7833b315-36ff-5a38-8904-c52b13da5917",
+        "85d43dcd-b942-5378-bcd0-d7106c3e55ec",
+        "8b5746d4-080f-57f4-bcfd-5cc20ff1f477",
+        "966512c4-79e5-544a-9ac1-9725c280fc17",
+        "9897d6ef-9d84-56b3-8845-77a6a3aeb739",
+        "bc80127b-6cda-5818-b2e6-5e2673d33d84",
+        "c44063d7-589e-53a3-954e-1c3872a34d10",
+        "e3c0acb5-9c64-5315-b54b-3e079f62b052",
+        "ebad707f-17df-5114-83b2-f47d1832266c",
+        "ff75daa5-cf7c-5599-8dcd-405b94cc9271"
+      ],
+      "facts": {
+        "mitre": [
+          "Debugger Evasion",
+          "Native API",
+          "Obfuscated Files or Information",
+          "Process Injection: Asynchronous Procedure Call",
+          "T1027",
+          "T1055.004",
+          "T1106",
+          "T1622",
+          "apc_injection",
+          "dynamic_native_api_resolution",
+          "encrypted_payload_decryption",
+          "ntqueryinformationprocess_debug"
+        ]
+      },
+      "id": "source-apc-rc4-antidebug",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [],
+      "facts": {
+        "mitre": []
+      },
+      "id": "source-no-signal",
+      "limitations": [],
+      "status": "completed",
+      "unknowns": [
+        "No complete high-confidence reverse behavior chain was established."
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "MALFORMED_PE",
+        "message": "RuntimeError"
+      },
+      "evidence_refs": [],
+      "facts": {},
+      "id": "malformed-pe",
+      "limitations": [],
+      "status": "partial",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "id": "dynamic-failure-fallback",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives.",
+        "dynamic emulation unavailable"
+      ],
+      "status": "partial",
+      "unknowns": []
+    }
+  ],
+  "implementation_root": ".",
+  "platform": {
+    "machine": "arm64",
+    "python": "3.13.13",
+    "system": "Darwin"
+  },
+  "run_identity": {
+    "evaluator_digest": "dbc468ecf9006c374d59932865f2b3ed31ab21749f87e35be51eef24e2fa6cf3",
+    "gold_isolation": "macos-sandbox-exec-deny-gold-plus-public-suite-copy",
+    "implementation_commit": "2044c3a98164bd3d4ad9e887634b899372261c07",
+    "implementation_digest": "5a37c04b7be0571ee6431d21c7bff3cca82552461bb890329f8a4905cd9a8919",
+    "launch_argv_sha256": "588fe0a0a95d24fbfdce1659ab09c0a887fa55acef94ac1d5c5e834cdef41294",
+    "manifest_sha256": "d87eca58b1cbdd3ee1f75deabfebfaf7bb6741034a3821a521589226dda44d8e",
+    "model_budget": "offline-no-model-calls",
+    "prompt_contract": "public-manifest-only",
+    "sandbox_executable": "/usr/bin/sandbox-exec",
+    "sandbox_profile_sha256": "ba48013b01ac36f64f75d0c19b688b2590acffded4899ad74c6a736d963b6a8b"
+  },
+  "safety": {
+    "host_pe_executions": 0,
+    "real_network_requests": 0,
+    "secret_leaks": 0,
+    "target_writes": 0
+  },
+  "safety_receipts": {
+    "host_pe_executions": {
+      "count": 0,
+      "evidence": [
+        "launch-contract:python-worker-and-api-emulator",
+        "launch-argv-sha256:588fe0a0a95d24fbfdce1659ab09c0a887fa55acef94ac1d5c5e834cdef41294"
+      ],
+      "status": "verified"
+    },
+    "real_network_requests": {
+      "count": 0,
+      "evidence": [
+        "sandbox-profile-sha256:ba48013b01ac36f64f75d0c19b688b2590acffded4899ad74c6a736d963b6a8b",
+        "launch-argv-sha256:588fe0a0a95d24fbfdce1659ab09c0a887fa55acef94ac1d5c5e834cdef41294"
+      ],
+      "sandbox_executable": "/usr/bin/sandbox-exec",
+      "status": "verified"
+    },
+    "secret_leaks": {
+      "count": 0,
+      "evidence": [
+        "serialized-output-secret-marker-scan-v1",
+        "3046591b28d1047bc672e4f45454a1c1f162417bf72869281be3a52acacba693"
+      ],
+      "status": "verified"
+    },
+    "target_writes": {
+      "count": 0,
+      "evidence": [
+        "target-hash-before:50374f8f22c77560d217126cfac19cf4eece267831379a4b0b60e3b4f174046b",
+        "target-hash-after:50374f8f22c77560d217126cfac19cf4eece267831379a4b0b60e3b4f174046b"
+      ],
+      "status": "verified"
+    }
+  },
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

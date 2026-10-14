@@ -1,0 +1,3 @@
+UNIFIED_ACCEPTANCE_20260903_C4E8
+
+This is a benign local integration marker. No network access is required.

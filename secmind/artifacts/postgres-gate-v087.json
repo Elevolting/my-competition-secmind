@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "postgres": {
+    "tests": 5,
+    "executed": 5,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0
+  },
+  "failures": []
+}

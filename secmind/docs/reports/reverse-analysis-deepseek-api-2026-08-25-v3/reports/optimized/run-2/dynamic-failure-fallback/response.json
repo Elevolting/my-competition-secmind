@@ -1,0 +1,135 @@
+{
+  "execution_status": "partial",
+  "model_response_sha256": "a417697ab5e2f5284f9330e9edf2682f2f19f538cda5c89b93dc11d751a59ecd",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "partial",
+    "executive_summary": "动态仿真不可用，保留静态分析结果。样本为x86-64 PE文件，包含文件操作、字符串比较及XOR解码候选，但无法确认运行时行为。建议人工审查或重新尝试动态分析。",
+    "findings": [
+      {
+        "business_impact": "可能隐藏配置或命令字符串，但未经验证，误报风险高。",
+        "confidence": "low",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "medium",
+        "technical_explanation": "存在XOR密钥和候选解码字符串，可能用于字符串混淆，但静态启发式可能产生假阳性。",
+        "title": "静态XOR解码候选痕迹"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "在隔离环境重试动态分析或手动反汇编关键代码段",
+        "decision_role": "Security Engineer",
+        "expected_outcome": "确认XOR解码是否用于恶意目的，消除误报",
+        "priority": "P2",
+        "rationale": "当前证据不足以评估实际风险"
+      }
+    ],
+    "limitations": [
+      "No dynamic execution was performed.",
+      "No full disassembly engine is bundled in this helper.",
+      "XOR decoding is heuristic and may include false positives.",
+      "dynamic emulation unavailable"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "重新尝试动态仿真",
+      "对关键导入函数调用点进行手动反汇编"
+    ],
+    "reverse_analysis": "静态分析发现PE文件包含导入函数如fopen/fwrite/fprintf等，暗示文件I/O功能；strcmp/strncmp暗示字符串比较；XOR密钥及候选解码字符串表明可能存在混淆数据。由于动态执行不可用，无法验证这些行为的实际触发路径。",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "unknown",
+      "overall_risk": "unknown",
+      "urgency": "low"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "static_presence",
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "status": "partial"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "XOR解码的实际用途与触发条件未知",
+      "文件I/O具体行为未知"
+    ]
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-failure-fallback",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}
