@@ -16,7 +16,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Protocol
 from uuid import uuid4
 
 from sqlalchemy import DateTime, Integer, String, Text, UniqueConstraint, create_engine, select
@@ -36,6 +36,37 @@ DERIVED_RELATION = "covers"
 
 class ColdDigestError(ValueError):
     """The graph or compaction parameters cannot be safely processed."""
+
+
+@dataclass(frozen=True)
+class DigestGeneration:
+    """The bounded result of one digest summary attempt.
+
+    ``body`` is deliberately kept separate from the durable digest row so an
+    empty or failed model response can be recorded without hiding the source
+    nodes or creating an unusable digest.
+    """
+
+    body: str
+    status: str = "generated"
+    model_id: str | None = None
+    usage: dict[str, int] = field(default_factory=dict)
+    error: str | None = None
+    round_id: str | None = None
+    signature: str | None = None
+    generation: int | None = None
+
+
+class DigestSummaryGenerator(Protocol):
+    def __call__(
+        self,
+        block: DigestBlock,
+        nodes: dict[str, GraphNode],
+        *,
+        run_id: str,
+        round_id: str,
+        signature: str,
+    ) -> DigestGeneration | str: ...
 
 
 @dataclass(frozen=True)
@@ -131,6 +162,27 @@ class ColdDigestRow(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     superseded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     invalidation_reason: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    generation_status: Mapped[str] = mapped_column(String(30), default="generated")
+    generation_error: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    generation_meta_json: Mapped[str] = mapped_column(Text, default="{}")
+
+
+class ColdDigestGenerationRow(Base):
+    """Durable status for every candidate summary generation attempt."""
+
+    __tablename__ = "cold_digest_generations"
+    __table_args__ = (UniqueConstraint("run_id", "round_no", "signature", name="uq_cold_digest_generation"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_id: Mapped[str] = mapped_column(String(128), index=True)
+    round_no: Mapped[int] = mapped_column(Integer, index=True)
+    round_id: Mapped[str] = mapped_column(String(200))
+    signature: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[str] = mapped_column(String(30))
+    error: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    model_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    usage_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class ColdDigestCoverRow(Base):
@@ -407,6 +459,7 @@ class ColdDigestStore:
         K: int = DEFAULT_K,
         round_id: str | None = None,
         summary_builder: Callable[[DigestBlock, dict[str, GraphNode]], str] | None = None,
+        summary_generator: DigestSummaryGenerator | None = None,
     ) -> dict[str, Any]:
         if not isinstance(run_id, str) or not run_id.strip():
             raise ColdDigestError("run_id 不能为空")
@@ -503,7 +556,10 @@ class ColdDigestStore:
             next_generation = max((row.generation for row in session.scalars(
                 select(ColdDigestRow).where(ColdDigestRow.run_id == run_id)
             ).all()), default=0) + 1
-            builder = summary_builder or build_digest_body
+            if summary_builder is not None and summary_generator is not None:
+                raise ColdDigestError("summary_builder 与 summary_generator 不能同时传入")
+            builder = summary_builder
+            generation_results: list[dict[str, Any]] = []
             for block in blocks:
                 signature = block_signature(block, versions)
                 existing = active_by_signature.get(signature)
@@ -514,15 +570,88 @@ class ColdDigestStore:
                 ):
                     digest = existing
                 else:
+                    generated = DigestGeneration(
+                        body=build_digest_body(block, graph.nodes),
+                        status="generated",
+                    )
+                    if summary_generator is not None:
+                        try:
+                            candidate = summary_generator(
+                                block,
+                                graph.nodes,
+                                run_id=run_id,
+                                round_id=effective_round_id,
+                                signature=signature,
+                            )
+                            generated = candidate if isinstance(candidate, DigestGeneration) else DigestGeneration(
+                                body=str(candidate),
+                            )
+                            if ((generated.round_id is not None and generated.round_id != effective_round_id)
+                                    or (generated.signature is not None and generated.signature != signature)
+                                    or (generated.generation is not None and generated.generation != next_generation)):
+                                generated = DigestGeneration(
+                                    body="",
+                                    status="failed",
+                                    error="stale digest generation identity",
+                                    round_id=generated.round_id,
+                                    signature=generated.signature,
+                                    generation=generated.generation,
+                                )
+                        except Exception as exc:  # generator failures are durable but non-fatal
+                            generated = DigestGeneration(
+                                body="",
+                                status="failed",
+                                error=f"{type(exc).__name__}: {str(exc)[:400]}",
+                            )
+                    elif builder is not None:
+                        try:
+                            generated = DigestGeneration(body=str(builder(block, graph.nodes)))
+                        except Exception as exc:
+                            generated = DigestGeneration(
+                                body="",
+                                status="failed",
+                                error=f"{type(exc).__name__}: {str(exc)[:400]}",
+                            )
+                    body = generated.body.strip()
+                    status = generated.status if generated.status in {"generated", "empty", "failed"} else "failed"
+                    if not body and status == "generated":
+                        status = "empty"
+                    generation_results.append({
+                        "signature": signature,
+                        "status": status,
+                        "model_id": generated.model_id,
+                        "usage": generated.usage,
+                        "error": generated.error,
+                    })
+                    session.add(ColdDigestGenerationRow(
+                        run_id=run_id,
+                        round_no=round_no,
+                        round_id=effective_round_id,
+                        signature=signature,
+                        status=status,
+                        error=generated.error,
+                        model_id=generated.model_id,
+                        usage_json=canonical_json(generated.usage),
+                        created_at=now,
+                    ))
+                    # A failed or empty summary never hides its source records.
+                    if status != "generated" or not body:
+                        continue
                     digest = ColdDigestRow(
                         digest_id=str(uuid4()), run_id=run_id, signature=signature,
-                        body=str(builder(block, graph.nodes)),
+                        body=body,
                         member_ids_json=canonical_json(list(block.member_ids)),
                         anchor_ids_json=canonical_json(list(block.anchor_ids)),
                         member_versions_json=canonical_json([versions[node_id] for node_id in block.member_ids]),
                         anchor_versions_json=canonical_json([versions.get(node_id, 1) for node_id in block.anchor_ids]),
                         source_refs_json=canonical_json(list(_block_refs(block, graph.nodes))),
                         generation=next_generation, status="active", created_at=now,
+                        generation_status=status,
+                        generation_error=generated.error,
+                        generation_meta_json=canonical_json({
+                            "model_id": generated.model_id,
+                            "usage": generated.usage,
+                        }),
                     )
                     next_generation += 1
                     session.add(digest)
@@ -541,6 +670,8 @@ class ColdDigestStore:
             session.commit()
         snapshot = self.snapshot(run_id)
         snapshot.update({"round_id": effective_round_id, "round_replayed": replayed})
+        if generation_results:
+            snapshot["generation_results"] = generation_results
         return snapshot
 
     def snapshot(self, run_id: str) -> dict[str, Any]:
@@ -563,6 +694,23 @@ class ColdDigestStore:
                         .order_by(ColdDigestRoundRow.round_no)
                     ).all()
                 ],
+                "generations": [
+                    {
+                        "round_no": row.round_no,
+                        "round_id": row.round_id,
+                        "signature": row.signature,
+                        "status": row.status,
+                        "error": row.error,
+                        "model_id": row.model_id,
+                        "usage": json.loads(row.usage_json or "{}"),
+                        "created_at": row.created_at.isoformat(),
+                    }
+                    for row in session.scalars(
+                        select(ColdDigestGenerationRow)
+                        .where(ColdDigestGenerationRow.run_id == run_id)
+                        .order_by(ColdDigestGenerationRow.round_no, ColdDigestGenerationRow.id)
+                    ).all()
+                ],
                 "nodes": {
                     key: {"content_version": row.content_version, "cold_since_round": row.cold_since_round,
                           "kind": row.kind, "state": row.state}
@@ -582,7 +730,11 @@ class ColdDigestStore:
                 "source_refs": list(json.loads(row.source_refs_json or "[]")),
                 "generation": row.generation, "created_at": row.created_at.isoformat(),
                 "superseded_at": row.superseded_at.isoformat() if row.superseded_at else None,
-                "invalidation_reason": row.invalidation_reason}
+                "invalidation_reason": row.invalidation_reason,
+                "generation_status": row.generation_status,
+                "generation_error": row.generation_error,
+                "generation_meta": json.loads(row.generation_meta_json or "{}"),
+                }
 
     def project_graph(self, run_id: str, projection: dict[str, Any]) -> dict[str, Any]:
         result = json.loads(json.dumps(projection, ensure_ascii=False))

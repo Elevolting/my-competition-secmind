@@ -4,9 +4,11 @@ from sqlalchemy import create_engine, inspect, select
 
 from security_agent.cold_digest import (
     ColdDigestCoverRow,
+    ColdDigestGenerationRow,
     ColdDigestRoundRow,
     ColdDigestRow,
     ColdDigestStore,
+    DigestGeneration,
     block_signature,
     graph_from_projection,
     group_cold_blocks,
@@ -132,13 +134,14 @@ def test_schema_migration_is_explicit_repeatable_and_upgrades_legacy_tables() ->
     ColdDigestStore(engine)
     with engine.connect() as connection:
         rows = connection.exec_driver_sql("SELECT version FROM cold_digest_schema").all()
-    assert rows == [(2,)]
+    assert rows == [(3,)]
+    assert "cold_digest_generations" in tables
 
 
 def test_round_identity_makes_planner_wakeup_replay_idempotent() -> None:
     engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
     store = ColdDigestStore(engine)
-    graph = projection([node("a"), node("b")], [])
+    graph = projection([node("anchor", "begin"), node("a"), node("b")], [("anchor", "a"), ("anchor", "b")])
 
     first = store.compact("run-replay", graph, R=2, K=2, round_id="planner-42")
     replay = store.compact("run-replay", graph, R=2, K=2, round_id="planner-42")
@@ -147,4 +150,58 @@ def test_round_identity_makes_planner_wakeup_replay_idempotent() -> None:
     with engine.connect() as connection:
         rounds = connection.execute(select(ColdDigestRoundRow)).all()
     assert [(row.run_id, row.round_key, row.round_no) for row in rounds] == [("run-replay", "planner-42", 1)]
+
+
+def test_summary_generator_is_skipped_for_unchanged_active_signature() -> None:
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+    store = ColdDigestStore(engine)
+    graph = projection([node("anchor", "begin"), node("a"), node("b")], [("anchor", "a"), ("anchor", "b")])
+    calls: list[str] = []
+
+    def generate(block, nodes, **kwargs):
+        calls.append(kwargs["signature"])
+        return DigestGeneration("model summary", model_id="mock", usage={"input_tokens": 4, "output_tokens": 2})
+
+    for index in range(3):
+        store.compact("run-generator", graph, R=2, K=2, round_id=f"r-{index}", summary_generator=generate)
+    store.compact("run-generator", graph, R=2, K=2, round_id="r-3", summary_generator=generate)
+    assert len(calls) == 1
+    snapshot = store.snapshot("run-generator")
+    assert snapshot["generations"][0]["status"] == "generated"
+    assert snapshot["generations"][0]["usage"] == {"input_tokens": 4, "output_tokens": 2}
+
+
+def test_failed_or_empty_summary_keeps_source_nodes_and_records_status() -> None:
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+    store = ColdDigestStore(engine)
+    graph = projection([node("anchor", "begin"), node("a"), node("b")], [("anchor", "a"), ("anchor", "b")])
+
+    def fail(block, nodes, **kwargs):
+        raise TimeoutError("mock timeout")
+
+    for index in range(3):
+        result = store.compact("run-failure", graph, R=2, K=2, round_id=f"f-{index}", summary_generator=fail)
+    assert result["digests"] == []
+    assert result["generation_results"][-1]["status"] == "failed"
+    assert "TimeoutError" in (result["generation_results"][-1]["error"] or "")
+    assert result["nodes"]["a"]["content_version"] == 1
+    assert result["nodes"]["b"]["content_version"] == 1
+    with engine.connect() as connection:
+        rows = connection.execute(select(ColdDigestGenerationRow)).all()
+    assert len(rows) == 1 and rows[0].status == "failed"
+
+
+def test_stale_summary_identity_cannot_create_digest() -> None:
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+    store = ColdDigestStore(engine)
+    graph = projection([node("anchor", "begin"), node("a"), node("b")], [("anchor", "a"), ("anchor", "b")])
+
+    def stale(block, nodes, **kwargs):
+        return DigestGeneration("late result", round_id="planner:old", signature=kwargs["signature"])
+
+    for index in range(3):
+        result = store.compact("run-stale", graph, R=2, K=2, round_id=f"s-{index}", summary_generator=stale)
+    assert result["digests"] == []
+    assert result["generation_results"][-1]["status"] == "failed"
+    assert "stale" in (result["generation_results"][-1]["error"] or "")
 

@@ -1235,6 +1235,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     item["digest_id"] for item in snapshot.get("digests", [])
                     if item.get("status") == "active"
                 ],
+                "generation_results": snapshot.get("generation_results", []),
             }
             if not snapshot.get("round_replayed"):
                 service.ledger.append(run_id, "blackboard.cold_digest.compacted", digest_result,
@@ -1358,7 +1359,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "R": payload.R, "K": payload.K,
             }, actor="cold_digest")
         result = app.state.cold_digests.project_graph(run_id, projection)
-        result.update({"round_id": snapshot.get("round_id"), "round_replayed": snapshot.get("round_replayed", False)})
+        result.update({"round_id": snapshot.get("round_id"), "round_replayed": snapshot.get("round_replayed", False),
+                       "generation_results": snapshot.get("generation_results", [])})
         return result
 
     @app.get("/api/v1/runs/{run_id}/asset-graph")

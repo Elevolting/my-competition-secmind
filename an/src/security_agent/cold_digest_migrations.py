@@ -11,9 +11,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import Table, insert, select, update
+from sqlalchemy import Table, insert, inspect, select, update
 
-CURRENT_COLD_DIGEST_SCHEMA = 2
+CURRENT_COLD_DIGEST_SCHEMA = 3
 
 
 class ColdDigestMigrationError(RuntimeError):
@@ -23,8 +23,9 @@ class ColdDigestMigrationError(RuntimeError):
 def ensure_cold_digest_schema(engine: Any) -> int:
     """Create or upgrade the cold-digest tables and return the schema version.
 
-    Version one is the original durable prototype schema.  Version two adds a
-    durable round identity table used to make planner wakeups idempotent.  A
+    Version one is the original durable prototype schema. Version two adds a
+    durable round identity table used to make planner wakeups idempotent.
+    Version three records summary generation outcomes and model usage. A
     database created by the prototype has no schema marker; its existing cold
     tables are treated as version one and then upgraded normally.
     """
@@ -33,6 +34,7 @@ def ensure_cold_digest_schema(engine: Any) -> int:
     # construction without introducing a module import cycle.
     from security_agent.cold_digest import (
         ColdDigestCoverRow,
+        ColdDigestGenerationRow,
         ColdDigestNodeRow,
         ColdDigestRoundRow,
         ColdDigestRow,
@@ -81,5 +83,25 @@ def ensure_cold_digest_schema(engine: Any) -> int:
                 .values(version=2, updated_at=datetime.now(UTC))
             )
             version = 2
+
+        if version < 3:
+            # ``cold_digests`` existed before generation metadata was added;
+            # ALTER is used because SQLite cannot safely recreate a live
+            # projection table during a rolling upgrade.
+            columns = {item["name"] for item in inspect(connection).get_columns("cold_digests")}
+            for name, ddl in (
+                ("generation_status", "VARCHAR(30) NOT NULL DEFAULT 'generated'"),
+                ("generation_error", "VARCHAR(500)"),
+                ("generation_meta_json", "TEXT NOT NULL DEFAULT '{}'"),
+            ):
+                if name not in columns:
+                    connection.exec_driver_sql(f"ALTER TABLE cold_digests ADD COLUMN {name} {ddl}")
+            cast(Table, ColdDigestGenerationRow.__table__).create(connection, checkfirst=True)
+            connection.execute(
+                update(ColdDigestSchemaRow)
+                .where(ColdDigestSchemaRow.schema_id == 1)
+                .values(version=3, updated_at=datetime.now(UTC))
+            )
+            version = 3
 
     return int(version)
