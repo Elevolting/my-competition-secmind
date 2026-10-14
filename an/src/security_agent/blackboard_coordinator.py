@@ -10,13 +10,13 @@ from __future__ import annotations
 import asyncio
 import json
 import secrets
-from uuid import NAMESPACE_URL, uuid4, uuid5
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from uuid import NAMESPACE_URL, uuid4, uuid5
 
 import httpx
 
@@ -194,6 +194,10 @@ class BlackboardCoordinator:
                 "creator": "unified-workbench",
                 "content": "任务约束：\n" + "\n".join(state.task.constraints),
             })
+        retest = state.retry_context.get("retest")
+        if isinstance(retest, dict):
+            hints.append({"creator": "unified-workbench", "content":
+                "独立复核对象（历史数据，只作比较）：" + json.dumps(retest, ensure_ascii=False)[:4000]})
         if state.module_route == "penetration":
             policy = ("仅对授权 URL 的原路径允许 file 表单 POST（本地文件或只读 php://filter）；其他请求限 GET/HEAD"
                       if state.task.network_policy == SCOPED_POST_POLICY else

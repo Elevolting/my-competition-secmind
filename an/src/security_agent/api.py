@@ -380,9 +380,9 @@ def build_runtime(settings: Settings) -> tuple[RunService, EvaluationService, Mo
     mcp = MCPRuntime(catalog, settings.run_root.parent,
         [settings.upload_root, settings.input_root, settings.run_root, settings.run_root.parent / 'incident/samples'],
         ledger, kali_enabled=settings.kali_mcp_enabled, kali_container=settings.kali_container)
+    from security_agent.receipt_traces import ReceiptTraceImporter, TraceSources
     from security_agent.trace_tools import TraceTool
     from security_agent.traces import TraceStore
-    from security_agent.receipt_traces import ReceiptTraceImporter, TraceSources
     from security_agent.worker_traces import WorkerTraceImporter
     native = default_registry()
     trace_store = TraceStore(ledger, TraceSources(
@@ -419,6 +419,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(_: FastAPI):
         await service.recover_incomplete()
+        await app.state.recover_retests()
+        app.state.recover_retest_claims()
         await evaluation_service.recover_incomplete()
         await question_banks.recover_incomplete()
         await batches.recover_incomplete()
@@ -465,6 +467,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_traces(app, service.traces)
     from security_agent.traffic_evidence_api import register_traffic_evidence
     register_traffic_evidence(app, service.ledger, actual_settings, app.state.mcp_runtime.store)
+    from security_agent.retests_api import register_retests
+    register_retests(app, service, actual_settings)
     register_experiences(app, experiences, service, gateway)
     register_tsec(app, actual_settings)
 
@@ -1517,7 +1521,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, "Run not found") from exc
         if state.report is None:
             raise HTTPException(409, "Report is not available yet")
-        return state.report.model_dump(mode="json")
+        report = state.report.model_dump(mode="json")
+        retests = [item for item in app.state.retests.list(run_id) if item["status"] == "completed"]
+        if retests:
+            report["retests"] = retests
+        return report
 
     @app.post("/api/v1/runs/{run_id}/report/refresh")
     async def refresh_report(run_id: str) -> dict[str, Any]:
@@ -1544,7 +1552,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             event = service.ledger.append(run_id, "report.refreshed",
                 {"source": state.external_execution.get("module", "local"), "status": state.status}, actor="api")
             await service.event_hub.publish(event.model_dump(mode="json"))
-            return state.report.model_dump(mode="json")
+            report = state.report.model_dump(mode="json")
+            retests = [item for item in app.state.retests.list(run_id) if item["status"] == "completed"]
+            if retests:
+                report["retests"] = retests
+            return report
 
     @app.get("/api/v1/runs/{run_id}/ledger")
     async def get_ledger(

@@ -67,6 +67,11 @@ export const getTrafficEvidence = (runId, evidenceId) => request(`/api/v1/runs/$
 export const bindTrafficEvidence = (runId, findingId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/findings/${encodeURIComponent(findingId)}/traffic-bindings`, { method: 'POST', body: JSON.stringify(payload) })
 export const trafficEvidenceExportUrl = (runId, evidenceId) => `${API_BASE}/api/v1/runs/${encodeURIComponent(runId)}/traffic-evidence/${encodeURIComponent(evidenceId)}/export`
 export const retryRun = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retry`, { method: 'POST', body: JSON.stringify(payload) })
+export const listRetests = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retests`)
+export const getRetest = (runId, retestId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retests/${encodeURIComponent(retestId)}`)
+export const createRetest = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retests`, { method: 'POST', body: JSON.stringify(payload) })
+export const recordRetestResult = (runId, retestId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retests/${encodeURIComponent(retestId)}/result`, { method: 'POST', body: JSON.stringify(payload) })
+export const cancelRetest = (runId, retestId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retests/${encodeURIComponent(retestId)}/cancel`, { method: 'POST' })
 export const cancelRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/cancel`, { method: 'POST' })
 export const submitRunHint = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/hint`, { method: 'POST', body: JSON.stringify(payload) })
 export const getReport = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/report`)

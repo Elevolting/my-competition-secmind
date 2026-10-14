@@ -51,6 +51,7 @@ import { ModuleFlow } from './ModuleFlow.jsx'
 import { BlackboardGraph } from './BlackboardGraph.jsx'
 import { AssetCoverageGraph } from './AssetCoverageGraph.jsx'
 import { TrafficEvidencePanel } from './TrafficEvidencePanel.jsx'
+import { RetestConclusion, RetestPanel } from './RetestPanel.jsx'
 
 const { Text, Title, Paragraph } = Typography
 
@@ -755,10 +756,10 @@ export function WorkbenchPage() {
         <Space><Button type="primary" loading={mcpApprovalBusy === item.approval_id} disabled={Boolean(mcpApprovalBusy)} onClick={() => decideMcp(item, 'approve')}>批准本次调用</Button><Button danger disabled={Boolean(mcpApprovalBusy)} onClick={() => decideMcp(item, 'deny')}>拒绝</Button></Space>
       </div>} />)}
       {view === 'stream' ? <RuntimeStream events={events} connected={streamConnected} active={Boolean(run?.run_id && run.run_id === selectedId)} /> : view === 'graph' ? <BlackboardGraph run={run} events={events} /> : view === 'coverage' ? <AssetCoverageGraph run={run} /> : view === 'thinking' ? <AIThoughtTimeline events={events} runStatus={run?.status} downloadUrl={run ? thoughtProcessUrl(run.run_id) : ''} /> : report ? <div className="report-view">
-        <div className="report-hero"><Text className="panel-kicker">安全分析报告</Text><Title level={3}>{localizePublicText(report.executive_summary)}</Title><Paragraph>{report.limitations?.map(localizePublicText).join('；') || '查看各项结论的验证状态与证据。'}</Paragraph></div>
+        <div className="report-hero"><Text className="panel-kicker">安全分析报告</Text><Title level={3}>{localizePublicText(report.executive_summary)}</Title><RetestConclusion runId={run.run_id} section="executive_summary" index={0} text={report.executive_summary} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /><Paragraph>{report.limitations?.map(localizePublicText).join('；') || '查看各项结论的验证状态与证据。'}</Paragraph></div>
         {getVerifiedOutputs(report).length > 0 && <section className="verified-output-list" aria-label="已验证输出">
           {getVerifiedOutputs(report).map((value) => <article className="verified-output" key={value}>
-            <div><Text className="panel-kicker">已获取 Flag</Text><code>{value}</code></div>
+            <div><Text className="panel-kicker">已获取 Flag</Text><code>{value}</code><RetestConclusion runId={run.run_id} section="verified_outputs" index={report.verified_outputs?.indexOf(value) ?? -1} text={value} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /></div>
             <Button aria-label="复制 Flag" title="复制 Flag" icon={<CopyOutlined />} onClick={() => copyOutput(value)} />
           </article>)}
         </section>}
@@ -766,9 +767,16 @@ export function WorkbenchPage() {
           ? [['已确认发现', report.confirmed_findings], ['待验证候选', report.candidate_findings]]
           : [['发现与证据', report.findings]]).map(([label, findings]) => <section key={label} aria-label={label}>
           <Title level={4}>{label} · {findings?.length || 0}</Title>
-          {findings?.map(localizeFinding).map((finding) => <article className="finding-card" key={finding.finding_id}><span className={`severity is-${finding.severity.toLowerCase()}`}>{severityLabels[finding.severity] || finding.severity}</span><div><b>{finding.title}</b><p>{finding.description}</p>{finding.remediation && <p className="finding-remediation"><strong>修复建议：</strong>{finding.remediation}</p>}<small>{finding.path}{finding.line ? `:${finding.line}` : ''} · 证据 {(finding.evidence_ids || []).join(', ') || '暂无有效证据'}</small><TrafficEvidencePanel runId={run.run_id} finding={finding} events={events} evidence={report.evidence} onChanged={() => refreshSelected(run.run_id)} /></div></article>)}
+          {findings?.map(localizeFinding).map((finding) => <article className="finding-card" key={finding.finding_id}><span className={`severity is-${finding.severity.toLowerCase()}`}>{severityLabels[finding.severity] || finding.severity}</span><div><b>{finding.title}</b><p>{finding.description}</p>{finding.remediation && <p className="finding-remediation"><strong>修复建议：</strong>{finding.remediation}</p>}<small>{finding.path}{finding.line ? `:${finding.line}` : ''} · 证据 {(finding.evidence_ids || []).join(', ') || '暂无有效证据'}</small><TrafficEvidencePanel runId={run.run_id} finding={finding} events={events} evidence={report.evidence} onChanged={() => refreshSelected(run.run_id)} /><RetestPanel runId={run.run_id} kind="finding" reference={finding.finding_id} conclusion={finding.title} moduleRoute={run.module_route} originalEvidence={finding.evidence_ids} /></div></article>)}
         </section>)}
-        {[['已排除方向', report.ruled_out_directions], ['证据不足', report.insufficient_evidence], ['Worker 报告', report.worker_reports], ['执行限制', report.limitations]].map(([label, items]) => items?.length > 0 && <section key={label} aria-label={label}><Title level={4}>{label} · {items.length}</Title><ul>{items.map((item, index) => <li key={index}>{localizePublicText(item)}</li>)}</ul></section>)}
+        {[['已排除方向', 'ruled_out_directions', report.ruled_out_directions], ['证据不足', 'insufficient_evidence', report.insufficient_evidence], ['Worker 报告', 'worker_reports', report.worker_reports], ['执行限制', 'limitations', report.limitations]].map(([label, section, items]) => items?.length > 0 && <section key={label} aria-label={label}><Title level={4}>{label} · {items.length}</Title><ul>{items.map((item, index) => <li key={index}>{localizePublicText(item)} <RetestConclusion runId={run.run_id} section={section} index={index} text={item} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(evidence => evidence.evidence_id)} /></li>)}</ul></section>)}
+        {report.retests?.length > 0 && <section aria-label="独立复核记录"><Title level={4}>独立复核 · {report.retests.length}</Title>
+          {report.retests.map(item => <div className="retest-report-row" key={item.retest_id}>
+            <Tag>{item.verdict}</Tag><span>{item.summary}</span>
+            <Text type="secondary">原对象 {item.source_kind}:{item.source_ref} · 原证据 {(item.original_evidence_ids || []).join('、') || '无'} · 本次证据 {(item.evidence_ids || []).join('、') || '无'}</Text>
+            <Button size="small" icon={<LinkOutlined />} onClick={() => navigate(`/workbench?run=${encodeURIComponent(item.child_run_id)}`)}>查看复核任务</Button>
+          </div>)}
+        </section>}
       </div> : <Empty description={run && !['completed', 'partial', 'failed', 'denied'].includes(run.status) ? '探索路径尚未完成，结果生成已延迟' : '报告将在运行结束后生成'} />}
     </section>
 
