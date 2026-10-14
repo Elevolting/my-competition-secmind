@@ -26,6 +26,7 @@ from secmind.metrics import TOOL_CALLS
 from secmind.policy import PolicyInput, manifest_digest
 from secmind.schemas import *
 from secmind.secret_scrubber import REDACTED, _key_tokens, scrub_text
+from secmind.skill_usage import tool_usage
 from secmind.tooling.core import ToolError, ToolInvocationIdentityError, ToolValidationError, _policy_path
 from secmind.unit_of_work import UnitOfWorkConflict
 
@@ -370,9 +371,11 @@ async def execute_tool(
             context,
             "tool.started",
             {"tool": name, "version": manifest.version, "invocation_id": context.invocation_id},
-            f"tool:{context.idempotency_key}:started",
+            f"tool:{context.idempotency_key}:attempt:{invocation_attempt}:started",
         )
     invocation_started_at = datetime.now(UTC)
+    execution_usage = None
+    work_contract = None
     try:
         if (
             broker.investigation_store is not None
@@ -387,7 +390,7 @@ async def execute_tool(
             )
             if context.work_contract_id is None or context.work_contract_digest is None:
                 raise ToolError("Durable execution requires an AgentWorkContract")
-            broker.investigation_store.authorize_work_contract(
+            work_contract = broker.investigation_store.authorize_work_contract(
                 context.work_contract_id,
                 run_id=context.run_id,
                 step_id=context.step_id,
@@ -418,6 +421,13 @@ async def execute_tool(
                 run_fence=context.run_fence,
                 step_fence=context.step_fence,
             )
+        execution_usage = tool_usage(context, invocation_attempt, work_contract)
+        broker._append(
+            context,
+            "tool.invoked",
+            {"tool": name, "version": manifest.version, "skill_usage": execution_usage},
+            f"tool-usage:{execution_usage['usage_id']}:invoked",
+        )
         result = await tool.invoke(args, context)
         if result.invocation_id is not None and not hmac.compare_digest(
             result.invocation_id,
@@ -439,6 +449,7 @@ async def execute_tool(
             "tool": name,
             "invocation_id": context.invocation_id,
             "error": safe_error,
+            "skill_usage": execution_usage,
         }
         if broker.coordinator is not None:
             broker.coordinator.fail_tool_invocation(
@@ -449,7 +460,7 @@ async def execute_tool(
                 owner_id=context.lease_owner_id,
                 fence=context.lease_fence,
                 error=safe_error,
-                transition_id=f"tool:{context.idempotency_key}:failed",
+                transition_id=f"tool:{context.idempotency_key}:attempt:{invocation_attempt}:failed",
                 event_type="tool.failed",
                 payload=failure_payload,
             )
@@ -466,7 +477,7 @@ async def execute_tool(
                 context,
                 "tool.failed",
                 failure_payload,
-                f"tool:{context.idempotency_key}:failed",
+                f"tool:{context.idempotency_key}:attempt:{invocation_attempt}:failed",
             )
         return ToolResult(
             invocation_id=context.invocation_id,
@@ -481,6 +492,7 @@ async def execute_tool(
         "version": manifest.version,
         "invocation_id": context.invocation_id,
         "status": result.status.value,
+        "skill_usage": execution_usage,
     }
     # Identity is committed before COMPLETED becomes visible.  A crash may
     # leave an idempotent invocation retryable, but can no longer expose a
@@ -502,7 +514,7 @@ async def execute_tool(
             owner_id=context.lease_owner_id,
             fence=context.lease_fence,
             result=result,
-            transition_id=f"tool:{context.idempotency_key}:completed",
+            transition_id=f"tool:{context.idempotency_key}:attempt:{invocation_attempt}:completed",
             event_type="tool.completed",
             payload=completion_payload,
         )
@@ -519,7 +531,7 @@ async def execute_tool(
             context,
             "tool.completed",
             completion_payload,
-            f"tool:{context.idempotency_key}:completed",
+            f"tool:{context.idempotency_key}:attempt:{invocation_attempt}:completed",
         )
     TOOL_CALLS.labels(tool=name, status=result.status.value).inc()
     return result

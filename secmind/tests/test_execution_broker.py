@@ -159,7 +159,7 @@ async def test_atomic_broker_validates_and_deduplicates(tmp_path) -> None:
     assert first.status == second.status == ToolStatus.SUCCESS
     assert first.invocation_id == second.invocation_id
     assert tool.calls == 1
-    assert [event.event_type for event in ledger.events("run-1")] == ["tool.started", "tool.completed"]
+    assert [event.event_type for event in ledger.events("run-1")] == ["tool.started", "tool.invoked", "tool.completed"]
 
 
 @pytest.mark.asyncio
@@ -172,7 +172,7 @@ async def test_atomic_broker_rejects_tool_result_from_another_invocation(tmp_pat
     assert result.status == ToolStatus.ERROR
     assert result.error_code == "TOOL_INVOCATION_MISMATCH"
     assert result.invocation_id == tool_context.invocation_id
-    assert [event.event_type for event in ledger.events("run-1")] == ["tool.started", "tool.failed"]
+    assert [event.event_type for event in ledger.events("run-1")] == ["tool.started", "tool.invoked", "tool.failed"]
 
 
 @pytest.mark.asyncio

@@ -15,6 +15,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from secmind.schemas import AuditSkillManifest, RiskLevel, Scenario, ToolHealth
+from secmind.skill_usage import record_skill_load
 from secmind.source_triage import routing_terms_for_signals
 
 BUILTIN_SKILL_ROOT = Path(__file__).with_name("builtin_skills")
@@ -192,6 +193,15 @@ class SkillRegistry:
         return [entry for _, entry in sorted(ranked, key=lambda pair: pair[0])[:limit]]
 
     def load(self, skill_id: str, version: str | None = None) -> LoadedAuditSkill:
+        try:
+            loaded = self._load(skill_id, version)
+        except Exception as exc:
+            record_skill_load(skill_id, version or self._latest.get(skill_id), error=exc)
+            raise
+        record_skill_load(skill_id, loaded.manifest.version)
+        return loaded
+
+    def _load(self, skill_id: str, version: str | None = None) -> LoadedAuditSkill:
         selected_version = version or self._latest.get(skill_id)
         if selected_version is None:
             raise KeyError(skill_id)

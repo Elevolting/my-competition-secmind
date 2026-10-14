@@ -473,6 +473,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_incident_review(app, incident_manager, service, actual_settings)
     from security_agent.asset_library_api import register_asset_library
     register_asset_library(app, service.ledger, app.state.mcp_runtime.store)
+    from security_agent.skill_usage_api import register_skill_usage
+    register_skill_usage(app, service.ledger, actual_settings)
     register_experiences(app, experiences, service, gateway)
     register_tsec(app, actual_settings)
 

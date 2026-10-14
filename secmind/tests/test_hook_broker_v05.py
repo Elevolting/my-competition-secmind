@@ -164,6 +164,7 @@ async def test_before_policy_patch_is_revalidated_and_bound_to_input_envelope(tm
         "hook.executed",
         "tool.input_bound",
         "tool.started",
+        "tool.invoked",
         "tool.completed",
     ]
 

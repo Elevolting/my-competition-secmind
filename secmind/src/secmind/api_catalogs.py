@@ -14,6 +14,7 @@ from fastapi.encoders import jsonable_encoder
 from secmind.policy import ELEVATED_PERMISSIONS, PROHIBITED_PERMISSIONS
 from secmind.runtime import ApplicationRuntime
 from secmind.schemas import SCHEMA_VERSION, RiskLevel
+from secmind.skill_usage import query_skill_usage, skill_usage_event
 from secmind.strategy import scenario_manifests
 from secmind.task_context import ResolvedTaskContractRequired, require_resolved_task_contract
 
@@ -80,6 +81,31 @@ def _effective_tool_policy(manifest: Any, autonomy_policy: str) -> dict[str, Any
 
 def register_catalog_routes(app: FastAPI, runtime: ApplicationRuntime) -> None:
     """Register capability discovery and policy-projection routes."""
+
+    @app.get("/api/v1/skills/usage")
+    def get_skill_usage(
+        run_id: Annotated[str | None, Query(max_length=100)] = None,
+        skill_id: Annotated[str | None, Query(max_length=100)] = None,
+        role: Annotated[str | None, Query(max_length=100)] = None,
+        event_type: Annotated[
+            str | None, Query(pattern=r"^(skill\.(loaded|load_failed)|tool\.(invoked|completed|failed))$")
+        ] = None,
+        limit: Annotated[int, Query(ge=1, le=200)] = 50,
+        offset: Annotated[int, Query(ge=0)] = 0,
+    ) -> dict[str, Any]:
+        if run_id is not None:
+            _run_state(runtime, run_id)
+        return query_skill_usage(
+            runtime.service.orchestrator.ledger,
+            run_id=run_id, skill_id=skill_id, role=role, event_type=event_type, limit=limit, offset=offset,
+        )
+
+    @app.get("/api/v1/skills/usage/events/{event_id}")
+    def get_skill_usage_event(event_id: str) -> dict[str, Any]:
+        try:
+            return skill_usage_event(runtime.service.orchestrator.ledger, event_id)
+        except KeyError as exc:
+            raise HTTPException(404, "Skill usage event not found") from exc
 
     @app.get("/api/v1/tools")
     async def list_tools() -> dict[str, Any]:

@@ -11,18 +11,19 @@ const ModelUsagePage = lazyPage(() => import('./ModelUsagePage.jsx'), 'ModelUsag
 const WorkbenchPage = lazyPage(() => import('./WorkbenchPage.jsx'), 'WorkbenchPage')
 const ExperienceLibraryPage = lazyPage(() => import('./ExperienceLibraryPage.jsx'), 'ExperienceLibraryPage')
 const AssetLibraryPage = lazyPage(() => import('./AssetLibraryPage.jsx'), 'AssetLibraryPage')
+const SkillUsagePage = lazyPage(() => import('./SkillUsagePage.jsx'), 'SkillUsagePage')
 const PromptCatalogPage = lazyPage(() => import('./PromptCatalogPage.jsx'), 'PromptCatalogPage')
 const McpRegistryPage = lazyPage(() => import('./McpRegistryPage.jsx'), 'McpRegistryPage')
 const IncidentResponsePage = lazyPage(() => import('./IncidentResponsePage.jsx'), 'IncidentResponsePage')
 const CockpitPage = lazyPage(() => import('./CockpitPage.jsx'), 'CockpitPage')
 
 const { Header, Sider, Content } = Layout
-const routes = { '/cockpit': ['安全运营驾驶舱', <DashboardOutlined />], '/workbench': ['任务编排', <TeamOutlined />], '/audit': ['审计与拦截', <AuditOutlined />], '/experiences': ['经验学习库', <DatabaseOutlined />], '/assets': ['跨任务资产库', <ClusterOutlined />], '/incident-response': ['应急响应', <AlertOutlined />], '/models': ['模型与用量', <RobotOutlined />], '/prompts': ['Prompt 目录', <FileTextOutlined />], '/mcp': ['MCP 工具清单', <ToolOutlined />] }
+const routes = { '/cockpit': ['安全运营驾驶舱', <DashboardOutlined />], '/workbench': ['任务编排', <TeamOutlined />], '/audit': ['审计与拦截', <AuditOutlined />], '/experiences': ['经验学习库', <DatabaseOutlined />], '/assets': ['跨任务资产库', <ClusterOutlined />], '/incident-response': ['应急响应', <AlertOutlined />], '/skills': ['技能使用统计', <ToolOutlined />], '/models': ['模型与用量', <RobotOutlined />], '/prompts': ['Prompt 目录', <FileTextOutlined />], '/mcp': ['MCP 工具清单', <ToolOutlined />] }
 
 export function FeatureApp({ themeMode = 'dark', onToggleTheme }) {
   const navigate = useNavigate(); const location = useLocation(); const [collapsed, setCollapsed] = useState(false); const [mobileOpen, setMobileOpen] = useState(false); const [isNarrow, setIsNarrow] = useState(() => window.matchMedia('(max-width: 900px)').matches); const [backend, setBackend] = useState(null)
   const logoSrc = themeMode === 'light' ? '/secmind-logo.png' : '/secmind-logo-dark.png'
-  const active = location.pathname === '/' || location.pathname.startsWith('/cockpit') || location.pathname === '/dashboard' ? '/cockpit' : location.pathname.startsWith('/audit') ? '/audit' : location.pathname.startsWith('/experiences') ? '/experiences' : location.pathname.startsWith('/assets') ? '/assets' : location.pathname.startsWith('/incident-response') ? '/incident-response' : location.pathname.startsWith('/models') ? '/models' : location.pathname.startsWith('/prompts') ? '/prompts' : location.pathname.startsWith('/mcp') ? '/mcp' : '/workbench'
+  const active = location.pathname === '/' || location.pathname.startsWith('/cockpit') || location.pathname === '/dashboard' ? '/cockpit' : location.pathname.startsWith('/audit') ? '/audit' : location.pathname.startsWith('/experiences') ? '/experiences' : location.pathname.startsWith('/assets') ? '/assets' : location.pathname.startsWith('/incident-response') ? '/incident-response' : location.pathname.startsWith('/skills') ? '/skills' : location.pathname.startsWith('/models') ? '/models' : location.pathname.startsWith('/prompts') ? '/prompts' : location.pathname.startsWith('/mcp') ? '/mcp' : '/workbench'
   const [title, titleIcon] = routes[active]
   useEffect(() => setMobileOpen(false), [location.pathname])
   useEffect(() => { const query = window.matchMedia('(max-width: 900px)'); const update = () => setIsNarrow(query.matches); update(); query.addEventListener?.('change', update); return () => query.removeEventListener?.('change', update) }, [])
@@ -38,6 +39,7 @@ export function FeatureApp({ themeMode = 'dark', onToggleTheme }) {
     ] },
     { type: 'group', label: '系统能力', children: [
       { key: '/models', icon: <RobotOutlined />, label: '模型与用量' },
+      { key: '/skills', icon: <ToolOutlined />, label: '技能使用统计' },
       { key: '/prompts', icon: <FileTextOutlined />, label: 'Prompt 目录' },
       { key: '/mcp', icon: <ToolOutlined />, label: 'MCP 工具清单' },
     ] },
@@ -62,7 +64,7 @@ export function FeatureApp({ themeMode = 'dark', onToggleTheme }) {
     </Sider>
     <Layout className="feature-main">
       <Header className="feature-header"><div><Button type="text" icon={(isNarrow ? !mobileOpen : collapsed) ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} onClick={toggleSidebar} aria-label="切换导航" /><span className="header-module">{titleIcon}<b>{title}</b></span></div><div className="header-status"><Tag color={backend ? 'success' : 'error'}>{backend ? '后端在线' : '后端离线'}</Tag>{backend?.demo_mode && <Tag color="gold">DEMO</Tag>}<span>{new Date().toLocaleDateString('zh-CN')}</span></div></Header>
-      <Content className="feature-content"><Suspense fallback={<div className="route-loading" role="status">正在加载页面…</div>}><Routes><Route path="/cockpit" element={<CockpitPage />} /><Route path="/dashboard" element={<CockpitPage />} /><Route path="/workbench" element={<WorkbenchPage />} /><Route path="/audit" element={<AuditReplayPage />} /><Route path="/audit/:runId" element={<AuditReplayPage />} /><Route path="/assets/:assetId?" element={<AssetLibraryPage />} /><Route path="/experiences" element={<ExperienceLibraryPage />} /><Route path="/incident-response" element={<IncidentResponsePage />} /><Route path="/models" element={<ModelUsagePage />} /><Route path="/prompts" element={<PromptCatalogPage />} /><Route path="/mcp" element={<McpRegistryPage />} /><Route path="*" element={<Navigate to="/cockpit" replace />} /></Routes></Suspense></Content>
+      <Content className="feature-content"><Suspense fallback={<div className="route-loading" role="status">正在加载页面…</div>}><Routes><Route path="/cockpit" element={<CockpitPage />} /><Route path="/dashboard" element={<CockpitPage />} /><Route path="/workbench" element={<WorkbenchPage />} /><Route path="/audit" element={<AuditReplayPage />} /><Route path="/audit/:runId" element={<AuditReplayPage />} /><Route path="/assets/:assetId?" element={<AssetLibraryPage />} /><Route path="/experiences" element={<ExperienceLibraryPage />} /><Route path="/incident-response" element={<IncidentResponsePage />} /><Route path="/skills" element={<SkillUsagePage />} /><Route path="/models" element={<ModelUsagePage />} /><Route path="/prompts" element={<PromptCatalogPage />} /><Route path="/mcp" element={<McpRegistryPage />} /><Route path="*" element={<Navigate to="/cockpit" replace />} /></Routes></Suspense></Content>
     </Layout>
   </Layout>
 }

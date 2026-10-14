@@ -38,6 +38,8 @@ export const updateModelConfig = (payload) => request('/api/v1/model-config', { 
 export const getPromptCatalog = () => request('/api/v1/prompts')
 export const getPrompt = (promptKey) => request(`/api/v1/prompts/${encodeURIComponent(promptKey)}`)
 export const getMcpCatalog = () => request('/api/v1/mcp/catalog')
+export const getSkillUsage = (filters = {}, signal) => request(`/api/v1/skills/usage?${new URLSearchParams(Object.entries(filters).filter(([, value]) => value !== '' && value != null))}`, { signal })
+export const getSkillUsageEvent = (eventId, signal) => request(`/api/v1/skills/usage/events/${encodeURIComponent(eventId)}`, { signal })
 export const getMcpServer = (serverId) => request(`/api/v1/mcp/servers/${encodeURIComponent(serverId)}`)
 export const createMcpServer = (payload) => request('/api/v1/mcp/servers', { method: 'POST', body: JSON.stringify(payload) })
 export const updateMcpServer = (serverId, payload) => request(`/api/v1/mcp/servers/${encodeURIComponent(serverId)}`, { method: 'PUT', body: JSON.stringify(payload) })

@@ -53,6 +53,7 @@ from secmind.orchestration.orchestrator_projections import (
     scenario_route,
     specialize_tool_skill_binding,
 )
+from secmind.skill_usage import SkillLoadScope, skill_load_scope
 
 
 def _merge_worker_patches(
@@ -790,6 +791,24 @@ class SecMindOrchestrator:
         if route is not None:
             result["route"] = route
         return result
+
+    def _skill_scope(
+        self, state: AgentState, purpose: str, operation_id: str,
+        *, step_id: str | None = None, role: str | None = None, attempt: int = 1,
+    ):
+        def emit(event_type: str, payload: dict[str, Any], dedupe_key: str) -> None:
+            if self.coordinator is not None:
+                self.coordinator.enqueue_outbox(
+                    state.run_id, transition_id=dedupe_key, event_type=event_type, payload=payload,
+                    actor="skill-registry", lease_owner_id=state.lease.owner_id,
+                    lease_fence=state.lease.fence if state.lease.owner_id is not None else None,
+                )
+            else:
+                self.ledger.append(state.run_id, event_type, payload, actor="skill-registry", dedupe_key=dedupe_key)
+        return skill_load_scope(SkillLoadScope(
+            operation_id=f"{state.run_id}:{operation_id}", purpose=purpose,
+            step_id=step_id, role=role, attempt=attempt, emit=emit,
+        ))
 
     async def _event(self, state: AgentState, event_type: str, payload: dict[str, Any]) -> None:
         if self.coordinator is not None and state.lease.owner_id is not None:
@@ -2303,7 +2322,9 @@ class SecMindOrchestrator:
             source = f"{item.skill_id}@{item.version}"
             if source in existing_skill_sources:
                 continue
-            loaded = self.skill_registry.load(item.skill_id, item.version)
+            with self._skill_scope(state, "context", f"context:{state.replan_count}:fence:{state.lease.fence}",
+                                  role="context-builder"):
+                loaded = self.skill_registry.load(item.skill_id, item.version)
             state.context_items.append(
                 self.context_item_store.add_text(
                     run_id=state.run_id,
@@ -3290,7 +3311,9 @@ class SecMindOrchestrator:
             raise RuntimeError("step is outside the active PlanContract/TeamPlan authority")
         if not set(step.skill_ids).issubset(member.skill_ids):
             raise RuntimeError("step skill binding is outside the active TeamPlan authority")
-        skill_bindings = [self.skill_runtime.compile_binding(skill_id) for skill_id in sorted(step.skill_ids)]
+        with self._skill_scope(state, "work_contract", item.step_run_id,
+                              step_id=step.step_id, role=member.profile_id, attempt=item.attempt):
+            skill_bindings = [self.skill_runtime.compile_binding(skill_id) for skill_id in sorted(step.skill_ids)]
         resolved_contract = require_resolved_task_contract(state)
         work = seal_contract(
             AgentWorkContract,
@@ -4378,6 +4401,9 @@ class SecMindOrchestrator:
         # the completion gate forever.
         reservation_id = str(uuid5(NAMESPACE_URL, f"secmind:model-budget:{transition_id}"))
         resolved_task = require_resolved_task_contract(state)
+        with self._skill_scope(state, "primary_work_contract", execution_identity,
+                              step_id=step.step_id, role="sast-investigator"):
+            skill_bindings = [self.skill_runtime.compile_binding(item) for item in sorted(step.skill_ids)]
         contract = seal_contract(
             AgentWorkContract,
             contract_id=str(uuid5(NAMESPACE_URL, f"secmind:primary-work:{execution_identity}")),
@@ -4398,7 +4424,7 @@ class SecMindOrchestrator:
             dependency_refs=[],
             allowed_action_kinds=["review_immutable_source", "propose_security_claim"],
             allowed_tool_sets=[],
-            skill_bindings=[self.skill_runtime.compile_binding(item) for item in sorted(step.skill_ids)],
+            skill_bindings=skill_bindings,
             success_criteria=list(step.success_criteria),
             failure_policy=step.failure_policy.value,
             budget_reservation_id=reservation_id,
@@ -4832,7 +4858,9 @@ class SecMindOrchestrator:
             selection = self._active_skill_selection(state)
         except SkillBindingError as exc:
             return [str(exc)]
-        return self.skill_runtime.validate_plan(state.plan, selection)
+        with self._skill_scope(state, "plan_validation",
+                              f"plan:{state.replan_count}:fence:{state.lease.fence}", role="planner"):
+            return self.skill_runtime.validate_plan(state.plan, selection)
 
     def _prepare_step_context(self, state: AgentState, step: PlanStep) -> None:
         items_by_source: dict[str, ContextItemRef] = {}
