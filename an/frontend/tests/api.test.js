@@ -2,8 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { bindTrafficEvidence, createTrafficEvidence, evaluationEventSocketUrl, eventSocketUrl,
-  getAsset, listAssets, getPrompt, getRunTrace, getTrafficEvidence, refreshRunReport, searchRunTraces,
-  terminalStatus, trafficEvidenceExportUrl } from '../src/api.js'
+  cancelSideQuestion, clearSideQuestion, createSideQuestion, getAsset, getPrompt, getRunTrace,
+  getSideQuestion, getSideQuestionEvents, getTrafficEvidence, listAssets, listSideQuestions,
+  refreshRunReport, searchRunTraces, terminalStatus, trafficEvidenceExportUrl } from '../src/api.js'
 
 test('builds the current run event websocket URL', () => {
   const url = eventSocketUrl('run id', 12, new URL('http://127.0.0.1:5173/workbench'))
@@ -79,5 +80,30 @@ test('asset queries omit empty filters, encode input and pass cancellation', asy
     assert.equal(requests[1].path, '/api/v1/assets/asset%2Fid')
     assert.equal(requests[0].options.signal, controller.signal)
     assert.equal(requests[1].options.signal, controller.signal)
+  } finally { globalThis.fetch = original }
+})
+
+test('side-question routes encode run and question identifiers and use the expected methods', async () => {
+  const original = globalThis.fetch
+  const requests = []
+  globalThis.fetch = async (path, options = {}) => {
+    requests.push({ path, method: options.method || 'GET' })
+    return { ok: true, status: 200, json: async () => ({ items: [], question: {} }) }
+  }
+  try {
+    await listSideQuestions('run id')
+    await createSideQuestion('run id', { question: '依据？' })
+    await getSideQuestion('run id', 'question/id')
+    await getSideQuestionEvents('run id', 'question/id', 4)
+    await cancelSideQuestion('run id', 'question/id')
+    await clearSideQuestion('run id', 'question/id')
+    assert.deepEqual(requests, [
+      { path: '/api/v1/runs/run%20id/side-questions?limit=100', method: 'GET' },
+      { path: '/api/v1/runs/run%20id/side-questions', method: 'POST' },
+      { path: '/api/v1/runs/run%20id/side-questions/question%2Fid', method: 'GET' },
+      { path: '/api/v1/runs/run%20id/side-questions/question%2Fid/events?after_sequence=4', method: 'GET' },
+      { path: '/api/v1/runs/run%20id/side-questions/question%2Fid/cancel', method: 'POST' },
+      { path: '/api/v1/runs/run%20id/side-questions/question%2Fid/clear', method: 'POST' },
+    ])
   } finally { globalThis.fetch = original }
 })

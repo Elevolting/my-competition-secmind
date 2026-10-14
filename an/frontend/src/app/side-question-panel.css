@@ -1,0 +1,41 @@
+.side-question-panel {
+  margin-top: 16px;
+}
+
+.side-question-panel .side-question-input {
+  display: flex;
+  align-items: stretch;
+  margin: 12px 0 8px;
+}
+
+.side-question-panel .side-question-input .ant-input {
+  flex: 1;
+}
+
+.side-question-panel .side-question-list {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.side-question-item {
+  width: 100%;
+}
+
+.side-question-meta,
+.side-question-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.side-question-answer {
+  margin: 8px 0 !important;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.side-question-actions {
+  justify-content: flex-start;
+  margin-top: 8px;
+}

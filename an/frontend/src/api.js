@@ -62,6 +62,20 @@ function socketUrl(path, params = {}, location = window.location) {
 export const modelUsageSocketUrl = (location = window.location) => socketUrl('/api/v1/model-usage/events', {}, location)
 export const listRuns = (params = {}) => request(`/api/v1/runs?${new URLSearchParams({ refresh: String(Date.now()), ...params })}`)
 export const getRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}`)
+export const listSideQuestions = (runId, limit = 100) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/side-questions?limit=${encodeURIComponent(limit)}`)
+export const createSideQuestion = (runId, payload) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/side-questions`, {
+    method: 'POST', body: JSON.stringify(payload),
+  })
+export const getSideQuestion = (runId, questionId) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/side-questions/${encodeURIComponent(questionId)}`)
+export const getSideQuestionEvents = (runId, questionId, afterSequence = 0) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/side-questions/${encodeURIComponent(questionId)}/events?after_sequence=${encodeURIComponent(afterSequence)}`)
+export const cancelSideQuestion = (runId, questionId) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/side-questions/${encodeURIComponent(questionId)}/cancel`, { method: 'POST' })
+export const clearSideQuestion = (runId, questionId) =>
+  request(`/api/v1/runs/${encodeURIComponent(runId)}/side-questions/${encodeURIComponent(questionId)}/clear`, { method: 'POST' })
 export const listAssets = (params = {}, signal) => {
   const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== ''))
   return request(`/api/v1/assets?${query}`, { signal })

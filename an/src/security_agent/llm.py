@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import hashlib
 import json
 import logging
@@ -91,6 +92,37 @@ class ModelGateway:
             planner_model=self.settings.planner_model, worker_model=self.settings.worker_model,
             fallback_model=self.settings.fallback_model,
         )
+
+    async def answer_side_question(
+        self, snapshot: dict[str, Any], question: str,
+    ) -> tuple[str, dict[str, int]]:
+        """Ask a bounded question using the frozen request context."""
+
+        if self.settings.demo_mode or not self.settings.model_api_key:
+            raise ModelGatewayError("side-question model calls require a configured model")
+        request = copy.deepcopy(snapshot.get("request"))
+        if not isinstance(request, dict) or not isinstance(request.get("messages"), list):
+            raise ModelGatewayError("side-question snapshot has no usable messages")
+        messages = request["messages"]
+        messages.append({"role": "user", "content": question})
+        payload: dict[str, Any] = {
+            "model": str(snapshot["model_id"]),
+            "messages": messages,
+            "max_tokens": self.settings.side_question_output_token_budget,
+            "temperature": 0,
+        }
+        try:
+            response = await self._client.post(
+                f"{self.settings.model_base_url.rstrip('/')}/chat/completions",
+                headers={"Authorization": f"Bearer {self.settings.model_api_key}"},
+                json=payload,
+                timeout=self.settings.model_timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise ModelGatewayError(f"Model response: {response.status_code}")
+            return completion_text(response)
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError) as exc:
+            raise ModelGatewayError("Malformed side-question model response") from exc
 
     async def _capture_request(self, payload: dict, parent: SnapshotParent | None, provenance: dict) -> None:
         if self.snapshot_store is None or parent is None:

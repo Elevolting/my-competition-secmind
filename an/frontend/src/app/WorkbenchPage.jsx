@@ -52,6 +52,7 @@ import { BlackboardGraph } from './BlackboardGraph.jsx'
 import { AssetCoverageGraph } from './AssetCoverageGraph.jsx'
 import { TrafficEvidencePanel } from './TrafficEvidencePanel.jsx'
 import { RetestConclusion, RetestPanel } from './RetestPanel.jsx'
+import { SideQuestionPanel } from './SideQuestionPanel.jsx'
 
 const { Text, Title, Paragraph } = Typography
 
@@ -784,6 +785,7 @@ export function WorkbenchPage() {
     <aside className={`glass-panel inspector-panel ${isGraphView ? 'is-graph-hidden' : ''}`}>
       <div className="panel-heading"><div><Text className="panel-kicker">TASK STATUS</Text><Title level={4}>任务状态与协作</Title></div><SafetyCertificateOutlined className="heading-icon" /></div>
       <TaskStatusPanel run={run} events={events} />
+      {run?.run_id === selectedId && <SideQuestionPanel runId={run.run_id} />}
       <div className="inspector-divider"><TeamOutlined /> 智能体网络</div>
       <AgentNetwork network={network} eventCount={events.length} />
       <div className="inspector-divider">模块状态</div>

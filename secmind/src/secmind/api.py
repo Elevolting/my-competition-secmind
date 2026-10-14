@@ -25,6 +25,7 @@ from secmind.api_events import register_event_routes
 from secmind.api_investigation import register_investigation_routes
 from secmind.api_prompting import register_prompt_routes
 from secmind.api_runs import register_run_routes  # noqa: F401
+from secmind.api_side_questions import register_side_questions
 from secmind.api_system import purge_expired_uploads as _purge_expired_uploads  # noqa: F401
 from secmind.api_system import register_system_routes
 from secmind.api_system import safe_upload_name as _safe_upload_name  # noqa: F401
@@ -152,6 +153,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         strict=strict,
         operator_token_valid=_operator_token,
     )
+    register_side_questions(app, runtime, actual_settings)
     return app
 
 

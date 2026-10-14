@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
@@ -12,9 +12,9 @@ from uuid import uuid4
 
 from sqlalchemy import Boolean, Integer, PrimaryKeyConstraint, String, Text, func, select
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, object_session
 
-from security_agent.model_snapshots import ModelConfiguration, ModelSnapshotStore, SnapshotParent
+from security_agent.model_snapshots import ModelConfiguration, ModelSnapshotRow, ModelSnapshotStore, SnapshotParent
 from security_agent.trace_redaction import redact_trace
 
 
@@ -297,6 +297,18 @@ class SideQuestionStore:
                 for event in events
             ]
 
+    def history(self, run_id: str, *, limit: int = 100) -> list[dict[str, Any]]:
+        """Return durable question history for one parent run."""
+
+        if limit < 1 or limit > 500:
+            raise ValueError("side-question history limit is out of range")
+        with Session(self.engine) as session:
+            rows = session.scalars(
+                select(SideQuestionRow).where(SideQuestionRow.run_id == run_id)
+                .order_by(SideQuestionRow.created_at.desc()).limit(limit)
+            ).all()
+            return [self._document(row) for row in rows]
+
     def record_usage(self, question_id: str, usage: SideQuestionBudget) -> dict[str, Any]:
         """Record provider usage observed before a stream reaches a terminal state."""
 
@@ -394,12 +406,38 @@ class SideQuestionStore:
             row = session.get(SideQuestionRow, question_id)
             return None if row is None else self._document(row)
 
-    @staticmethod
-    def _document(row: SideQuestionRow) -> dict[str, Any]:
+    def _document(self, row: SideQuestionRow) -> dict[str, Any]:
+        current_session = object_session(row)
+        if current_session is None:
+            snapshot_row = self.snapshot_store.get(row.snapshot_id)
+        else:
+            snapshot_row = current_session.scalar(
+                select(ModelSnapshotRow).where(ModelSnapshotRow.snapshot_id == row.snapshot_id)
+            )
+        if snapshot_row is None:
+            snapshot = None
+        elif isinstance(snapshot_row, ModelSnapshotRow):
+            snapshot = {
+                "snapshot_id": snapshot_row.snapshot_id,
+                "version": snapshot_row.version,
+                "captured_at": snapshot_row.captured_at,
+                "source": snapshot_row.source,
+                "step_id": snapshot_row.step_id,
+                "worker_id": snapshot_row.worker_id,
+            }
+        else:
+            snapshot = {
+                "snapshot_id": snapshot_row["snapshot_id"],
+                "version": snapshot_row["version"],
+                "captured_at": snapshot_row["captured_at"],
+                "source": snapshot_row["parent"]["source"],
+                "step_id": snapshot_row["parent"].get("step_id"),
+                "worker_id": snapshot_row["parent"].get("worker_id"),
+            }
         return {
             "question_id": row.question_id, "request_key": row.request_key,
             "parent": {"run_id": row.run_id, "source": row.source},
-            "snapshot_id": row.snapshot_id, "snapshot_version": row.snapshot_version,
+            "snapshot_id": row.snapshot_id, "snapshot_version": row.snapshot_version, "snapshot": snapshot,
             "configuration_identity": row.configuration_identity, "question_sha256": row.question_sha256,
             "question": row.question_text, "status": row.status,
             "cancel_requested": row.cancel_requested,
@@ -443,7 +481,17 @@ class SideQuestionRunner:
             try:
                 running = self.store.mark_running(reserved["question_id"])
                 snapshot = self.store.snapshot_store.frozen(parent, snapshot_id, configuration)
-                result, usage = await call_model(snapshot, question)
+                result, raw_usage = await call_model(snapshot, question)
+                if isinstance(raw_usage, SideQuestionBudget):
+                    usage = raw_usage
+                elif isinstance(raw_usage, Mapping):
+                    usage = SideQuestionBudget(
+                        int(raw_usage.get("input_tokens", 0) or 0),
+                        int(raw_usage.get("output_tokens", 0) or 0),
+                        int(raw_usage.get("provider_requests", 1) or 1),
+                    )
+                else:
+                    raise TypeError("side-question model usage must be a budget or mapping")
             except SideQuestionCancelled:
                 row = self.store.settle(reserved["question_id"], status="cancelled", error_type="cancelled")
                 return SideQuestionAnswer(
@@ -454,6 +502,12 @@ class SideQuestionRunner:
                 raise SideQuestionError("side-question model call failed") from exc
             current = self.store.get(running["question_id"])
             status = "cancelled" if current and current["cancel_requested"] else "completed"
+            if status == "completed" and result:
+                try:
+                    clear_version = current["clear_version"] if current else running["clear_version"]
+                    self.store.append_output(running["question_id"], result, clear_version=clear_version)
+                except SideQuestionCancelled:
+                    status = "cancelled"
             row = self.store.settle(running["question_id"], status=status, answer=result, usage=usage,
                                     error_type="cancelled" if status == "cancelled" else None)
             return SideQuestionAnswer(

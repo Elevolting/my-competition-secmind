@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import hashlib
 import json
 import logging
@@ -204,6 +205,49 @@ class QwenGateway:
             planner_model=self.policy.planner.model_id, worker_model=self.policy.worker.model_id,
             fallback_model=self.policy.fallback.model_id,
         )
+
+    async def answer_side_question(
+        self, snapshot: dict[str, Any], question: str,
+    ) -> tuple[str, dict[str, int]]:
+        """Ask a bounded question using the frozen request context."""
+
+        if self.policy.mode is not ModelMode.LIVE:
+            raise ModelGatewayError("side-question model calls require live model mode")
+        request = copy.deepcopy(snapshot.get("request"))
+        if not isinstance(request, dict) or not isinstance(request.get("messages"), list):
+            raise ModelGatewayError("side-question snapshot has no usable messages")
+        messages = request["messages"]
+        messages.append({"role": "user", "content": question})
+        payload: dict[str, Any] = {
+            "model": str(snapshot["model_id"]),
+            "messages": messages,
+            "max_tokens": self.settings.side_question_output_token_budget,
+            "temperature": 0,
+        }
+        response = await self._require_provider().post(
+            f"{self.policy.base_url.rstrip('/')}/chat/completions",
+            headers={"Authorization": f"Bearer {self._api_key()}"},
+            json=payload,
+            timeout=self.settings.model_timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise ModelGatewayError(f"Model response: {response.status_code}")
+        try:
+            body = json.loads((await read_bounded_response(
+                response, max_bytes=self.settings.model_max_response_bytes,
+                read_idle_timeout_seconds=self.settings.model_read_idle_timeout_seconds,
+            )).decode("utf-8"))
+            content = body["choices"][0]["message"]["content"]
+            usage = body.get("usage") or {}
+            normalized = {
+                "input_tokens": int(usage.get("prompt_tokens", usage.get("input_tokens", 0)) or 0),
+                "output_tokens": int(usage.get("completion_tokens", usage.get("output_tokens", 0)) or 0),
+            }
+            if not isinstance(content, str) or not content.strip():
+                raise ValueError("empty model content")
+            return content, normalized
+        except (UnicodeDecodeError, ValueError, KeyError, IndexError, TypeError) as exc:
+            raise ModelGatewayError("Malformed side-question model response") from exc
 
     async def _capture_request(self, payload: dict, parent: SnapshotParent | None, provenance: dict) -> None:
         if self.snapshot_store is None or parent is None:

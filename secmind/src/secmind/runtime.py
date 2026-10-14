@@ -32,6 +32,7 @@ from secmind.runtime_profile import resolve_runtime_profile
 from secmind.sandbox import SandboxToolSpec, default_allowlist, invocation_input_sha256
 from secmind.sandbox_client import SandboxBanditTool
 from secmind.service import EventHub, RunService
+from secmind.side_questions import SideQuestionRunner, SideQuestionStore
 from secmind.tool_assurance import require_tool_assurance_readiness
 from secmind.tools import (
     SEMGREP_REVIEWED_RULE_BUNDLE_DIGEST,
@@ -291,6 +292,8 @@ class ApplicationRuntime:
         self.settings = settings
         self._service: RunService | None = None
         self._gateway: QwenGateway | None = None
+        self._side_questions: SideQuestionStore | None = None
+        self._side_question_runner: SideQuestionRunner | None = None
         self._checkpoint_context: AbstractAsyncContextManager[Any] | None = None
 
     @property
@@ -298,6 +301,24 @@ class ApplicationRuntime:
         if self._service is None:
             raise RuntimeError("SecMind runtime has not been started")
         return self._service
+
+    @property
+    def gateway(self) -> QwenGateway:
+        if self._gateway is None:
+            raise RuntimeError("SecMind runtime has not been started")
+        return self._gateway
+
+    @property
+    def side_questions(self) -> SideQuestionStore:
+        if self._side_questions is None:
+            raise RuntimeError("SecMind runtime has not been started")
+        return self._side_questions
+
+    @property
+    def side_question_runner(self) -> SideQuestionRunner:
+        if self._side_question_runner is None:
+            raise RuntimeError("SecMind runtime has not been started")
+        return self._side_question_runner
 
     async def startup(self) -> None:
         if self._service is not None:
@@ -321,6 +342,15 @@ class ApplicationRuntime:
 
         try:
             self._service, self._gateway = build_runtime(self.settings, checkpointer)
+            self._side_questions = SideQuestionStore(
+                self._service.ledger.engine,
+                self._gateway.snapshot_store,
+                max_concurrency=self.settings.side_question_max_concurrency,
+                budget_input_tokens=self.settings.side_question_input_token_budget,
+                budget_output_tokens=self.settings.side_question_output_token_budget,
+            )
+            self._side_question_runner = SideQuestionRunner(self._side_questions)
+            self._side_questions.interrupt_running()
             profile = resolve_runtime_profile(self.settings)
             logger.info(
                 "SecMind resolved runtime capability profile: %s",
@@ -339,6 +369,8 @@ class ApplicationRuntime:
             await close_gateway_safely(self._gateway)
         self._service = None
         self._gateway = None
+        self._side_questions = None
+        self._side_question_runner = None
         if self._checkpoint_context is not None:
             await self._checkpoint_context.__aexit__(None, None, None)
             self._checkpoint_context = None

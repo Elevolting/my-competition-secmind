@@ -67,6 +67,7 @@ from security_agent.schemas import (
     TaskRequest,
 )
 from security_agent.service import EventHub, RunService
+from security_agent.side_questions import SideQuestionRunner, SideQuestionStore
 from security_agent.tools import ToolBroker, default_registry
 from security_agent.tsec_api import register_tsec
 
@@ -404,6 +405,14 @@ def build_runtime(settings: Settings) -> tuple[RunService, EvaluationService, Mo
 def create_app(settings: Settings | None = None) -> FastAPI:
     actual_settings = settings or get_settings()
     service, evaluation_service, gateway, experiences = build_runtime(actual_settings)
+    side_questions = SideQuestionStore(
+        service.ledger.engine,
+        gateway.snapshot_store,
+        max_concurrency=actual_settings.side_question_max_concurrency,
+        budget_input_tokens=actual_settings.side_question_input_token_budget,
+        budget_output_tokens=actual_settings.side_question_output_token_budget,
+    )
+    side_question_runner = SideQuestionRunner(side_questions)
     usage_collector = ExternalUsageCollector(actual_settings, service.ledger)
     question_banks = QuestionBankService(actual_settings, gateway)
     batches = BatchService(actual_settings, question_banks, service)
@@ -421,6 +430,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        side_questions.interrupt_running()
         await service.recover_incomplete()
         await app.state.recover_retests()
         app.state.recover_retest_claims()
@@ -463,6 +473,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # the Runtime lease/event path instead of starting a second executor.
     app.state.workbench_tool_registry = service.orchestrator.broker.registry
     app.state.traces = service.traces
+    app.state.side_questions = side_questions
+    app.state.side_question_runner = side_question_runner
     register_operations(app, incident_manager, app.state.mcp_runtime, app.state.prompt_catalog)
     from security_agent.blackboard_mcp import register_blackboard_mcp
     register_blackboard_mcp(app, app.state.mcp_runtime, actual_settings)
@@ -478,6 +490,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_asset_library(app, service.ledger, app.state.mcp_runtime.store)
     from security_agent.skill_usage_api import register_skill_usage
     register_skill_usage(app, service.ledger, actual_settings)
+    from security_agent.side_questions_api import register_side_questions
+    register_side_questions(app, service, gateway, actual_settings, side_questions, side_question_runner)
     register_experiences(app, experiences, service, gateway)
     register_tsec(app, actual_settings)
 

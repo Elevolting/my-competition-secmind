@@ -194,6 +194,22 @@ class ModelSnapshotStore:
             )
             return None if row is None else self._document(row)
 
+    def get(self, snapshot_id: str) -> dict | None:
+        """Read a snapshot envelope before the caller constructs its parent key."""
+
+        with Session(self.engine) as session:
+            row = session.scalar(select(ModelSnapshotRow).where(ModelSnapshotRow.snapshot_id == snapshot_id))
+            return None if row is None else self._document(row)
+
+    def latest_for_run(self, run_id: str, source: str) -> dict | None:
+        with Session(self.engine) as session:
+            row = session.scalar(
+                select(ModelSnapshotRow).where(
+                    ModelSnapshotRow.run_id == run_id, ModelSnapshotRow.source == source,
+                ).order_by(ModelSnapshotRow.version.desc()).limit(1)
+            )
+            return None if row is None else self._document(row)
+
     def frozen(self, parent: SnapshotParent, snapshot_id: str, configuration: ModelConfiguration) -> dict:
         with Session(self.engine) as session:
             row = session.scalar(select(ModelSnapshotRow).where(

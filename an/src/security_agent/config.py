@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://qdrant:6333"
     qdrant_collection: str = "security_agent_knowledge"
     model_timeout_seconds: float = 45.0
+    side_question_max_concurrency: int = Field(default=2, ge=1, le=16)
+    side_question_input_token_budget: int = Field(default=32_000, ge=1_000, le=2_000_000)
+    side_question_output_token_budget: int = Field(default=8_192, ge=128, le=128_000)
     model_hourly_token_quota: int = Field(default=0, ge=0)
     model_daily_token_quota: int = Field(default=0, ge=0)
     model_monthly_token_quota: int = Field(default=0, ge=0)

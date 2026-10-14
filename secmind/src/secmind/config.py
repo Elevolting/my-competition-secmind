@@ -119,6 +119,9 @@ class Settings(BaseSettings):
     model_pool_timeout_seconds: float = Field(default=10.0, ge=0.1, le=300)
     model_write_timeout_seconds: float = Field(default=30.0, ge=0.1, le=300)
     model_read_idle_timeout_seconds: float = Field(default=240.0, ge=0.1, le=300)
+    side_question_max_concurrency: int = Field(default=2, ge=1, le=16)
+    side_question_input_token_budget: int = Field(default=32_000, ge=1_000, le=2_000_000)
+    side_question_output_token_budget: int = Field(default=8_192, ge=128, le=128_000)
     audit_kernel_mode: Literal["baseline", "shadow", "authoritative"] = "shadow"
     # Ablation showed unconditional critic adjudication reduced quality while
     # more than doubling provider work. It is an explicit canary, never a
