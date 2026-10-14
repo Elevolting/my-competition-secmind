@@ -62,6 +62,10 @@ export const listRuns = (params = {}) => request(`/api/v1/runs?${new URLSearchPa
 export const getRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}`)
 export const searchRunTraces = (runId, params = {}) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traces?${new URLSearchParams(params)}`)
 export const getRunTrace = (runId, traceId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traces/${encodeURIComponent(traceId)}`)
+export const createTrafficEvidence = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traffic-evidence`, { method: 'POST', body: JSON.stringify(payload) })
+export const getTrafficEvidence = (runId, evidenceId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/traffic-evidence/${encodeURIComponent(evidenceId)}`)
+export const bindTrafficEvidence = (runId, findingId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/findings/${encodeURIComponent(findingId)}/traffic-bindings`, { method: 'POST', body: JSON.stringify(payload) })
+export const trafficEvidenceExportUrl = (runId, evidenceId) => `${API_BASE}/api/v1/runs/${encodeURIComponent(runId)}/traffic-evidence/${encodeURIComponent(evidenceId)}/export`
 export const retryRun = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/retry`, { method: 'POST', body: JSON.stringify(payload) })
 export const cancelRun = (runId) => request(`/api/v1/runs/${encodeURIComponent(runId)}/cancel`, { method: 'POST' })
 export const submitRunHint = (runId, payload) => request(`/api/v1/runs/${encodeURIComponent(runId)}/hint`, { method: 'POST', body: JSON.stringify(payload) })

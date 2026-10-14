@@ -463,6 +463,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_blackboard_mcp(app, app.state.mcp_runtime, actual_settings)
     from security_agent.traces_api import register_traces
     register_traces(app, service.traces)
+    from security_agent.traffic_evidence_api import register_traffic_evidence
+    register_traffic_evidence(app, service.ledger, actual_settings, app.state.mcp_runtime.store)
     register_experiences(app, experiences, service, gateway)
     register_tsec(app, actual_settings)
 

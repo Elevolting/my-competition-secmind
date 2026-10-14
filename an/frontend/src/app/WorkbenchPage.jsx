@@ -50,6 +50,7 @@ import './workbench-header.css'
 import { ModuleFlow } from './ModuleFlow.jsx'
 import { BlackboardGraph } from './BlackboardGraph.jsx'
 import { AssetCoverageGraph } from './AssetCoverageGraph.jsx'
+import { TrafficEvidencePanel } from './TrafficEvidencePanel.jsx'
 
 const { Text, Title, Paragraph } = Typography
 
@@ -765,7 +766,7 @@ export function WorkbenchPage() {
           ? [['已确认发现', report.confirmed_findings], ['待验证候选', report.candidate_findings]]
           : [['发现与证据', report.findings]]).map(([label, findings]) => <section key={label} aria-label={label}>
           <Title level={4}>{label} · {findings?.length || 0}</Title>
-          {findings?.map(localizeFinding).map((finding) => <article className="finding-card" key={finding.finding_id}><span className={`severity is-${finding.severity.toLowerCase()}`}>{severityLabels[finding.severity] || finding.severity}</span><div><b>{finding.title}</b><p>{finding.description}</p>{finding.remediation && <p className="finding-remediation"><strong>修复建议：</strong>{finding.remediation}</p>}<small>{finding.path}{finding.line ? `:${finding.line}` : ''} · 证据 {(finding.evidence_ids || []).join(', ') || '暂无有效证据'}</small></div></article>)}
+          {findings?.map(localizeFinding).map((finding) => <article className="finding-card" key={finding.finding_id}><span className={`severity is-${finding.severity.toLowerCase()}`}>{severityLabels[finding.severity] || finding.severity}</span><div><b>{finding.title}</b><p>{finding.description}</p>{finding.remediation && <p className="finding-remediation"><strong>修复建议：</strong>{finding.remediation}</p>}<small>{finding.path}{finding.line ? `:${finding.line}` : ''} · 证据 {(finding.evidence_ids || []).join(', ') || '暂无有效证据'}</small><TrafficEvidencePanel runId={run.run_id} finding={finding} events={events} evidence={report.evidence} onChanged={() => refreshSelected(run.run_id)} /></div></article>)}
         </section>)}
         {[['已排除方向', report.ruled_out_directions], ['证据不足', report.insufficient_evidence], ['Worker 报告', report.worker_reports], ['执行限制', report.limitations]].map(([label, items]) => items?.length > 0 && <section key={label} aria-label={label}><Title level={4}>{label} · {items.length}</Title><ul>{items.map((item, index) => <li key={index}>{localizePublicText(item)}</li>)}</ul></section>)}
       </div> : <Empty description={run && !['completed', 'partial', 'failed', 'denied'].includes(run.status) ? '探索路径尚未完成，结果生成已延迟' : '报告将在运行结束后生成'} />}

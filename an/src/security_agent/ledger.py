@@ -12,6 +12,7 @@ from uuid import uuid4
 from sqlalchemy import DateTime, Integer, String, Text, UniqueConstraint, case, create_engine, func, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
+from security_agent.report_sections import report_sections
 from security_agent.schemas import AgentState, LedgerEvent, RunStatus
 
 ZERO_HASH = "0" * 64
@@ -223,9 +224,28 @@ class LedgerStore:
                     incoming = {getattr(item, identity): item for item in getattr(state, field)}
                     for item in getattr(current, field):
                         key = getattr(item, identity)
-                        if key not in incoming or field == 'findings' and item.raw.get('verification_status') in {'confirmed', 'excluded'}:
+                        previous = incoming.get(key)
+                        if previous is not None and field == 'findings':
+                            selected = (item if item.raw.get('verification_status') in {'confirmed', 'excluded'}
+                                        else previous)
+                            bindings = [*previous.raw.get('traffic_bindings', []),
+                                        *item.raw.get('traffic_bindings', [])]
+                            if bindings:
+                                selected.raw['traffic_bindings'] = list({
+                                    (binding.get('evidence_id'), binding.get('role')): binding
+                                    for binding in bindings if isinstance(binding, dict)
+                                }.values())
+                                selected.evidence_ids = list(dict.fromkeys([
+                                    *selected.evidence_ids,
+                                    *(binding['evidence_id'] for binding in selected.raw['traffic_bindings']
+                                      if binding.get('evidence_id'))]))
+                            incoming[key] = selected
+                        elif previous is None:
                             incoming[key] = item
                     setattr(state, field, list(incoming.values()))
+                if state.report is not None:
+                    state.report = state.report.model_copy(update={
+                        'findings': state.findings, 'evidence': state.evidence, **report_sections(state)})
                 for field in ('provider_requests_used', 'model_calls_used', 'prompt_tokens_used',
                               'completion_tokens_used', 'cache_read_tokens_used', 'tool_calls_used', 'runtime_seconds_used'):
                     setattr(state.budget, field, max(getattr(state.budget, field), getattr(current.budget, field)))
