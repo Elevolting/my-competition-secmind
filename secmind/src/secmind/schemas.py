@@ -714,6 +714,7 @@ class ContextPackRef(BaseModel):
     repository_slice_refs: list[str] = Field(default_factory=list)
     selected_skill_refs: list[str] = Field(default_factory=list)
     knowledge_refs: list[str] = Field(default_factory=list)
+    derived_digest_refs: list[str] = Field(default_factory=list)
     evidence_handles: list[str] = Field(default_factory=list)
     tool_schema_refs: list[str] = Field(default_factory=list)
     working_summary: str = ""

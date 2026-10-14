@@ -176,6 +176,116 @@ def test_context_pack_preserves_taint_provenance_and_reduces_tokens(tmp_path: Pa
     assert first.token_budget.compacted_items > 0
 
 
+def test_cold_digest_is_advisory_traceable_and_rehydrates(tmp_path: Path) -> None:
+    item_store = ContextItemStore(ContentAddressedArtifactStore(tmp_path / "digest-artifacts"))
+    manager = ContextManager(item_store)
+    source = add_item(
+        item_store,
+        kind="code",
+        source="src/app.py",
+        authority=InstructionLayer.REPOSITORY_CONTENT,
+        taint=ContextTaint.UNTRUSTED,
+        content="dangerous_call(user_input)",
+    )
+    digest = item_store.add_cold_digest(
+        run_id="run-context",
+        digest_id="digest-1",
+        signature="sig-1",
+        body="The source contains one candidate sink.",
+        member_ids=[source.context_id],
+        anchor_ids=["finding-1"],
+        source_refs=["graph:node-1"],
+    )
+    assert digest.kind == "cold_digest"
+    assert digest.authority_level == InstructionLayer.RETRIEVED_KNOWLEDGE
+    assert digest.taint == ContextTaint.ADVISORY
+    assert digest.metadata["derived_kind"] == "cold_digest"
+    assert digest.metadata["member_ids"] == [source.context_id]
+
+    request = ContextCompileRequest(
+        run_id="run-context",
+        agent_profile="security-investigator",
+        task_capsule={"objective": "audit code"},
+        repository_items=[source],
+        derived_digest_items=[digest],
+        token_budget=ContextBudget(
+            total_tokens=1_500,
+            policy_tokens=100,
+            task_tokens=120,
+            skill_tool_tokens=20,
+            repository_tokens=700,
+            evidence_tokens=100,
+            working_output_tokens=100,
+        ),
+    )
+    pack = manager.compile(request)
+    materialized = manager.materialize(pack.pack_id)
+    blocks = json.loads(materialized.user_text)["repository_and_knowledge"]
+    assert {block["source"] for block in blocks} == {"src/app.py", "cold-digest:digest-1"}
+    digest_block = next(block for block in blocks if block["kind"] == "cold_digest")
+    assert json.loads(digest_block["content"])["member_ids"] == [source.context_id]
+    assert pack.derived_digest_refs == [digest.context_id]
+
+    restarted = ContextManager(
+        ContextItemStore(ContentAddressedArtifactStore(tmp_path / "digest-artifacts"))
+    )
+    recovered = restarted.rehydrate(pack, [source, digest])
+    assert restarted.materialize(recovered.pack_id) == materialized
+
+    changed_digest = item_store.add_cold_digest(
+        run_id="run-context",
+        digest_id="digest-1",
+        signature="sig-1",
+        body="The source contains two candidate sinks.",
+        member_ids=[source.context_id],
+        anchor_ids=["finding-1"],
+        source_refs=["graph:node-1"],
+    )
+    changed_pack = manager.compile(request.model_copy(update={"derived_digest_items": [changed_digest]}))
+    assert changed_pack.pack_digest != pack.pack_digest
+
+
+def test_cold_digest_budget_overflow_keeps_handle_without_content(tmp_path: Path) -> None:
+    item_store = ContextItemStore(ContentAddressedArtifactStore(tmp_path / "digest-handle"))
+    manager = ContextManager(item_store)
+    digest = item_store.add_cold_digest(
+        run_id="run-context",
+        digest_id="digest-large",
+        signature="sig-large",
+        body="long-summary " * 1_000,
+        member_ids=["node-1", "node-2"],
+        anchor_ids=["anchor-1"],
+        source_refs=["graph:node-1"],
+    )
+    pack = manager.compile(
+        ContextCompileRequest(
+            run_id="run-context",
+            agent_profile="security-investigator",
+            task_capsule={"objective": "audit code"},
+            derived_digest_items=[digest],
+            token_budget=ContextBudget(
+                total_tokens=900,
+                policy_tokens=100,
+                task_tokens=120,
+                skill_tool_tokens=20,
+                repository_tokens=140,
+                evidence_tokens=100,
+                working_output_tokens=100,
+            ),
+        )
+    )
+    inspection = manager.inspect(pack.pack_id)
+    digest_selection = next(item for item in inspection.selections if item.context_id == digest.context_id)
+    assert digest_selection.materialized is False
+    assert digest_selection.reason == "digest content budget; retained as handle"
+    assert pack.derived_digest_refs == [digest.context_id]
+    user_payload = json.loads(manager.materialize(pack.pack_id).user_text)
+    digest_block = next(block for block in user_payload["repository_and_knowledge"] if block["kind"] == "cold_digest")
+    assert digest_block["content"] is None
+    assert digest_block["source"] == "cold-digest:digest-large"
+    assert digest_block["sha256"] == digest.content_hash
+
+
 @pytest.mark.parametrize("budget_offset", [0, 12, 60, 10_000])
 def test_incremental_evidence_selection_matches_legacy_greedy_output(
     tmp_path: Path,
@@ -408,6 +518,13 @@ def test_context_manager_rejects_invalid_partitions_and_unknown_packs(tmp_path: 
             InstructionLayer.RETRIEVED_KNOWLEDGE,
             ContextTaint.TRUSTED,
             "advisory or untrusted L5",
+        ),
+        (
+            "derived_digest_items",
+            "cold_digest",
+            InstructionLayer.RETRIEVED_KNOWLEDGE,
+            ContextTaint.ADVISORY,
+            "cold digest",
         ),
         (
             "evidence_items",

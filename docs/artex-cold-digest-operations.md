@@ -41,5 +41,5 @@ Content-Type: application/json
 
 ## 当前限制
 
-本阶段的手动 compact 接口、确定性文本摘要、显式迁移和真实 planner round 投影已接入；模型摘要生成、上下文 token 节省对照和完整故障矩阵仍在 M5.3–M5.5 验收范围内。自动化测试使用固定图、临时数据库和 MockTransport，不调用真实付费模型。
+本阶段的手动 compact 接口、确定性文本摘要、显式迁移、真实 planner round 投影和 ContextManager 派生摘要契约已接入。`cold_digest` 以 advisory/L5 保存，带 digest/member/anchor/source provenance；预算不足时保留 handle-only，且 pack digest、materialize 和 rehydrate 可复现。模型摘要生成、两侧运行时传入、固定长任务 token 节省对照和完整故障矩阵仍在 M5.3–M5.5 验收范围内。自动化测试使用固定图、临时数据库和 MockTransport，不调用真实付费模型。
 

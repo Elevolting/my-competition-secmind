@@ -42,6 +42,7 @@ class ContextCompileRequest(BaseModel):
     repository_items: list[ContextItemRef] = Field(default_factory=list)
     selected_skill_items: list[ContextItemRef] = Field(default_factory=list)
     knowledge_items: list[ContextItemRef] = Field(default_factory=list)
+    derived_digest_items: list[ContextItemRef] = Field(default_factory=list)
     evidence_items: list[ContextItemRef] = Field(default_factory=list)
     tool_schema_items: list[ContextItemRef] = Field(default_factory=list)
     working_summary: str = ""
@@ -154,6 +155,51 @@ class ContextItemStore:
             raise ContextInvariantError("deterministic context id collided with different metadata")
         self._items[context_id] = reference
         return reference
+
+    def add_cold_digest(
+        self,
+        *,
+        run_id: str,
+        digest_id: str,
+        signature: str,
+        body: str,
+        member_ids: Iterable[str] = (),
+        anchor_ids: Iterable[str] = (),
+        source_refs: Iterable[str] = (),
+    ) -> ContextItemRef:
+        """Store a cold digest as an advisory, traceable derived view.
+
+        The original graph members remain outside this context item.  Metadata
+        keeps their identifiers and source references available for expansion,
+        while the authority and taint explicitly prevent the digest from being
+        treated as policy, evidence, or an execution instruction.
+        """
+
+        payload = {
+            "digest_id": digest_id,
+            "signature": signature,
+            "body": body,
+            "member_ids": sorted({str(item) for item in member_ids}),
+            "anchor_ids": sorted({str(item) for item in anchor_ids}),
+            "source_refs": sorted({str(item) for item in source_refs}),
+        }
+        return self.add_text(
+            run_id=run_id,
+            kind="cold_digest",
+            source=f"cold-digest:{digest_id}",
+            authority_level=InstructionLayer.RETRIEVED_KNOWLEDGE,
+            taint=ContextTaint.ADVISORY,
+            content=_canonical_json(payload),
+            metadata={
+                "derived": True,
+                "derived_kind": "cold_digest",
+                "digest_id": digest_id,
+                "signature": signature,
+                "member_ids": payload["member_ids"],
+                "anchor_ids": payload["anchor_ids"],
+                "source_refs": payload["source_refs"],
+            },
+        )
 
     def register(self, reference: ContextItemRef) -> None:
         """Rehydrate a durable reference after a process restart."""
@@ -281,6 +327,7 @@ class ContextManager:
         tool_items = self._ordered(request.tool_schema_items)
         repository_items = self._ordered(request.repository_items)
         knowledge_items = self._ordered(request.knowledge_items)
+        digest_items = self._ordered(request.derived_digest_items)
         evidence_items = self._ordered(request.evidence_items)
 
         policy_blocks = [self._block(item, request.run_id, include_content=True) for item in policy_items]
@@ -305,13 +352,17 @@ class ContextManager:
             "skill/tool context budget",
         )
         selected_skill_ids = {item.context_id for item in selected_skills}
-        selected_repository, repository_selections = self._select_within(
-            [*repository_items, *knowledge_items],
+        selected_repository, repository_selections = self._select_repository_partition(
+            repository_items,
+            knowledge_items,
+            digest_items,
             request.run_id,
             request.token_budget.repository_tokens,
-            "repository/knowledge context budget",
         )
         selected_repository_ids = {item.context_id for item in selected_repository}
+        materialized_repository_ids = {
+            selection.context_id for selection in repository_selections if selection.materialized
+        }
 
         materialized_evidence, evidence_selections = self._select_evidence(
             evidence_items,
@@ -338,6 +389,9 @@ class ContextManager:
         selected_knowledge_refs = [
             item.context_id for item in knowledge_items if item.context_id in selected_repository_ids
         ]
+        selected_digest_refs = [
+            item.context_id for item in digest_items if item.context_id in selected_repository_ids
+        ]
         # A context pack is a bounded working view, not the evidence ledger.
         # Keep only as many stable handles as its partition can carry; every
         # omitted record remains immutable in the run's evidence graph and is
@@ -353,6 +407,7 @@ class ContextManager:
             repository_slice_refs=selected_repository_refs,
             selected_skill_refs=selected_skill_refs,
             knowledge_refs=selected_knowledge_refs,
+            derived_digest_refs=selected_digest_refs,
             evidence_handles=evidence_handles,
             tool_schema_refs=selected_tool_refs,
             working_summary=compacted_summary,
@@ -362,10 +417,13 @@ class ContextManager:
         user_text = self._user_text(
             provisional,
             [*skill_items, *tool_items],
-            [*repository_items, *knowledge_items],
+            # Digest items share the bounded repository/knowledge partition but
+            # retain a separate reference list in the durable pack.
+            [*repository_items, *knowledge_items, *digest_items],
             selected_evidence,
             selected_skill_ids,
             selected_repository_ids,
+            materialized_repository_ids,
             materialized_evidence,
         )
         compiled_tokens = self.estimator.estimate(system_text) + self.estimator.estimate(user_text)
@@ -397,13 +455,26 @@ class ContextManager:
             "working_summary": compacted_summary,
             "token_budget": used_budget.model_dump(mode="json"),
         }
+        # Keep the historical digest shape byte-for-byte stable for packs that
+        # were compiled before cold-digest references existed.
+        if digest_items:
+            digest_payload["derived_digests"] = self._digest_refs(
+                [item for item in digest_items if item.context_id in selected_repository_ids]
+            )
         pack_digest = self._sha256_json(digest_payload)
         pack_id = str(uuid5(NAMESPACE_URL, f"secmind:context-pack:{pack_digest}"))
         pack = provisional.model_copy(
             update={"pack_id": pack_id, "pack_digest": pack_digest, "token_budget": used_budget}
         )
 
-        all_full_items = [*policy_items, *skill_items, *tool_items, *repository_items, *knowledge_items]
+        all_full_items = [
+            *policy_items,
+            *skill_items,
+            *tool_items,
+            *repository_items,
+            *knowledge_items,
+            *digest_items,
+        ]
         full_policy = self._system_text(
             [self._block(item, request.run_id, include_content=True) for item in policy_items]
         )
@@ -445,6 +516,7 @@ class ContextManager:
                 *tool_items,
                 *repository_items,
                 *knowledge_items,
+                *digest_items,
                 *evidence_items,
             ]
         }
@@ -483,6 +555,7 @@ class ContextManager:
                 repository_items=selected(reference.repository_slice_refs),
                 selected_skill_items=selected(reference.selected_skill_refs),
                 knowledge_items=selected(reference.knowledge_refs),
+                derived_digest_items=selected(reference.derived_digest_refs),
                 evidence_items=selected(reference.evidence_handles),
                 tool_schema_items=selected(reference.tool_schema_refs),
                 working_summary=reference.working_summary,
@@ -529,6 +602,7 @@ class ContextManager:
             "repository": request.repository_items,
             "skill": request.selected_skill_items,
             "knowledge": request.knowledge_items,
+            "derived_digest": request.derived_digest_items,
             "evidence": request.evidence_items,
             "tool_schema": request.tool_schema_items,
         }
@@ -565,6 +639,14 @@ class ContextManager:
         elif group == "knowledge":
             if item.authority_level != InstructionLayer.RETRIEVED_KNOWLEDGE or item.taint == ContextTaint.TRUSTED:
                 raise ContextInvariantError("retrieved knowledge must remain advisory or untrusted L5 data")
+        elif group == "derived_digest":
+            if (
+                item.kind != "cold_digest"
+                or item.authority_level != InstructionLayer.RETRIEVED_KNOWLEDGE
+                or item.taint != ContextTaint.ADVISORY
+                or item.metadata.get("derived_kind") != "cold_digest"
+            ):
+                raise ContextInvariantError("cold digest must remain an advisory derived L5 view")
         elif group == "evidence":
             if item.authority_level != InstructionLayer.TOOL_OBSERVATION or item.taint == ContextTaint.TRUSTED:
                 raise ContextInvariantError("tool evidence must remain non-trusted L7 data")
@@ -593,6 +675,42 @@ class ContextManager:
                 selections.append(self._selection(item, True, "selected within partition budget"))
             else:
                 selections.append(self._selection(item, False, exclusion_reason))
+        return selected, selections
+
+    def _select_repository_partition(
+        self,
+        repository_items: list[ContextItemRef],
+        knowledge_items: list[ContextItemRef],
+        digest_items: list[ContextItemRef],
+        run_id: str,
+        token_limit: int,
+    ) -> tuple[list[ContextItemRef], list[ContextSelection]]:
+        """Select repository data while retaining cold-digest handles on overflow."""
+
+        selected: list[ContextItemRef] = []
+        blocks: list[dict[str, Any]] = []
+        selections: list[ContextSelection] = []
+        digest_ids = {item.context_id for item in digest_items}
+        for item in [*repository_items, *knowledge_items, *digest_items]:
+            if item.sensitivity in {DataSensitivity.SECRET, DataSensitivity.CREDENTIAL_CANDIDATE}:
+                selections.append(self._selection(item, False, "sensitive content retained as handle"))
+                continue
+            content_block = self._block(item, run_id, include_content=True)
+            if self._json_tokens([*blocks, content_block]) <= token_limit:
+                blocks.append(content_block)
+                selected.append(item)
+                selections.append(self._selection(item, True, "selected within partition budget"))
+                continue
+            if item.context_id in digest_ids:
+                handle_block = self._block(item, run_id, include_content=False)
+                if self._json_tokens([*blocks, handle_block]) <= token_limit:
+                    blocks.append(handle_block)
+                    selected.append(item)
+                    selections.append(
+                        self._selection(item, False, "digest content budget; retained as handle")
+                    )
+                    continue
+            selections.append(self._selection(item, False, "repository/knowledge context budget"))
         return selected, selections
 
     def _select_evidence(
@@ -676,6 +794,7 @@ class ContextManager:
         evidence_items: list[ContextItemRef],
         selected_skill_ids: set[str],
         selected_repository_ids: set[str],
+        materialized_repository_ids: set[str],
         materialized_evidence: set[str],
     ) -> str:
         skills_and_tools = [
@@ -684,7 +803,7 @@ class ContextManager:
             if item.context_id in selected_skill_ids
         ]
         repository_and_knowledge = [
-            self._block(item, pack.run_id, include_content=True)
+            self._block(item, pack.run_id, include_content=item.context_id in materialized_repository_ids)
             for item in repository_and_knowledge_items
             if item.context_id in selected_repository_ids
         ]
@@ -721,8 +840,8 @@ class ContextManager:
             for item in [*pack.selected_skill_refs, *pack.tool_schema_refs]
         ]
         repository_and_knowledge = [
-            self._block(by_id[item], pack.run_id, include_content=True)
-            for item in [*pack.repository_slice_refs, *pack.knowledge_refs]
+            self._block(by_id[item], pack.run_id, include_content=item in selected_ids)
+            for item in [*pack.repository_slice_refs, *pack.knowledge_refs, *pack.derived_digest_refs]
         ]
         evidence = [
             self._block(by_id[item], pack.run_id, include_content=item in selected_ids)
