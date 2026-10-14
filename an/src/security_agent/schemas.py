@@ -150,6 +150,7 @@ class ColdDigestCompactRequest(BaseModel):
 
     R: int = Field(default=6, ge=1, le=1000)
     K: int = Field(default=2, ge=2, le=1000)
+    round_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class QuestionBankInspectRequest(BaseModel):

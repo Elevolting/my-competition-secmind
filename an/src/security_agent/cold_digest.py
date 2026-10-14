@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -75,6 +76,27 @@ class ColdDigestRunRow(Base):
     compaction_R: Mapped[int] = mapped_column(Integer, default=DEFAULT_R)
     compaction_K: Mapped[int] = mapped_column(Integer, default=DEFAULT_K)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ColdDigestSchemaRow(Base):
+    """Schema marker maintained by the explicit cold-digest migrator."""
+
+    __tablename__ = "cold_digest_schema"
+
+    schema_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ColdDigestRoundRow(Base):
+    """One durable planner wakeup identity for a run."""
+
+    __tablename__ = "cold_digest_rounds"
+
+    run_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    round_key: Mapped[str] = mapped_column(String(200), primary_key=True)
+    round_no: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class ColdDigestNodeRow(Base):
@@ -361,7 +383,15 @@ class ColdDigestStore:
             )
         else:
             self.engine = engine_or_url
-        Base.metadata.create_all(self.engine)
+        from security_agent.cold_digest_migrations import ensure_cold_digest_schema
+
+        ensure_cold_digest_schema(self.engine)
+        self._locks: dict[str, threading.RLock] = {}
+        self._locks_guard = threading.Lock()
+
+    def _lock_for(self, run_id: str) -> threading.RLock:
+        with self._locks_guard:
+            return self._locks.setdefault(run_id, threading.RLock())
 
     def _rows(self, session: Session, run_id: str) -> dict[str, ColdDigestNodeRow]:
         return {row.node_id: row for row in session.scalars(
@@ -375,16 +405,40 @@ class ColdDigestStore:
         *,
         R: int = DEFAULT_R,
         K: int = DEFAULT_K,
+        round_id: str | None = None,
         summary_builder: Callable[[DigestBlock, dict[str, GraphNode]], str] | None = None,
     ) -> dict[str, Any]:
         if not isinstance(run_id, str) or not run_id.strip():
             raise ColdDigestError("run_id 不能为空")
         if R < 1 or K < 2:
             raise ColdDigestError("R 必须为正整数，K 必须至少为 2")
+        if round_id is not None and (not isinstance(round_id, str) or not round_id.strip()):
+            raise ColdDigestError("round_id 不能为空字符串")
         graph = graph_from_projection(projection)
         now = datetime.now(UTC)
-        with Session(self.engine) as session:
-            run = session.get(ColdDigestRunRow, run_id)
+        effective_round_id = (round_id.strip() if round_id is not None else None) or f"manual:{uuid4()}"
+        replayed = False
+        with self._lock_for(run_id), Session(self.engine) as session:
+            prior_round = session.get(ColdDigestRoundRow, (run_id, effective_round_id))
+            if prior_round is not None:
+                replayed = True
+                snapshot = self.snapshot(run_id)
+                snapshot.update({"round_id": effective_round_id, "round_replayed": True})
+                return snapshot
+
+            run = session.execute(
+                select(ColdDigestRunRow)
+                .where(ColdDigestRunRow.run_id == run_id)
+                .with_for_update()
+            ).scalar_one_or_none()
+            # A second process may have inserted the round while the row lock
+            # was being acquired.  Recheck after locking the run row before
+            # attempting the unique round insert.
+            prior_round = session.get(ColdDigestRoundRow, (run_id, effective_round_id))
+            if prior_round is not None:
+                snapshot = self.snapshot(run_id)
+                snapshot.update({"round_id": effective_round_id, "round_replayed": True})
+                return snapshot
             if run is None:
                 run = ColdDigestRunRow(
                     run_id=run_id,
@@ -401,6 +455,12 @@ class ColdDigestStore:
             run.round_no += 1
             run.updated_at = now
             round_no = run.round_no
+            session.add(ColdDigestRoundRow(
+                run_id=run_id,
+                round_key=effective_round_id,
+                round_no=round_no,
+                created_at=now,
+            ))
             previous_rows = self._rows(session, run_id)
             rows_by_id = dict(previous_rows)
             versions: dict[str, int] = {}
@@ -479,7 +539,9 @@ class ColdDigestStore:
                 old.invalidation_reason = "active block changed or became hot"
                 session.query(ColdDigestCoverRow).filter(ColdDigestCoverRow.digest_id == old.digest_id).delete()
             session.commit()
-        return self.snapshot(run_id)
+        snapshot = self.snapshot(run_id)
+        snapshot.update({"round_id": effective_round_id, "round_replayed": replayed})
+        return snapshot
 
     def snapshot(self, run_id: str) -> dict[str, Any]:
         with Session(self.engine) as session:
@@ -493,6 +555,14 @@ class ColdDigestStore:
                 "round_no": run.round_no if run else 0,
                 "R": run.compaction_R if run else DEFAULT_R,
                 "K": run.compaction_K if run else DEFAULT_K,
+                "rounds": [
+                    {"round_id": row.round_key, "round_no": row.round_no, "created_at": row.created_at.isoformat()}
+                    for row in session.scalars(
+                        select(ColdDigestRoundRow)
+                        .where(ColdDigestRoundRow.run_id == run_id)
+                        .order_by(ColdDigestRoundRow.round_no)
+                    ).all()
+                ],
                 "nodes": {
                     key: {"content_version": row.content_version, "cold_since_round": row.cold_since_round,
                           "kind": row.kind, "state": row.state}

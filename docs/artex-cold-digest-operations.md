@@ -18,10 +18,10 @@ GET /api/v1/runs/{run_id}/cold-digest
 POST /api/v1/runs/{run_id}/cold-digest/compact
 Content-Type: application/json
 
-{"R": 6, "K": 2}
+{"R": 6, "K": 2, "round_id": "planner-wakeup-42"}
 ```
 
-请求会校验任务绑定的黑板项目 ID 和标题。返回值包含 `round_no`、节点冷却戳、摘要正文、签名、generation、成员/锚点版本、来源引用和 `active`/`superseded` 历史。
+`round_id` 是同一 planner wakeup 的稳定身份；重复提交同一个 `round_id` 会返回原 round，不增加 `round_no`，也不会重复写 compact ledger 事件。省略它时接口会生成一次性的手动 round。请求会校验任务绑定的黑板项目 ID 和标题。返回值包含 `round_no`、节点冷却戳、摘要正文、签名、generation、成员/锚点版本、来源引用和 `active`/`superseded` 历史。
 
 ## 判定规则
 
@@ -35,11 +35,11 @@ Content-Type: application/json
 
 黑板图会显示“冷节点摘要”节点。默认隐藏 active digest 覆盖的成员；展开摘要或从搜索结果进入时，成员原节点重新显示。详情面板列出正文、签名、代数、成员、锚点和来源引用，点击成员可定位原节点并继续查看证据。
 
-## 重启与排障
+## 迁移、重启与排障
 
-round、冷却戳、摘要历史和 active covers 存在 SecMind 数据库中；服务重启后通过 `GET` 可恢复。若摘要不可用，先确认任务已绑定黑板项目，再检查项目 ID/标题是否匹配，随后查看账本事件 `blackboard.cold_digest.compacted` 和 `cold_digest` 快照。重新激活的分支应先让原节点恢复可见，再由下一次 compact 更新摘要覆盖。
+冷摘要表由 `security_agent.cold_digest_migrations.ensure_cold_digest_schema()` 管理，当前 schema 版本为 2。首次打开旧原型数据库时会识别已有表并补建 schema 标记与 round identity 表；重复启动不会重复迁移。round、冷却戳、摘要历史和 active covers 存在 SecMind 数据库中；服务重启后通过 `GET` 可恢复。若摘要不可用，先确认任务已绑定黑板项目，再检查项目 ID/标题是否匹配，随后查看账本事件 `blackboard.cold_digest.compacted` 和 `cold_digest` 快照。重新激活的分支应先让原节点恢复可见，再由下一次 compact 更新摘要覆盖。
 
 ## 当前限制
 
-本阶段的手动 compact 接口和确定性文本摘要已接入，真实 planner round、模型摘要生成、上下文 token 节省对照和正式迁移仍在 M5.3–M5.5 验收范围内。自动化测试使用固定图、临时数据库和 MockTransport，不调用真实付费模型。
+本阶段的手动 compact 接口、确定性文本摘要、显式迁移和真实 planner round 投影已接入；模型摘要生成、上下文 token 节省对照和完整故障矩阵仍在 M5.3–M5.5 验收范围内。自动化测试使用固定图、临时数据库和 MockTransport，不调用真实付费模型。
 

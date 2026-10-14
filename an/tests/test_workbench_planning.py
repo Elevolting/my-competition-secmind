@@ -611,6 +611,42 @@ async def test_internal_callback_requires_token_and_url_binding(settings, monkey
             assert (await client.post(url, json={**body, 'run_id': 'other'}, headers=headers)).status_code == 409
             response = await client.post(url, json=body, headers=headers)
             assert response.status_code == 200 and response.json()['stop_reason']
+            assert response.json()['cold_digest']['status'] == 'compacted'
+            replay = await client.post(url, json=body, headers=headers)
+            assert replay.status_code == 200
+            assert replay.json()['cold_digest']['status'] == 'replayed'
+            digest = await client.get('/api/v1/runs/planning-test/cold-digest')
+            assert digest.status_code == 200
+            assert len(digest.json()['rounds']) == 1
+            compacted = [event for event in service.ledger.events('planning-test', limit=1000)
+                         if event.event_type == 'blackboard.cold_digest.compacted']
+            assert len(compacted) == 1
+    finally:
+        await service.orchestrator.gateway.close()
+
+
+async def test_runtime_planning_keeps_response_when_cold_digest_fails(settings, monkeypatch):
+    settings.security_runtime_callback_token = 'unit-test-planning-credential'
+    app = create_app(settings)
+    service = app.state.service
+    state = bound_state(settings)
+    service.ledger.save_state(state)
+
+    def fail_compact(*args, **kwargs):
+        raise RuntimeError('digest fixture failure')
+
+    monkeypatch.setattr(app.state.cold_digests, 'compact', fail_compact)
+    body = request(state).model_dump(mode='json')
+    headers = {'X-Security-Runtime-Token': settings.security_runtime_callback_token}
+    try:
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://testserver') as client:
+            response = await client.post('/api/v1/internal/runs/planning-test/planning', json=body, headers=headers)
+            assert response.status_code == 200
+            assert response.json()['stop_reason']
+            assert response.json()['cold_digest']['status'] == 'failed'
+            failed = [event for event in service.ledger.events('planning-test', limit=1000)
+                      if event.event_type == 'blackboard.cold_digest.failed']
+            assert len(failed) == 1
     finally:
         await service.orchestrator.gateway.close()
 

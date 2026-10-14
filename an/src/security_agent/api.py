@@ -1197,7 +1197,60 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, "Run not found") from exc
         except ValueError as exc:
             raise HTTPException(409, str(exc)) from exc
-        return result.model_dump(mode="json", by_alias=True)
+        response = result.model_dump(mode="json", by_alias=True)
+
+        # The digest is a derived view of the exact planner snapshot.  Keep it
+        # outside the planner response contract: a digest failure must never
+        # turn a successful planning decision into a failed callback.
+        digest_result: dict[str, Any] = {"status": "skipped"}
+        try:
+            state = service.state(run_id)
+            detail = {
+                "project": {
+                    "id": payload.project_id,
+                    "title": project_title_for_run(run_id),
+                    "status": "active",
+                },
+                "facts": payload.facts,
+                "intents": payload.intents,
+                "hints": payload.hints,
+            }
+            projection = normalize_penetration_graph(
+                detail,
+                state.external_execution.get("fact_assessments"),
+                service.ledger.events(run_id, limit=100000),
+                state,
+                app.state.mcp_runtime.store.pending_mcp_approvals(run_id),
+            )
+            snapshot = app.state.cold_digests.compact(
+                run_id,
+                projection,
+                round_id=f"planner:{payload.decision_id}",
+            )
+            digest_result = {
+                "status": "replayed" if snapshot.get("round_replayed") else "compacted",
+                "round_id": snapshot.get("round_id"),
+                "round_no": snapshot.get("round_no"),
+                "active_digest_ids": [
+                    item["digest_id"] for item in snapshot.get("digests", [])
+                    if item.get("status") == "active"
+                ],
+            }
+            if not snapshot.get("round_replayed"):
+                service.ledger.append(run_id, "blackboard.cold_digest.compacted", digest_result,
+                                      actor="cold_digest")
+        except Exception as exc:  # pragma: no cover - exercised by failure matrix
+            digest_result = {
+                "status": "failed",
+                "reason": f"{type(exc).__name__}: {str(exc)[:240]}",
+            }
+            try:
+                service.ledger.append(run_id, "blackboard.cold_digest.failed", digest_result,
+                                      actor="cold_digest")
+            except Exception as ledger_exc:
+                digest_result["ledger_event_error"] = f"{type(ledger_exc).__name__}: {str(ledger_exc)[:120]}"
+        response["cold_digest"] = digest_result
+        return response
 
     @app.get("/api/v1/runs/{run_id}/blackboard-graph")
     async def get_blackboard_graph(run_id: str) -> dict[str, Any]:
@@ -1292,15 +1345,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 service.ledger.events(run_id, limit=100000), state,
                 app.state.mcp_runtime.store.pending_mcp_approvals(run_id),
             )
-            snapshot = app.state.cold_digests.compact(run_id, projection, R=payload.R, K=payload.K)
+            snapshot = app.state.cold_digests.compact(
+                run_id, projection, R=payload.R, K=payload.K, round_id=payload.round_id
+            )
         except (PenetrationProtocolError, ColdDigestError) as exc:
             raise HTTPException(409, str(exc)) from exc
-        service.ledger.append(run_id, "blackboard.cold_digest.compacted", {
-            "round_no": snapshot["round_no"],
-            "active_digest_ids": [item["digest_id"] for item in snapshot["digests"] if item["status"] == "active"],
-            "R": payload.R, "K": payload.K,
-        }, actor="cold_digest")
-        return app.state.cold_digests.project_graph(run_id, projection)
+        if not snapshot.get("round_replayed"):
+            service.ledger.append(run_id, "blackboard.cold_digest.compacted", {
+                "round_id": snapshot.get("round_id"),
+                "round_no": snapshot["round_no"],
+                "active_digest_ids": [item["digest_id"] for item in snapshot["digests"] if item["status"] == "active"],
+                "R": payload.R, "K": payload.K,
+            }, actor="cold_digest")
+        result = app.state.cold_digests.project_graph(run_id, projection)
+        result.update({"round_id": snapshot.get("round_id"), "round_replayed": snapshot.get("round_replayed", False)})
+        return result
 
     @app.get("/api/v1/runs/{run_id}/asset-graph")
     async def get_asset_graph(run_id: str) -> dict[str, Any]:

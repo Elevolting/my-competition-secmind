@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, inspect, select
 
 from security_agent.cold_digest import (
     ColdDigestCoverRow,
+    ColdDigestRoundRow,
     ColdDigestRow,
     ColdDigestStore,
     block_signature,
@@ -115,4 +116,35 @@ def test_store_debounces_reuses_and_supersedes_digests() -> None:
         rows = connection.execute(select(ColdDigestRow)).all()
     assert len(covers) == 2
     assert sum(row.status == "active" for row in rows) == 1
+
+
+def test_schema_migration_is_explicit_repeatable_and_upgrades_legacy_tables() -> None:
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+    # Simulate a database produced by the old create_all-only prototype.
+    from security_agent.cold_digest import Base
+
+    Base.metadata.create_all(engine)
+    ColdDigestStore(engine)
+    tables = set(inspect(engine).get_table_names())
+    assert {"cold_digest_schema", "cold_digest_rounds", "cold_digest_runs",
+            "cold_digest_nodes", "cold_digests", "cold_digest_covers"} <= tables
+    # Reopening the store must not create a second schema marker or fail.
+    ColdDigestStore(engine)
+    with engine.connect() as connection:
+        rows = connection.exec_driver_sql("SELECT version FROM cold_digest_schema").all()
+    assert rows == [(2,)]
+
+
+def test_round_identity_makes_planner_wakeup_replay_idempotent() -> None:
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+    store = ColdDigestStore(engine)
+    graph = projection([node("a"), node("b")], [])
+
+    first = store.compact("run-replay", graph, R=2, K=2, round_id="planner-42")
+    replay = store.compact("run-replay", graph, R=2, K=2, round_id="planner-42")
+    assert first["round_no"] == replay["round_no"] == 1
+    assert replay["round_replayed"] is True
+    with engine.connect() as connection:
+        rounds = connection.execute(select(ColdDigestRoundRow)).all()
+    assert [(row.run_id, row.round_key, row.round_no) for row in rounds] == [("run-replay", "planner-42", 1)]
 
