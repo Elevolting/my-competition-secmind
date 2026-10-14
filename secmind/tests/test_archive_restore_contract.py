@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -204,3 +205,51 @@ def test_export_rejects_active_or_corrupt_runs(tmp_path: Path) -> None:
             created_at="2026-10-15T00:00:00Z",
         )
     ledger.close()
+
+
+def test_restore_recovers_a_crashed_journal_before_installing(tmp_path: Path) -> None:
+    root = tmp_path / "archive"
+    target = tmp_path / "restored"
+    manifest = _make_manifest(root)
+    write_manifest(root, manifest)
+    target.mkdir()
+    staging = target / ".restore-crashed"
+    (staging / "ledger").mkdir(parents=True)
+    (staging / "ledger" / "events.jsonl").write_text("partial", encoding="utf-8")
+    (target / "ledger").mkdir()
+    (target / "ledger" / "events.jsonl").write_text("partial", encoding="utf-8")
+    (target / ".restore-journal.json").write_text(
+        json.dumps(
+            {
+                "archive_id": manifest.archive_id,
+                "target_run_id": "run-restored",
+                "manifest_digest": manifest.digest(),
+                "staging_name": staging.name,
+                "planned_paths": [member.path for member in manifest.members],
+                "committed_paths": ["ledger/events.jsonl"],
+                "phase": "committing",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = restore_archive(root, target, target_run_id="run-restored")
+
+    assert result.already_restored is False
+    assert not staging.exists()
+    assert not (target / ".restore-journal.json").exists()
+    assert (target / "ledger" / "events.jsonl").read_text(encoding="utf-8") == '{"sequence":1}\n'
+
+
+def test_restore_rejects_a_live_target_lock(tmp_path: Path) -> None:
+    root = tmp_path / "archive"
+    target = tmp_path / "restored"
+    manifest = _make_manifest(root)
+    write_manifest(root, manifest)
+    target.mkdir()
+    (target / ".restore-lock.json").write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
+    try:
+        with pytest.raises(ArchiveError, match="target is locked"):
+            restore_archive(root, target, target_run_id="run-restored")
+    finally:
+        (target / ".restore-lock.json").unlink(missing_ok=True)

@@ -99,5 +99,5 @@ ARTEX 对照版本：`ce42b66a6b1f8150380f2cbdedcd98b34d4bd404d56869ada31a67f067
 
 ## 当前执行点
 
-路线文档和 M6 差距审计已提交。M6 文件级归档契约和基础测试已加入工作区，下一步从阶段 2 的真实导出适配器开始：接入 `LedgerStore`、`ContentAddressedArtifactStore` 和 `AgentState`，随后补冻结、journal、ID 映射和跨服务恢复测试。
+路线文档和 M6 差距审计已提交。M6 文件级归档契约、`LedgerStore`/`ContentAddressedArtifactStore` 真实导出、目标锁和持久恢复 journal 已完成并有固定 fixture。下一步补冻结期间写入 fencing、真实 run/artifact/event/checkpoint ID 映射与引用重写，再接入服务状态隔离和跨服务恢复测试。
 

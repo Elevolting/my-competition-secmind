@@ -26,6 +26,8 @@ _SUPPORTED_FORMAT_VERSIONS = frozenset({1})
 _MEMBER_KINDS = frozenset({"ledger", "state", "audit", "artifact", "checkpoint", "metadata"})
 _MANIFEST_NAME = "manifest.json"
 _RESTORE_MARKER_NAME = ".restore-complete.json"
+_RESTORE_JOURNAL_NAME = ".restore-journal.json"
+_RESTORE_LOCK_NAME = ".restore-lock.json"
 _CHUNK_BYTES = 1024 * 1024
 _ARCHIVABLE_STATUSES = frozenset({"completed", "partial", "denied", "failed", "recovery_required", "cancelled"})
 _ARTIFACT_ID_KEYS = frozenset({"artifact_id", "artifact_ids", "prompt_artifact_id", "response_artifact_id"})
@@ -299,6 +301,95 @@ def _write_bytes(path: Path, content: bytes) -> None:
         Path(temporary).replace(path)
     finally:
         Path(temporary).unlink(missing_ok=True)
+
+
+def _write_json_atomic(path: Path, payload: Mapping[str, Any]) -> None:
+    _write_bytes(path, _canonical_json(payload) + b"\n")
+
+
+def _read_json(path: Path, *, error: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ArchiveError(error) from exc
+    if not isinstance(payload, dict):
+        raise ArchiveError(error)
+    return payload
+
+
+def _process_is_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except (OSError, ProcessLookupError):
+        return False
+    return True
+
+
+def _acquire_restore_lock(target: Path) -> Path:
+    lock = target / _RESTORE_LOCK_NAME
+    payload = {"pid": os.getpid(), "created_at": datetime.now(UTC).isoformat()}
+    for _ in range(2):
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            try:
+                previous = _read_json(lock, error="restore lock is unreadable")
+                previous_pid = int(previous.get("pid", 0))
+            except (ArchiveError, TypeError, ValueError):
+                raise ArchiveError("restore target is locked") from None
+            if _process_is_alive(previous_pid):
+                raise ArchiveError("restore target is locked") from None
+            lock.unlink(missing_ok=True)
+            continue
+        try:
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(_canonical_json(payload) + b"\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+        except Exception:
+            lock.unlink(missing_ok=True)
+            raise
+        return lock
+    raise ArchiveError("restore target is locked")
+
+
+def _recover_restore_journal(target: Path, manifest: ArchiveManifest, target_run_id: str) -> None:
+    journal_path = target / _RESTORE_JOURNAL_NAME
+    if not journal_path.exists():
+        return
+    if journal_path.is_symlink() or not journal_path.is_file():
+        raise ArchiveError("restore journal is invalid")
+    journal = _read_json(journal_path, error="restore journal is unreadable")
+    if (
+        journal.get("archive_id") != manifest.archive_id
+        or journal.get("target_run_id") != target_run_id
+        or journal.get("manifest_digest") != manifest.digest()
+    ):
+        raise ArchiveError("restore journal belongs to another archive")
+    staging_name = journal.get("staging_name")
+    if (
+        not isinstance(staging_name, str)
+        or not staging_name.startswith(".restore-")
+        or Path(staging_name).name != staging_name
+    ):
+        raise ArchiveError("restore journal staging path is invalid")
+    staging = target / staging_name
+    if staging.is_symlink():
+        raise ArchiveError("restore journal staging path is a symlink")
+    if staging.exists():
+        shutil.rmtree(staging)
+    planned_paths = journal.get("planned_paths", [])
+    if not isinstance(planned_paths, list) or any(not isinstance(item, str) for item in planned_paths):
+        raise ArchiveError("restore journal planned paths are invalid")
+    for relative in planned_paths:
+        destination = _safe_target_path(target, relative)
+        if destination.is_symlink() or destination.is_file():
+            destination.unlink()
+        elif destination.exists():
+            raise ArchiveError(f"restore journal destination is not a file: {relative}")
+    journal_path.unlink(missing_ok=True)
 
 
 def _member_for_file(
@@ -655,40 +746,90 @@ def restore_archive(
         raise ArchiveError("restore target must not be a symlink")
     target = target.resolve()
     marker = target / _RESTORE_MARKER_NAME
-    if marker.exists():
-        if marker.is_symlink() or not marker.is_file():
-            raise ArchiveError("restore marker is invalid")
-        try:
-            previous = json.loads(marker.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise ArchiveError("restore marker is unreadable") from exc
-        if previous.get("archive_id") != manifest.archive_id or previous.get("target_run_id") != target_run_id:
-            raise ArchiveError("restore target already belongs to another archive")
-        if previous.get("manifest_digest") != manifest.digest() or previous.get("execution_allowed") is not False:
-            raise ArchiveError("restore marker does not attest to the verified archive")
-        return RestoreResult(manifest.archive_id, target_run_id, tuple(previous.get("restored_paths", [])), True)
-
-    restored: list[str] = []
-    staging = Path(tempfile.mkdtemp(prefix=".restore-", dir=target))
+    lock = _acquire_restore_lock(target)
     try:
-        for member in manifest.members:
-            source = root / Path(member.path)
-            destination = staging / Path(member.path)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            if source.is_symlink() or not source.is_file():
-                raise ArchiveError(f"archive member disappeared during restore: {member.path}")
-            shutil.copyfile(source, destination)
-            size, digest = _hash_file(destination)
-            if size != member.size_bytes or not hmac.compare_digest(digest, member.sha256):
-                raise ArchiveError(f"restored member integrity mismatch: {member.path}")
-            restored.append(member.path)
-        for member in manifest.members:
-            staged = staging / Path(member.path)
-            destination = _safe_target_path(target, member.path)
+        if marker.exists():
+            if marker.is_symlink() or not marker.is_file():
+                raise ArchiveError("restore marker is invalid")
+            previous = _read_json(marker, error="restore marker is unreadable")
+            if previous.get("archive_id") != manifest.archive_id or previous.get("target_run_id") != target_run_id:
+                raise ArchiveError("restore target already belongs to another archive")
+            if previous.get("manifest_digest") != manifest.digest() or previous.get("execution_allowed") is not False:
+                raise ArchiveError("restore marker does not attest to the verified archive")
+            journal = target / _RESTORE_JOURNAL_NAME
+            if journal.exists():
+                if journal.is_symlink() or not journal.is_file():
+                    raise ArchiveError("restore journal is invalid")
+                journal.unlink()
+            return RestoreResult(manifest.archive_id, target_run_id, tuple(previous.get("restored_paths", [])), True)
+
+        _recover_restore_journal(target, manifest, target_run_id)
+        planned_paths = [member.path for member in manifest.members]
+        for relative in planned_paths:
+            destination = _safe_target_path(target, relative)
             if destination.exists() or destination.is_symlink():
-                raise ArchiveError(f"restore destination already exists: {member.path}")
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            staged.replace(destination)
+                raise ArchiveError(f"restore destination already exists: {relative}")
+        staging = Path(tempfile.mkdtemp(prefix=".restore-", dir=target))
+        journal_path = target / _RESTORE_JOURNAL_NAME
+        _write_json_atomic(
+            journal_path,
+            {
+                "archive_id": manifest.archive_id,
+                "target_run_id": target_run_id,
+                "manifest_digest": manifest.digest(),
+                "staging_name": staging.name,
+                "planned_paths": planned_paths,
+                "committed_paths": [],
+                "phase": "staging",
+            },
+        )
+        restored: list[str] = []
+        try:
+            for member in manifest.members:
+                source = root / Path(member.path)
+                destination = staging / Path(member.path)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                if source.is_symlink() or not source.is_file():
+                    raise ArchiveError(f"archive member disappeared during restore: {member.path}")
+                shutil.copyfile(source, destination)
+                size, digest = _hash_file(destination)
+                if size != member.size_bytes or not hmac.compare_digest(digest, member.sha256):
+                    raise ArchiveError(f"restored member integrity mismatch: {member.path}")
+                restored.append(member.path)
+            _write_json_atomic(
+                journal_path,
+                {
+                    "archive_id": manifest.archive_id,
+                    "target_run_id": target_run_id,
+                    "manifest_digest": manifest.digest(),
+                    "staging_name": staging.name,
+                    "planned_paths": planned_paths,
+                    "committed_paths": [],
+                    "phase": "committing",
+                },
+            )
+            committed: list[str] = []
+            for member in manifest.members:
+                staged = staging / Path(member.path)
+                destination = _safe_target_path(target, member.path)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                staged.replace(destination)
+                committed.append(member.path)
+                _write_json_atomic(
+                    journal_path,
+                    {
+                        "archive_id": manifest.archive_id,
+                        "target_run_id": target_run_id,
+                        "manifest_digest": manifest.digest(),
+                        "staging_name": staging.name,
+                        "planned_paths": planned_paths,
+                        "committed_paths": committed,
+                        "phase": "committing",
+                    },
+                )
+        except Exception:
+            _recover_restore_journal(target, manifest, target_run_id)
+            raise
         marker_payload = {
             "archive_id": manifest.archive_id,
             "target_run_id": target_run_id,
@@ -696,22 +837,14 @@ def restore_archive(
             "restored_paths": sorted(restored),
             "execution_allowed": False,
         }
-        fd, temporary = tempfile.mkstemp(prefix=".restore-marker-", dir=target)
-        try:
-            with os.fdopen(fd, "wb") as handle:
-                handle.write(_canonical_json(marker_payload) + b"\n")
-                handle.flush()
-                os.fsync(handle.fileno())
-            Path(temporary).replace(marker)
-        finally:
-            Path(temporary).unlink(missing_ok=True)
+        _write_json_atomic(marker, marker_payload)
+        (target / _RESTORE_JOURNAL_NAME).unlink(missing_ok=True)
         return RestoreResult(manifest.archive_id, target_run_id, tuple(sorted(restored)), False)
-    except Exception:
-        for relative in restored:
-            (target / Path(relative)).unlink(missing_ok=True)
-        raise
     finally:
-        shutil.rmtree(staging, ignore_errors=True)
+        lock.unlink(missing_ok=True)
+        staging_path = locals().get("staging")
+        if isinstance(staging_path, Path):
+            shutil.rmtree(staging_path, ignore_errors=True)
 
 
 __all__ = [

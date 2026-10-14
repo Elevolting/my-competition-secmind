@@ -64,6 +64,18 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 6. 没有把恢复和“继续执行”硬隔离的服务边界及契约测试。
 7. 现有 artifact 分类保证访问策略，但还没有把分类 marker、外部 blob 和 ledger/state 一起纳入归档一致性证明。
 
+## 当前实现进度
+
+已加入 `secmind/src/secmind/archive_restore.py` 和对应契约测试：
+
+- `export_run_archive(...)` 从现有 `LedgerStore` 导出 state 与完整 hash-chain JSONL，并记录状态版本、最新序号和链头哈希。
+- 从 `ContentAddressedArtifactStore` 读取 artifact bytes 与分类 metadata；成员路径、大小、SHA-256、媒体类型和数量进入 manifest。
+- 导出拒绝运行中状态和无效账本；归档目录只在新建或空目录中发布。
+- 恢复增加目标锁、持久 `.restore-journal.json` 和 staging 目录；进程中断后下一次恢复先清理 journal 记录的半成品，再重新安装。
+- 重复恢复仍由 `.restore-complete.json` 幂等保护，恢复结果继续固定为 `execution_allowed=false`。
+
+这些内容完成了 M6.2 的 manifest/成员校验基础和 M6.3 的本地 staging/journal 基础。冻结期间写入 fencing、真实 run/artifact/event/checkpoint ID 重写、数据库事务接入、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
+
 ## 首期 M6 契约
 
 ### 归档清单建议结构
