@@ -469,6 +469,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_traffic_evidence(app, service.ledger, actual_settings, app.state.mcp_runtime.store)
     from security_agent.retests_api import register_retests
     register_retests(app, service, actual_settings)
+    from security_agent.incident_review import register_incident_review
+    register_incident_review(app, incident_manager, service, actual_settings)
     register_experiences(app, experiences, service, gateway)
     register_tsec(app, actual_settings)
 

@@ -121,6 +121,7 @@ export const startIncidentMonitor = () => request('/api/v1/incident/monitor/star
 export const stopIncidentMonitor = () => request('/api/v1/incident/monitor/stop', { method: 'POST' })
 export const getIncidentLogs = (limit = 100, offset = 0) => request(`/api/v1/incident/logs?${new URLSearchParams({ limit, offset })}`)
 export const getIncidentActions = (limit = 100, offset = 0) => request(`/api/v1/incident/actions?${new URLSearchParams({ limit, offset })}`)
+export const createIncidentReviewSource = (actionId) => request(`/api/v1/incident/actions/${encodeURIComponent(actionId)}/review-source`, { method: 'POST' })
 export const getIncidentApprovals = (limit = 100) => request(`/api/v1/incident/approvals?limit=${limit}`)
 export const getIncidentPendingApprovals = () => request('/api/v1/incident/pending-approvals')
 export const getIncidentEligibleUnblocks = () => request('/api/v1/incident/eligible-unblocks')

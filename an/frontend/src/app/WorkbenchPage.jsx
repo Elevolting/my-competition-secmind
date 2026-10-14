@@ -203,7 +203,7 @@ export function WorkbenchPage() {
   const [events, setEvents] = useState([])
   const [report, setReport] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
-  const [view, setView] = useState('stream')
+  const [view, setView] = useState(() => new URLSearchParams(location.search).get('view') === 'result' ? 'result' : 'stream')
   const [streamConnected, setStreamConnected] = useState(false)
   const [modules, setModules] = useState([])
   const [refreshingReport, setRefreshingReport] = useState(false)
@@ -394,6 +394,7 @@ export function WorkbenchPage() {
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     if (params.get('create') === '1') setModalOpen(true)
+    if (params.get('view') === 'result') setView('result')
     setSelectedId(params.get('run') || '')
     batchIdRef.current = params.get('batch') || ''
     setBatchId(batchIdRef.current)

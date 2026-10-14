@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, App, Button, Empty, Input, Modal, Select, Space, Table, Tag, Typography, Upload } from 'antd'
-import { UploadOutlined } from '@ant-design/icons'
+import { AuditOutlined, UploadOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import { getIncidentActions, getIncidentCommands, getIncidentLogs, getIncidentStatus,
   getIncidentEligibleUnblocks, getIncidentPendingApprovals,
+  createIncidentReviewSource,
   resolveIncidentApproval, startIncidentMonitor, stopIncidentMonitor, submitIncidentCommand,
   uploadIncidentSample, incidentEvidenceUrl } from '../api.js'
 import { incidentFeedback } from './incidentFeedback.js'
@@ -12,6 +14,7 @@ const historyPageSize = 20
 
 export function IncidentResponsePage() {
   const { message } = App.useApp()
+  const navigate = useNavigate()
   const [status, setStatus] = useState(null)
   const [logs, setLogs] = useState([])
   const [logPage, setLogPage] = useState(1)
@@ -87,6 +90,15 @@ export function IncidentResponsePage() {
   const inventory = status?.inventory
   const detail = actions.find(action => action.action_id === detailActionId) || null
   const responseCommand = ['isolate_sample', 'restore_snapshot', 'block_indicator', 'unblock_indicator'].includes(command)
+  async function openReview(action) {
+    if (busy) return
+    setBusy(true)
+    try {
+      const source = await createIncidentReviewSource(action.action_id)
+      navigate(`/workbench?run=${encodeURIComponent(source.run_id)}&view=result`)
+    } catch (err) { setError(err.message) }
+    finally { setBusy(false) }
+  }
   return <div className="incident-page">
     <section className="page-intro"><div><Text className="panel-kicker">LOCAL HOST RESPONSE</Text><Title level={2}>本机监控与应急处置</Title><p>采集当前部署机器的进程与监听端口，保留证据；文件隔离、恢复和防火墙变更经审批后实际执行。</p></div>
       <Space><Tag color={status?.running ? 'green' : 'default'}>{status ? status.running ? '采集中' : '采集已停止' : '状态未知'}</Tag>
@@ -132,7 +144,10 @@ export function IncidentResponsePage() {
     <section className="glass-panel" style={{ padding: 20 }}><Title level={4}>执行回执</Title><Table rowKey="action_id" dataSource={actions} pagination={{ current: actionPage, pageSize: historyPageSize, total: actionTotal, showTotal: total => `共 ${total} 条` }} onChange={pagination => { setDetailActionId(null); setActionPage(pagination.current) }} columns={[
       { title: '动作', dataIndex: 'label' }, { title: '目标', dataIndex: 'target', ellipsis: true },
       { title: '状态', render: (_, a) => <Tag color={a.status === 'completed' ? 'green' : a.status === 'failed' ? 'red' : 'default'}>{labels[a.status] || a.status}</Tag> },
-      { title: '结果', render: (_, a) => <Space><Button size="small" onClick={() => setDetailActionId(a.action_id)}>查看回执</Button>{a.result?.evidence_id && <a href={incidentEvidenceUrl(a.result.evidence_id)} download>下载证据</a>}</Space> },
+      { title: '结果', render: (_, a) => <Space><Button size="small" onClick={() => setDetailActionId(a.action_id)}>查看回执</Button>
+        {['completed', 'partial'].includes(a.status) && <Button size="small" icon={<AuditOutlined />}
+            loading={busy} onClick={() => openReview(a)}>复核研判</Button>}
+        {a.result?.evidence_id && <a href={incidentEvidenceUrl(a.result.evidence_id)} download>下载证据</a>}</Space> },
     ]} /></section>
     <section className="glass-panel" style={{ padding: 20 }}><Title level={4}>审计日志</Title><Table size="small" rowKey="sequence" dataSource={logs} pagination={{ current: logPage, pageSize: historyPageSize, total: logTotal, showTotal: total => `共 ${total} 条` }} onChange={pagination => setLogPage(pagination.current)} columns={[{ title: '时间', dataIndex: 'timestamp', render: t => new Date(t).toLocaleString() }, { title: '事件', dataIndex: 'event_type' }, { title: '详情', dataIndex: 'message' }]} /></section>
     <Modal open={!!detail} title="执行回执" onCancel={() => setDetailActionId(null)} footer={null} width={850}><pre style={{ whiteSpace: 'pre-wrap', maxHeight: '65vh', overflow: 'auto' }}>{JSON.stringify(detail, null, 2)}</pre></Modal>
