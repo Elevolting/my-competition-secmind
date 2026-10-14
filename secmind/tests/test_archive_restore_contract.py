@@ -166,6 +166,42 @@ def test_export_run_archive_binds_state_ledger_and_cas_metadata(tmp_path: Path) 
     assert verify_archive(archive_root).digest() == manifest.digest()
     metadata_path = archive_root / f"artifacts/metadata/{artifact.artifact_id[:2]}/{artifact.artifact_id}.json"
     assert json.loads(metadata_path.read_text(encoding="utf-8"))["artifact_id"] == artifact.artifact_id
+
+    restored = restore_archive(archive_root, tmp_path / "restored", target_run_id="run-restored")
+    assert restored.id_map == {run_id: "run-restored"}
+    restored_state = json.loads((tmp_path / "restored" / "state" / "run.json").read_text(encoding="utf-8"))
+    assert restored_state["run_id"] == "run-restored"
+    assert restored_state["status"] == "recovery_required"
+    restored_events = [
+        json.loads(line)
+        for line in (tmp_path / "restored" / "ledger" / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert restored_events[0]["run_id"] == "run-restored"
+    previous_hash = "0" * 64
+    for event in restored_events:
+        assert event["prev_hash"] == previous_hash
+        digest_input = {
+            key: event[key]
+            for key in (
+                "event_id",
+                "run_id",
+                "sequence",
+                "event_type",
+                "timestamp",
+                "actor",
+                "dedupe_key",
+                "payload",
+                "prev_hash",
+            )
+        }
+        assert event["hash"] == hashlib.sha256(
+            json.dumps(digest_input, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        previous_hash = event["hash"]
+    restored_metadata_path = (
+        tmp_path / "restored" / f"artifacts/metadata/{artifact.artifact_id[:2]}/{artifact.artifact_id}.json"
+    )
+    assert json.loads(restored_metadata_path.read_text(encoding="utf-8"))["run_ids"] == ["run-restored"]
     ledger.close()
 
 

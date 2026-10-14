@@ -72,9 +72,10 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 - 从 `ContentAddressedArtifactStore` 读取 artifact bytes 与分类 metadata；成员路径、大小、SHA-256、媒体类型和数量进入 manifest。
 - 导出拒绝运行中状态和无效账本；归档目录只在新建或空目录中发布。
 - 恢复增加目标锁、持久 `.restore-journal.json` 和 staging 目录；进程中断后下一次恢复先清理 journal 记录的半成品，再重新安装。
+- 恢复到新 run 时会重写 state/ledger 中的 `run_id`，重新计算 ledger 链，分类 metadata 的 run 绑定同步到目标 run，并把 `id_map` 写入结果；artifact bytes 仍按原 SHA-256 保持不变。
 - 重复恢复仍由 `.restore-complete.json` 幂等保护，恢复结果继续固定为 `execution_allowed=false`。
 
-这些内容完成了 M6.2 的 manifest/成员校验基础和 M6.3 的本地 staging/journal 基础。冻结期间写入 fencing、真实 run/artifact/event/checkpoint ID 重写、数据库事务接入、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
+这些内容完成了 M6.2 的 manifest/成员校验基础、M6.3 的本地 staging/journal 基础和 M6.4 的文件级 run 映射基础。冻结期间写入 fencing、数据库事务接入、artifact/event/checkpoint 的持久 ID 冲突处理、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
 
 ## 首期 M6 契约
 

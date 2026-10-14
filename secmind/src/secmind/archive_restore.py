@@ -15,7 +15,7 @@ import os
 import shutil
 import tempfile
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
@@ -278,6 +278,7 @@ class RestoreResult:
     restored_paths: tuple[str, ...]
     already_restored: bool
     execution_allowed: bool = False
+    id_map: dict[str, str] = field(default_factory=dict)
 
 
 def _hash_file(path: Path) -> tuple[int, str]:
@@ -390,6 +391,71 @@ def _recover_restore_journal(target: Path, manifest: ArchiveManifest, target_run
         elif destination.exists():
             raise ArchiveError(f"restore journal destination is not a file: {relative}")
     journal_path.unlink(missing_ok=True)
+
+
+def _restore_id_map(manifest: ArchiveManifest, target_run_id: str) -> dict[str, str]:
+    source_run_id = manifest.source.get("run_id")
+    mapping = dict(manifest.id_map)
+    if isinstance(source_run_id, str) and source_run_id:
+        mapping[source_run_id] = target_run_id
+    return mapping
+
+
+def _rewrite_identity(value: Any, id_map: Mapping[str, str]) -> Any:
+    if isinstance(value, str):
+        return id_map.get(value, value)
+    if isinstance(value, Mapping):
+        return {_rewrite_identity(str(key), id_map): _rewrite_identity(item, id_map) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_rewrite_identity(item, id_map) for item in value]
+    return value
+
+
+def _rewrite_ledger_jsonl(content: bytes, id_map: Mapping[str, str]) -> bytes:
+    try:
+        rows = [json.loads(line) for line in content.decode("utf-8").splitlines() if line.strip()]
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ArchiveError("ledger member is not valid JSONL") from exc
+    if not rows or not all(isinstance(row, dict) for row in rows):
+        raise ArchiveError("ledger member rows must be objects")
+    rewritten = [_rewrite_identity(row, id_map) for row in rows]
+    required = {"event_id", "run_id", "sequence", "event_type", "timestamp", "actor", "dedupe_key", "payload"}
+    if not all(required.issubset(row) for row in rewritten):
+        return content
+    previous = "0" * 64
+    output: list[bytes] = []
+    for row in rewritten:
+        row["prev_hash"] = previous
+        digest_input = {
+            "event_id": row["event_id"],
+            "run_id": row["run_id"],
+            "sequence": row["sequence"],
+            "event_type": row["event_type"],
+            "timestamp": row["timestamp"],
+            "actor": row["actor"],
+            "dedupe_key": row["dedupe_key"],
+            "payload": row["payload"],
+            "prev_hash": row["prev_hash"],
+        }
+        row["hash"] = hashlib.sha256(_canonical_json(digest_input)).hexdigest()
+        previous = row["hash"]
+        output.append(_canonical_json(row) + b"\n")
+    return b"".join(output)
+
+
+def _rewrite_restore_member(member: ArchiveMember, content: bytes, id_map: Mapping[str, str]) -> bytes:
+    if member.kind == "ledger":
+        return _rewrite_ledger_jsonl(content, id_map)
+    if member.kind not in {"state", "metadata"}:
+        return content
+    try:
+        payload = json.loads(content.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ArchiveError(f"{member.kind} member is not valid JSON: {member.path}") from exc
+    rewritten = _rewrite_identity(payload, id_map)
+    if member.kind == "state" and isinstance(rewritten, dict) and "run_id" in rewritten:
+        rewritten["status"] = "recovery_required"
+    return _canonical_json(rewritten) + b"\n"
 
 
 def _member_for_file(
@@ -748,6 +814,7 @@ def restore_archive(
     marker = target / _RESTORE_MARKER_NAME
     lock = _acquire_restore_lock(target)
     try:
+        id_map = _restore_id_map(manifest, target_run_id)
         if marker.exists():
             if marker.is_symlink() or not marker.is_file():
                 raise ArchiveError("restore marker is invalid")
@@ -761,7 +828,17 @@ def restore_archive(
                 if journal.is_symlink() or not journal.is_file():
                     raise ArchiveError("restore journal is invalid")
                 journal.unlink()
-            return RestoreResult(manifest.archive_id, target_run_id, tuple(previous.get("restored_paths", [])), True)
+            previous_map = previous.get("id_map", id_map)
+            if not isinstance(previous_map, dict):
+                raise ArchiveError("restore marker id_map is invalid")
+            return RestoreResult(
+                manifest.archive_id,
+                target_run_id,
+                tuple(previous.get("restored_paths", [])),
+                True,
+                False,
+                {str(key): str(value) for key, value in previous_map.items()},
+            )
 
         _recover_restore_journal(target, manifest, target_run_id)
         planned_paths = [member.path for member in manifest.members]
@@ -791,10 +868,13 @@ def restore_archive(
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 if source.is_symlink() or not source.is_file():
                     raise ArchiveError(f"archive member disappeared during restore: {member.path}")
-                shutil.copyfile(source, destination)
-                size, digest = _hash_file(destination)
-                if size != member.size_bytes or not hmac.compare_digest(digest, member.sha256):
+                source_size, source_digest = _hash_file(source)
+                if source_size != member.size_bytes or not hmac.compare_digest(source_digest, member.sha256):
                     raise ArchiveError(f"restored member integrity mismatch: {member.path}")
+                if member.kind in {"state", "ledger", "metadata"}:
+                    destination.write_bytes(_rewrite_restore_member(member, source.read_bytes(), id_map))
+                else:
+                    shutil.copyfile(source, destination)
                 restored.append(member.path)
             _write_json_atomic(
                 journal_path,
@@ -836,10 +916,11 @@ def restore_archive(
             "manifest_digest": manifest.digest(),
             "restored_paths": sorted(restored),
             "execution_allowed": False,
+            "id_map": id_map,
         }
         _write_json_atomic(marker, marker_payload)
         (target / _RESTORE_JOURNAL_NAME).unlink(missing_ok=True)
-        return RestoreResult(manifest.archive_id, target_run_id, tuple(sorted(restored)), False)
+        return RestoreResult(manifest.archive_id, target_run_id, tuple(sorted(restored)), False, False, id_map)
     finally:
         lock.unlink(missing_ok=True)
         staging_path = locals().get("staging")

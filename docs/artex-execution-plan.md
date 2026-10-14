@@ -99,5 +99,5 @@ ARTEX 对照版本：`ce42b66a6b1f8150380f2cbdedcd98b34d4bd404d56869ada31a67f067
 
 ## 当前执行点
 
-路线文档和 M6 差距审计已提交。M6 文件级归档契约、`LedgerStore`/`ContentAddressedArtifactStore` 真实导出、目标锁和持久恢复 journal 已完成并有固定 fixture。下一步补冻结期间写入 fencing、真实 run/artifact/event/checkpoint ID 映射与引用重写，再接入服务状态隔离和跨服务恢复测试。
+路线文档和 M6 差距审计已提交。M6 文件级归档契约、`LedgerStore`/`ContentAddressedArtifactStore` 真实导出、目标锁、持久恢复 journal 和文件级 run 映射已完成并有固定 fixture。下一步补冻结期间写入 fencing、数据库事务中的 artifact/event/checkpoint 冲突处理，再接入服务状态隔离和跨服务恢复测试。
 
