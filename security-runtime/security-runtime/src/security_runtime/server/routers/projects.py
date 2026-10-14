@@ -359,6 +359,12 @@ def apply_planning_decision(project_id: str, body: ApplyPlanningDecisionRequest,
         if body.stop_reason and body.intents:
             raise HTTPException(422, "A stop decision cannot include new directions")
 
+        from security_runtime.server.planning_dependencies import confirm_outputs, validate_graph
+        if body.validated_outputs or any(p.step_id or p.depends_on or p.required_outputs for p in body.intents):
+            require_planner_token(planner_token)
+        validate_graph(conn, project_id, body.intents)
+        confirm_outputs(conn, project_id, body.validated_outputs)
+
         existing_facts = {row["id"] for row in conn.execute(
             "SELECT id FROM facts WHERE project_id=? AND id!='goal'", (project_id,)
         ).fetchall()}
@@ -403,6 +409,10 @@ def apply_planning_decision(project_id: str, body: ApplyPlanningDecisionRequest,
                 (json.dumps({fid: relation for fid, relation in proposal.source_relations.items()}, ensure_ascii=False),
                  project_id, intent_id),
             )
+            conn.execute('UPDATE intents SET step_id=?,depends_on_json=?,required_outputs_json=? '
+                         'WHERE project_id=? AND id=?',
+                         (proposal.step_id, json.dumps(proposal.depends_on), json.dumps(proposal.required_outputs),
+                          project_id, intent_id))
             for fact_id in proposal.from_:
                 conn.execute(
                     "INSERT INTO intent_sources (intent_id,project_id,fact_id) VALUES (?,?,?)",

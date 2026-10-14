@@ -151,6 +151,8 @@ def run_worker_process(
                                      'description': {'type': 'string'}, 'title': {'type': 'string'},
                                      'items': {'type': 'array', 'items': {'type': 'object',
                                          'properties': {'id': {'type': 'string'}, 'type': {'type': 'string'},
+                                                        'output_key': {'type': 'string', 'minLength': 1,
+                                                                       'maxLength': 120},
                                                         'title': {'type': 'string'}, 'summary': {'type': 'string'},
                                                         'evidence_ids': {'type': 'array', 'items': {'type': 'string'}},
                                                         'finding_id': {'type': 'string'}, 'verification_status': {'type': 'string'},

@@ -45,6 +45,9 @@ class PlanOutput(BaseModel):
 
 
 class IncrementalIntentOutput(BaseModel):
+    step_id: str | None = Field(default=None, min_length=1, max_length=120)
+    depends_on: list[str] = Field(default_factory=list, max_length=30)
+    required_outputs: dict[str, list[str]] = Field(default_factory=dict)
     from_: list[str] = Field(alias="from", min_length=1, max_length=30)
     description: str = Field(min_length=1, max_length=4000)
     title: str = Field(min_length=1, max_length=240)
@@ -59,7 +62,7 @@ class IncrementalIntentOutput(BaseModel):
 
 
 class IncrementalPlanOutput(BaseModel):
-    intents: list[IncrementalIntentOutput] = Field(default_factory=list, max_length=8)
+    intents: list[IncrementalIntentOutput] = Field(default_factory=list, max_length=12)
     completion_requested: bool = False
     completion_evidence_ids: list[str] = Field(default_factory=list, max_length=30)
     completion_summary: str | None = Field(default=None, max_length=2000)
@@ -332,11 +335,9 @@ class PlannerAgent(BaseAgent):
             if isinstance(item, dict) and isinstance(item.get("id"), str)
         }
         facts_by_id.pop("goal", None)
-        open_intents = [
-            item for item in request.intents
-            if isinstance(item, dict) and not item.get("to") and not item.get("concluded_at")
-            and item.get('execution_status') not in {'failed', 'timeout', 'cancelled'}
-        ]
+        from security_agent.workbench_results import has_live_planning_work, validated_step_outputs
+        open_intents = has_live_planning_work(request.intents,
+            validated_step_outputs(request.intents, request.facts, tool_receipts or {}))
         if not facts_by_id:
             return PlanningCallbackResponse(
                 decision_id=request.decision_id, snapshot_hash=request.snapshot_hash,
@@ -375,6 +376,15 @@ class PlannerAgent(BaseAgent):
             "给出验证目标和可观察的成功条件。拒绝扩大授权范围。"
             "只写简短、面向分析人员的规划摘要，不输出隐藏推理。\n"
             "失败或超时后可设置 retry_intent_id 重试原想法，必须说明新的验证依据；不要自动无限重试。\n"
+            "复杂目标用稳定 step_id 声明整个待办链，并以 depends_on 引用本任务的步骤编号。"
+            "可以本轮声明 A、B、C 并设置 B 依赖 A、C 依赖 B；Runtime 只领取前置满足的步骤。"
+            "待执行步骤仍须引用现有事实作为初始来源；前置步骤的产出在领取时自动加入来源。"
+            "需要具体产物时设置 required_outputs，例如 {\"A\":[\"session\"]}；"
+            "在 A 的成功条件中要求结果条目给出 output_key=session、outcome=observed 和实际 evidence_ids。"
+            "步骤执行完成本身不能满足必需产物；否定结果或无实际证据的输出不解锁下游。"
+            "重试必须保留原 step_id、depends_on 和 required_outputs。禁止重复编号、未知依赖和环。\n"
+            "单轮最多声明12项待办；其中不依赖本轮其他步骤的新方向数量不得超过剩余预算 max_new_intents。"
+            "若所有待办因失败、取消或缺少产物而无法推进，必须显式重试或给出 stop_reason。\n"
             f"模块：{state.module_route}\n任务目标：{state.task.objective}\n"
             f"授权范围：{state.task.target_scope or ['未提供']}\n"
             f"任务约束：{state.task.constraints}\n"
@@ -413,6 +423,10 @@ class PlannerAgent(BaseAgent):
         rejected: list[str] = []
         normalized_sources: list[str] = []
         seen = set(used)
+        try:
+            round_limit = min(5, max(0, int(request.budget.get("max_new_intents", 3))))
+        except (TypeError, ValueError):
+            round_limit = 3
         for draft in output.intents:
             description = " ".join(draft.description.split())
             criteria = list(dict.fromkeys(value.strip() for value in draft.success_criteria if value.strip()))
@@ -428,7 +442,6 @@ class PlannerAgent(BaseAgent):
             if signature in seen and not retry:
                 rejected.append("方向与已有方向重复")
                 continue
-            seen.add(signature)
             # Runtime retries must use exactly the source facts of the failed
             # intent. Normalize the model proposal before validation so a
             # malformed retry cannot reach the 422 apply path.
@@ -463,13 +476,15 @@ class PlannerAgent(BaseAgent):
                 source_relations=relations, success_criteria=criteria,
                 verification_target=draft.verification_target,
                 retry_intent_id=draft.retry_intent_id,
+                step_id=retry.get('step_id') if retry else draft.step_id,
+                depends_on=(retry.get('depends_on') or []) if retry else draft.depends_on,
+                required_outputs=(retry.get('required_outputs') or {}) if retry else draft.required_outputs,
             ))
-            try:
-                round_limit = int(request.budget.get("max_new_intents", 3))
-            except (TypeError, ValueError):
-                round_limit = 3
-            if len(intents) >= min(5, max(1, round_limit)):
-                break
+            seen.add(signature)
+
+        from security_agent.workbench_planning import filter_planning_dependencies
+        intents, dependency_errors = filter_planning_dependencies(intents, request.intents, round_limit)
+        rejected.extend(dependency_errors)
 
         if (output.intents and not intents and rejected and not repair_attempt
                 and not output.completion_requested and not open_intents):

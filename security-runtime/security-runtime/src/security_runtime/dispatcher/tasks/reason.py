@@ -370,6 +370,7 @@ def _run_workbench_reason_task(
         "trigger": trigger,
         "summary": payload.get("summary", ""),
         "intents": payload.get("intents", []),
+        "validated_outputs": payload.get("validated_outputs", {}),
         "completion_validated": bool(payload.get("completion_validated")),
         "completion_fact_ids": payload.get("completion_fact_ids", []),
         "completion_reason": payload.get("completion_reason"),

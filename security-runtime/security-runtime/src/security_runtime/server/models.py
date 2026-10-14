@@ -12,6 +12,7 @@ class Settings(BaseModel):
 
 class ResultItem(BaseModel):
     id: str | None = None
+    output_key: str | None = Field(default=None, min_length=1, max_length=120)
     type: Literal["fact", "finding", "observation", "artifact"] = "fact"
     title: str = Field(min_length=1, max_length=240)
     summary: str = ""
@@ -49,6 +50,11 @@ class Intent(BaseModel):
     concluded_at: str | None = None
     attempt_id: str | None = None
     execution_status: str = "waiting"
+    step_id: str | None = None
+    depends_on: list[str] = Field(default_factory=list)
+    required_outputs: dict[str, list[str]] = Field(default_factory=dict)
+    validated_outputs: list[str] = Field(default_factory=list)
+    blocked_reasons: list[str] = Field(default_factory=list)
     source_relations: dict[str, Literal["evidence", "process", "unknown"]] = Field(default_factory=dict)
     source_relation: str = "evidence"
     success_criteria: str | None = None
@@ -327,6 +333,9 @@ class ReopenResponse(BaseModel):
 
 
 class PlanningIntentProposal(BaseModel):
+    step_id: str | None = Field(default=None, min_length=1, max_length=120)
+    depends_on: list[str] = Field(default_factory=list, max_length=30)
+    required_outputs: dict[str, list[str]] = Field(default_factory=dict)
     from_: list[str] = Field(alias="from", min_length=1, max_length=30)
     description: str = Field(min_length=1, max_length=4000)
     title: str | None = Field(default=None, max_length=240)
@@ -347,6 +356,7 @@ class ApplyPlanningDecisionRequest(BaseModel):
     trigger: str = Field(min_length=1, max_length=120)
     summary: str = Field(default="", max_length=4000)
     intents: list[PlanningIntentProposal] = Field(default_factory=list, max_length=12)
+    validated_outputs: dict[str, list[str]] = Field(default_factory=dict)
     completion_validated: bool = False
     completion_fact_ids: list[str] = Field(default_factory=list, max_length=30)
     completion_reason: str | None = Field(default=None, max_length=2000)

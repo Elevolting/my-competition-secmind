@@ -42,4 +42,6 @@ Normal return example:
 
 
 # Structured result bundles
+Preserve any requested named output as `output_key` on its fact or artifact item. Use `outcome: observed` only when it was demonstrated before this conclude phase and cite actual successful tool receipts from this attempt in `evidence_ids`. Use `negative` or `unverified` for missing outputs and failures; do not obtain new evidence in conclude phase. Completing an intent alone does not satisfy its dependent steps' required outputs.
+
 Where the protocol requests a fact description, it also accepts optional `title` and `items` alongside `description`. Keep `title` short and readable; keep raw logs and JSON in referenced attachments. Each item has a stable local `id`, `type` (fact, observation, finding, artifact), `title`, `summary`, and `evidence_ids` from actual tool receipts. Use `outcome: negative` to retain an observed unsuccessful direction; use `unverified` when the evidence does not establish the outcome. Finding items may include `finding_id` and `verification_status` (candidate, pending, insufficient). Never invent evidence IDs or claim confirmed/ruled_out from tool success or your own assertion. Without recorded evidence, describe the item as a Worker report. Preserve the enclosing accepted/data or fact object required above. Produce one result bundle per exploration.

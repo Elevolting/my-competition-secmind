@@ -400,6 +400,10 @@ class PlanningIntent(BaseModel):
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
+    step_id: str | None = Field(default=None, min_length=1, max_length=120)
+    depends_on: list[str] = Field(default_factory=list, max_length=30)
+    required_outputs: dict[str, list[str]] = Field(default_factory=dict)
+
     from_: list[str] = Field(alias="from", min_length=1, max_length=30)
     description: str = Field(min_length=1, max_length=4000)
     title: str | None = Field(default=None, max_length=240)
@@ -442,6 +446,7 @@ class PlanningCallbackResponse(BaseModel):
     snapshot_hash: str = Field(min_length=8, max_length=128)
     summary: str = Field(default="", max_length=4000)
     intents: list[PlanningIntent] = Field(default_factory=list, max_length=12)
+    validated_outputs: dict[str, list[str]] = Field(default_factory=dict)
     completion_requested: bool = False
     completion_validated: bool = False
     completion_reason: str | None = Field(default=None, max_length=2000)

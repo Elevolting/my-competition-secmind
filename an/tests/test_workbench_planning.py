@@ -9,11 +9,19 @@ from security_agent.agents import CompletionReviewOutput
 from security_agent.api import build_runtime, create_app
 from security_agent.llm import ModelCallMeta
 from security_agent.report_sections import report_sections
-from security_agent.schemas import (AgentState, DecisionRecord, Evidence, RunStatus, TaskRequest,
-                                    PlanningCallbackRequest, ToolResult, ToolStatus)
-from security_agent.workbench_results import merge_workbench_results
 from security_agent.report_sync import synchronize_report
-from security_agent.schemas import AgentReport
+from security_agent.schemas import (
+    AgentReport,
+    AgentState,
+    DecisionRecord,
+    Evidence,
+    PlanningCallbackRequest,
+    RunStatus,
+    TaskRequest,
+    ToolResult,
+    ToolStatus,
+)
+from security_agent.workbench_results import has_live_planning_work, merge_workbench_results, validated_step_outputs
 
 
 def bound_state(settings, route='penetration'):
@@ -39,6 +47,147 @@ def request(state, key='decision-initial', facts=None, intents=None, hints=None,
 def direction(title, sources=None, **extra):
     return {'from': sources or ['origin'], 'title': title, 'description': title,
             'verification_target': title, 'success_criteria': ['返回可复核的工具证据'], **extra}
+
+
+def test_step_outputs_need_observed_item_and_successful_current_receipt():
+    intents = [{'step_id': 'A', 'to': 'f001', 'execution_status': 'completed'}]
+    fact = {'id': 'f001', 'items': [
+        {'type': 'artifact', 'output_key': 'session', 'outcome': 'observed', 'evidence_ids': ['ok']},
+        {'type': 'artifact', 'output_key': 'failed', 'outcome': 'observed', 'evidence_ids': ['bad']},
+        {'type': 'fact', 'output_key': 'negative', 'outcome': 'negative', 'evidence_ids': ['ok']},
+    ]}
+    receipts = {'ok': {'fact_id': 'f001', 'status': 'completed',
+                       'result': {'structuredContent': {'status': 'success'}}},
+                'bad': {'fact_id': 'f001', 'status': 'failed', 'result': {}},
+                'other': {'fact_id': 'f002', 'status': 'completed', 'result': {}}}
+    assert validated_step_outputs(intents, [fact], receipts) == {'A': ['session']}
+    assert validated_step_outputs(intents, [{'id': 'f001', 'items': None}], receipts) == {}
+    assert validated_step_outputs(intents, [{'id': 'f001', 'items': [
+        {'type': 'artifact', 'output_key': 'session', 'outcome': 'observed', 'evidence_ids': ['other']},
+    ]}], receipts) == {}
+
+
+def waiting_chain(status='completed', outputs=None):
+    return [
+        {'id': 'i001', 'step_id': 'A', 'description': '执行A', 'execution_status': status,
+         'to': 'f001' if status == 'completed' else None, 'worker': 'worker' if status == 'completed' else None,
+         'attempt_id': 'attempt-current', 'validated_outputs': outputs or [], 'from': ['origin']},
+        {'id': 'i002', 'step_id': 'B', 'description': '执行B', 'execution_status': 'waiting',
+         'depends_on': ['A'], 'required_outputs': {'A': ['session']}, 'from': ['origin']},
+    ]
+
+
+@pytest.mark.parametrize('status', ['failed', 'timeout', 'cancelled', 'completed'])
+def test_blocked_chain_is_not_live_but_independent_branch_remains_live(status):
+    chain = waiting_chain(status)
+    assert not has_live_planning_work(chain, {})
+    assert has_live_planning_work(chain + [{'id': 'x', 'execution_status': 'waiting'}], {})
+
+
+def test_waiting_chain_stays_live_until_upstream_finishes_or_output_is_confirmed():
+    assert has_live_planning_work(waiting_chain('running'), {})
+    assert has_live_planning_work(waiting_chain(), {'A': ['session']})
+    assert has_live_planning_work(waiting_chain(outputs=['session']), {})
+
+
+async def test_all_blocked_steps_stop_on_budget_exhaustion(planning):
+    orchestrator, state, _, calls = planning
+    state.budget.model_calls_used = state.budget.max_model_calls
+    orchestrator.ledger.save_state(state)
+    result = await orchestrator.planning_callback(request(state, intents=waiting_chain()))
+    assert result.stop_reason and not result.intents and not calls
+
+
+@pytest.mark.parametrize('receipt_case,confirmed', [
+    ('success', True), ('failed', False), ('old-attempt', False), ('other-project', False),
+    ('other-worker', False), ('native-failure', False), ('mcp-error', False),
+])
+async def test_callback_confirms_only_bound_current_successful_outputs(planning, receipt_case, confirmed):
+    orchestrator, state, _, calls = planning
+    state.budget.model_calls_used = state.budget.max_model_calls
+    orchestrator.ledger.save_state(state)
+    binding = {'project_id': 'proj-test', 'intent_id': 'i001',
+               'worker': 'worker', 'attempt_id': 'attempt-current'}
+    if receipt_case == 'old-attempt':
+        binding['attempt_id'] = 'attempt-old'
+    if receipt_case == 'other-project':
+        binding['project_id'] = 'other'
+    if receipt_case == 'other-worker':
+        binding['worker'] = 'other'
+    result = {'structuredContent': {'status': 'failed' if receipt_case == 'native-failure' else 'success'}}
+    if receipt_case == 'mcp-error':
+        result['isError'] = True
+    orchestrator.ledger.append(state.run_id, 'mcp.call.completed', {
+        'blackboard': binding, 'call_id': 'receipt',
+        'status': 'failed' if receipt_case == 'failed' else 'completed', 'result': result})
+    facts = [{'id': 'origin'}, {'id': 'f001', 'items': [{
+        'type': 'artifact', 'output_key': 'session', 'outcome': 'observed', 'evidence_ids': ['receipt']}]}]
+    req = request(state, facts=facts, intents=waiting_chain())
+    response = await orchestrator.planning_callback(req)
+    assert response.validated_outputs == ({'A': ['session']} if confirmed else {})
+    assert bool(response.stop_reason) is not confirmed
+    assert not calls
+    replay = await orchestrator.planning_callback(req)
+    assert replay.replayed and replay.validated_outputs == response.validated_outputs
+
+
+async def test_independent_branch_prevents_whole_task_stop_on_failed_dependency(planning):
+    orchestrator, state, queue, _ = planning
+    queue.append({'stop_reason': 'A失败'})
+    result = await orchestrator.planning_callback(request(state, intents=waiting_chain('failed') + [
+        {'id': 'x', 'description': '独立方向', 'execution_status': 'waiting'}]))
+    assert result.stop_reason is None
+
+
+async def test_serial_todos_survive_one_independent_direction_limit(planning):
+    orchestrator, state, queue, _ = planning
+    queue.append({'intents': [direction('执行A', step_id='A'),
+        direction('执行B', step_id='B', depends_on=['A'], required_outputs={'A': ['session']}),
+        direction('执行C', step_id='C', depends_on=['B']), direction('独立X', step_id='X'),
+        direction('执行Y', step_id='Y', depends_on=['X'])]})
+    response = await orchestrator.planning_callback(request(state, budget={'max_new_intents': 1}))
+    assert [item.step_id for item in response.intents] == ['A', 'B', 'C']
+    assert not response.stop_reason
+
+
+async def test_invalid_branch_does_not_consume_independent_direction_limit(planning):
+    orchestrator, state, queue, _ = planning
+    queue.append({'intents': [direction('重复1', step_id='A'), direction('重复2', step_id='A'),
+        direction('执行B', step_id='B', depends_on=['A']), direction('可行X', step_id='X')]})
+    response = await orchestrator.planning_callback(request(state, budget={'max_new_intents': 1}))
+    assert [item.step_id for item in response.intents] == ['X']
+
+
+@pytest.mark.parametrize('proposals', [
+    [direction('执行A', step_id='A', depends_on=['B']), direction('执行B', step_id='B', depends_on=['A'])],
+    [direction('执行A', step_id='A', depends_on=['unknown'])],
+    [direction('执行A', step_id='A', required_outputs={'unknown': ['session']})],
+    [direction('执行A', depends_on=['A'])],
+])
+async def test_invalid_dependency_contract_triggers_bounded_repair(planning, proposals):
+    orchestrator, state, queue, calls = planning
+    queue.extend([{'intents': proposals}, {'intents': [direction('修复后方向', step_id='X')]}])
+    response = await orchestrator.planning_callback(request(state))
+    assert [item.step_id for item in response.intents] == ['X'] and len(calls) == 2
+    assert '上一轮方向未通过应用层校验' in calls[1]['user_prompt']
+
+
+async def test_step_retry_preserves_dependency_contract_when_model_omits_fields(planning):
+    orchestrator, state, queue, _ = planning
+    chain = waiting_chain(outputs=['session'])
+    chain[1]['execution_status'] = 'failed'
+    queue.append({'intents': [direction('执行B', retry_intent_id='i002')]})
+    response = await orchestrator.planning_callback(request(state, intents=chain))
+    item = response.intents[0]
+    assert item.step_id == 'B' and item.depends_on == ['A'] and item.required_outputs == {'A': ['session']}
+
+
+async def test_planner_accepts_twelve_serial_todos(planning):
+    orchestrator, state, queue, _ = planning
+    queue.append({'intents': [direction(f'步骤{index}', step_id=str(index),
+        depends_on=[str(index-1)] if index else []) for index in range(12)]})
+    response = await orchestrator.planning_callback(request(state, budget={'max_new_intents': 1}))
+    assert len(response.intents) == 12
 
 
 @pytest.fixture

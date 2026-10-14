@@ -9,6 +9,7 @@ from fastapi import HTTPException
 
 from security_runtime.server.models import Intent, ProjectDetail, ProjectMeta, ProjectReason
 from security_runtime.server.execution import record
+from security_runtime.server.planning_dependencies import blocked_reasons, inherit_sources
 
 
 def utcnow() -> str:
@@ -122,6 +123,10 @@ def get_claimable_open_intent_or_404(
         raise HTTPException(409, "Intent already concluded")
     if row["worker"] is not None and row["worker"] != worker:
         raise HTTPException(409, f"Intent is currently claimed by {row['worker']}")
+    reasons = blocked_reasons(conn, project_id, row)
+    if reasons:
+        raise HTTPException(409, {"message": "Planning prerequisites are not satisfied", "blocked_reasons": reasons})
+    inherit_sources(conn, project_id, row)
     return row
 
 
@@ -169,6 +174,11 @@ def intent_to_model(conn: sqlite3.Connection, row: sqlite3.Row, project_id: str)
         concluded_at=row["concluded_at"],
         attempt_id=row["attempt_id"],
         execution_status=row["execution_status"],
+        step_id=row["step_id"],
+        depends_on=json.loads(row["depends_on_json"]),
+        required_outputs=json.loads(row["required_outputs_json"]),
+        validated_outputs=json.loads(row["validated_outputs_json"]),
+        blocked_reasons=blocked_reasons(conn, project_id, row),
         source_relation=row["source_relation"],
         source_relations=json.loads(row["source_relations_json"] or "{}"),
         success_criteria=row["success_criteria"],

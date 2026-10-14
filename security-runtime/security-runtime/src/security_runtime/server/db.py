@@ -177,6 +177,14 @@ def _ensure_project_columns(conn: sqlite3.Connection) -> None:
     for column in ("title", "verification_target", "decision_id", "decision_summary"):
         if column not in intent_columns:
             conn.execute(f"ALTER TABLE intents ADD COLUMN {column} TEXT")
+    if "step_id" not in intent_columns:
+        conn.execute("ALTER TABLE intents ADD COLUMN step_id TEXT")
+    for column, default in (("depends_on_json", "[]"), ("required_outputs_json", "{}"),
+                            ("validated_outputs_json", "[]")):
+        if column not in intent_columns:
+            conn.execute(f"ALTER TABLE intents ADD COLUMN {column} TEXT NOT NULL DEFAULT '{default}'")
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_project_step_id "
+                 "ON intents(project_id,step_id) WHERE step_id IS NOT NULL")
     fact_columns = {row["name"] for row in conn.execute("PRAGMA table_info(facts)")}
     if "title" not in fact_columns:
         conn.execute("ALTER TABLE facts ADD COLUMN title TEXT")

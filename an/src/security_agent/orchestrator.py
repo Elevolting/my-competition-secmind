@@ -491,12 +491,13 @@ class SecurityOrchestrator:
         ) if request.budget[key] <= 0), None)
         if request.budget['execution_supported'] is False:
             exhausted = '当前 Dispatcher 未配置支持任务预算的 Pi Worker，无法开始探索'
-        open_intents = any(
-            isinstance(intent, dict) and not intent.get('to') and not intent.get('concluded_at')
-            and intent.get('execution_status') not in {'failed', 'timeout', 'cancelled'}
-            for intent in request.intents
+        from security_agent.workbench_results import (
+            has_live_planning_work,
+            merge_workbench_results,
+            validated_step_outputs,
         )
-        from security_agent.workbench_results import merge_workbench_results
+        validated_outputs = validated_step_outputs(request.intents, request.facts, tool_receipts)
+        open_intents = has_live_planning_work(request.intents, validated_outputs)
         merge_workbench_results(state, request.facts, tool_receipts)
         linked_refs = list(dict.fromkeys(
             ref for fact in request.facts if isinstance(fact, dict)
@@ -566,6 +567,9 @@ class SecurityOrchestrator:
                     decision_id=request.decision_id, snapshot_hash=request.snapshot_hash,
                     summary='模型预算耗尽，已保留本轮结果及证据。',
                     stop_reason=None if open_intents else str(exc)), None
+        # Only actual receipts from the completed step's current attempt may
+        # confirm a named output. The model cannot nominate these confirmations.
+        response = response.model_copy(update={'validated_outputs': validated_outputs})
         decision = DecisionRecord(
             decision="planning_round",
             rationale_summary=response.summary,

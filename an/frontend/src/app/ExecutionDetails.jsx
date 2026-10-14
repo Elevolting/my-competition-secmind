@@ -15,6 +15,16 @@ export default function ExecutionDetails({ node, graph, expanded, toggleBundle, 
     {(!intent || node.summary) && <p className="execution-detail-lead">{node.summary || node.title || node.description}</p>}
     {intent ? <>
       <Section title="验证目标"><p>{node.description || '未记录验证目标'}</p></Section>
+      {node.step_id && <Section title="规划步骤"><p><code>{node.step_id}</code></p>
+        {!!node.depends_on?.length && node.depends_on.map((step) => {
+          const parent = graph.nodes?.find((item) => item.step_id === step)
+          return <button className="execution-source-reference" key={step} onClick={() => parent && focus(parent.id)} disabled={!parent}>
+            {parent?.title || step}<small>{step} · {node.required_outputs?.[step]?.length ? `需要 ${node.required_outputs[step].join('、')}` : '前置步骤'}</small>
+          </button>
+        })}
+        {!!node.validated_outputs?.length && <p>已确认产物：{node.validated_outputs.join('、')}</p>}
+        {!!node.blocked_reasons?.length && <p role="status">等待条件：{node.blocked_reasons.join('；')}</p>}
+      </Section>}
       <Section title="基于哪些事实">{node.source_links?.length ? node.source_links.map((source) => <button className="execution-source-reference" key={source.fact_id} onClick={() => focus(graph.nodes.find((item) => item.raw_id === source.fact_id)?.id || `fact:${source.fact_id}`)}>
         {graph.nodes.find((item) => item.raw_id === source.fact_id)?.title || source.fact_id}
         <small>{source.fact_id} · {{ evidence: '引用事实', process: '流程衔接', unknown: '来源不明' }[source.relation] || '来源不明'}</small>

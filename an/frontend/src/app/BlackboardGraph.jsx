@@ -333,7 +333,7 @@ export function BlackboardGraph({ run, events = [] }) {
   const active = intents.filter((node) => !TERMINAL.has(node.status))
   const complete = intents.filter((node) => TERMINAL.has(node.status))
   const sorted = [...active].sort((a, b) => ({ running: 0, exploring: 0, approval: 1, failed: 2, timeout: 2, waiting: 3 }[a.status] ?? 4) - ({ running: 0, exploring: 0, approval: 1, failed: 2, timeout: 2, waiting: 3 }[b.status] ?? 4))
-  const matchesQueue = (node) => !query || [node.title, node.description, node.worker, node.tool_name, node.raw_id, ...(shown.edges || []).filter((edge) => edge.source === node.id).flatMap((edge) => { const result = shown.nodes.find((item) => item.id === edge.target); return (result?.items || []).map((item) => `${item.title} ${item.summary} ${(item.evidence_ids || []).join(' ')}`) })].join(' ').toLocaleLowerCase().includes(query.toLocaleLowerCase())
+  const matchesQueue = (node) => !query || [node.title, node.description, node.worker, node.tool_name, node.raw_id, node.step_id, ...(node.blocked_reasons || []), ...(shown.edges || []).filter((edge) => edge.source === node.id).flatMap((edge) => { const result = shown.nodes.find((item) => item.id === edge.target); return (result?.items || []).map((item) => `${item.title} ${item.summary} ${(item.evidence_ids || []).join(' ')}`) })].join(' ').toLocaleLowerCase().includes(query.toLocaleLowerCase())
   const selectedNode = detailValue((shown.nodes || []).find((node) => node.id === selected) || elements.find((item) => item.data.id === selected)?.data, shown)
   const selectFromList = (id) => { if (window.matchMedia('(max-width: 850px)').matches) setMobileView('graph'); requestAnimationFrame(() => focus(id)) }
   const toggleBundle = (id) => setExpanded((current) => { const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next })
@@ -347,9 +347,10 @@ export function BlackboardGraph({ run, events = [] }) {
   const confirmed = findings.filter((item) => item.verification_status === 'confirmed').length
   const motionEnabled = !reducedMotion && !error && !hidden && ['running', 'pending', 'waiting_approval'].includes(run?.status) && shown.project?.status === 'active'
   const queueRow = (node, historical = false) => <button key={node.id} className={`execution-list-item ${historical ? 'history' : ''} ${selected === node.id ? 'selected' : ''}`} onClick={() => selectFromList(node.id)}>
-    <span className="execution-row-top"><code>{node.raw_id}</code><StatusBadge status={node.status} /></span>
+    <span className="execution-row-top"><code>{node.step_id || node.raw_id}</code><StatusBadge status={node.status} /></span>
     <strong>{short(node.title || node.label, 85)}</strong>
     <span className="execution-row-meta"><span>{node.worker || '未领取'}</span><time>{elapsed(node)}</time></span>
+    {!!node.blocked_reasons?.length && <small className="execution-queue-activity">{node.blocked_reasons.join('；')}</small>}
     {!historical && <span className={`execution-row-action ${ACTIVE.has(node.status) ? 'is-live' : ''}`}><i />{node.current_tool || (ACTIVE.has(node.status) ? '执行中，暂无工具记录' : node.phase || STATUS[node.status])}</span>}
     <small className="execution-queue-activity" title={node.latest_activity || '未记录最近活动'}>{node.phase || '未记录阶段'} · {node.latest_activity ? new Date(node.latest_activity).toLocaleTimeString('zh-CN') : '暂无活动记录'}</small>
   </button>

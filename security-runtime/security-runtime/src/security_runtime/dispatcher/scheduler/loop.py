@@ -344,6 +344,7 @@ class DispatcherLoop:
             and intent.worker is None
             and intent.id not in running_intent_ids
             and not self._is_bootstrap_intent(intent)
+            and not intent.blocked_reasons
             and (not self._is_workbench(project) or intent.execution_status not in {"failed", "timeout", "cancelled"})
         ]
         if running_intent_ids and not unclaimed_intents:

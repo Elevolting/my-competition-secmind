@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from concurrent.futures import Future
+from types import SimpleNamespace
+
+import pytest
 
 from conftest import make_config, make_intent, make_project
 
@@ -8,7 +11,7 @@ from security_runtime.dispatcher.models import ReasonCheckpoint, RunningTask
 from security_runtime.dispatcher.runtime.cancellation import TaskCancellation
 from security_runtime.dispatcher.scheduler.loop import DispatcherLoop
 from security_runtime.dispatcher.scheduler.worker_select import choose_worker
-from security_runtime.server.models import Fact, ProjectSummary
+from security_runtime.server.models import Fact, Hint, ProjectSummary
 
 
 def _loop() -> DispatcherLoop:
@@ -63,6 +66,45 @@ def test_reason_trigger_returns_none_when_graph_is_unchanged() -> None:
         open_intent_count=1,
     )
 
+    assert loop._reason_trigger(project) is None
+
+
+@pytest.mark.parametrize('independent', [False, True])
+def test_scheduler_dispatches_independent_step_and_leaves_all_blocked_project_active(independent):
+    loop = _loop()
+    loop.config = make_config()
+    loop.futures = {}
+    blocked = make_intent().model_copy(update={
+        'worker': None, 'step_id': 'B', 'depends_on': ['A'], 'blocked_reasons': ['A: failed']})
+    project = make_project(intents=[blocked])
+    if independent:
+        project.intents.append(make_intent('x').model_copy(update={'worker': None, 'step_id': 'X'}))
+    loop.container_manager = SimpleNamespace(container_name=lambda pid: pid)
+    loop.client = SimpleNamespace(get_project=lambda _: project, export_project=lambda _: 'graph')
+    loop.reason_checkpoints['proj_001'] = ReasonCheckpoint(
+        fact_count=len(project.facts), hint_count=len(project.hints), open_intent_count=len(project.intents))
+    dispatched = []
+    loop._dispatch_explore = lambda _project, _graph, intent: dispatched.append(intent.id) or True
+    loop._dispatch_reason = lambda *_args: pytest.fail('unchanged graph must not start another reason task')
+    assert loop._try_dispatch_project(_summary('proj_001', 'active')) is independent
+    assert dispatched == (['x'] if independent else [])
+    assert project.project.status == 'active'
+
+
+@pytest.mark.parametrize('status', ['failed', 'timeout', 'cancelled'])
+def test_failed_dependency_wakes_planner_once_without_auto_retry(status):
+    loop = _loop()
+    project = make_project(intents=[make_intent().model_copy(update={
+        'worker': None, 'step_id': 'A', 'attempt_id': 'attempt', 'execution_status': status})])
+    project.hints.append(Hint(id='workbench', content='workbench_planner:run_id=test;schema=1.1',
+                             creator='unified-workbench', created_at='2026-01-01T00:00:03Z'))
+    loop.reason_checkpoints['proj_001'] = ReasonCheckpoint(
+        fact_count=len(project.facts), hint_count=len(project.hints), open_intent_count=1)
+    assert loop._reason_trigger(project) == 'attempt_finished,open_intents:1->0'
+    loop.reason_checkpoints['proj_001'].open_intent_count = 0
+    loop.reason_checkpoints['proj_001'].terminal_attempts = loop._terminal_attempts(project)
+    assert loop._reason_trigger(project) is None
+    project.intents[0].execution_status = 'waiting'
     assert loop._reason_trigger(project) is None
 
 

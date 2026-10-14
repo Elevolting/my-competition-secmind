@@ -8,6 +8,88 @@ from copy import deepcopy
 from security_agent.schemas import AgentState, Evidence, Finding
 
 
+def validated_step_outputs(intents: list[dict], facts: list[dict], receipts: dict[str, dict]) -> dict[str, list[str]]:
+    """Confirm observed outputs against successful receipts of their producing fact.
+
+    The caller has already bound receipts to the current intent/attempt. Failed
+    tool calls remain useful evidence of a limitation, but cannot unlock steps.
+    """
+    facts_by_id = {fact['id']: fact for fact in facts if isinstance(fact, dict) and isinstance(fact.get('id'), str)}
+    confirmed = {}
+    for intent in intents:
+        if not isinstance(intent, dict) or intent.get('execution_status') != 'completed':
+            continue
+        key, fact_id = intent.get('step_id'), intent.get('to')
+        if not isinstance(key, str) or not key.strip() or not isinstance(fact_id, str):
+            continue
+        items = facts_by_id.get(fact_id, {}).get('items')
+        if not isinstance(items, list):
+            continue
+        outputs = set()
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            output = item.get('output_key')
+            refs = item.get('evidence_ids')
+            if (not isinstance(output, str) or not output.strip() or len(output) > 120
+                    or item.get('type') not in {'fact', 'artifact'}
+                    or item.get('outcome') != 'observed' or not isinstance(refs, list)):
+                continue
+            for ref in refs:
+                receipt = receipts.get(ref) if isinstance(ref, str) else None
+                if not isinstance(receipt, dict) or receipt.get('fact_id') != fact_id:
+                    continue
+                result = receipt.get('result')
+                if not isinstance(result, dict) or result.get('isError'):
+                    continue
+                native = result.get('structuredContent')
+                if (receipt.get('status') in {'failed', 'cancelled', 'timeout'}
+                        or receipt.get('error')
+                        or isinstance(native, dict) and native.get('status') in {
+                            'failed', 'error', 'cancelled', 'timeout', 'unavailable', 'denied'}):
+                    continue
+                outputs.add(output)
+                break
+        if outputs:
+            confirmed[key] = sorted(outputs)
+    return confirmed
+
+
+def has_live_planning_work(intents: list[dict], confirmations: dict[str, list[str]]) -> bool:
+    """Whether unfinished work can progress without a new Planner decision.
+
+    A waiting chain remains live while an upstream step can run. A failed or
+    cancelled upstream, or a completed step lacking its required output, needs
+    a new decision instead of leaving an idle task alive indefinitely.
+    """
+    steps = {item['step_id']: item for item in intents
+             if isinstance(item, dict) and isinstance(item.get('step_id'), str)}
+
+    def can_progress(item, visiting):
+        if item.get('execution_status') in {'failed', 'timeout', 'cancelled'}:
+            return False
+        key = item.get('step_id')
+        if key in visiting:
+            return False
+        required = item.get('required_outputs') or {}
+        for parent_key in item.get('depends_on') or []:
+            parent = steps.get(parent_key)
+            if not parent:
+                return False
+            if parent.get('to') or parent.get('concluded_at'):
+                if parent.get('execution_status') != 'completed':
+                    return False
+                available = set(parent.get('validated_outputs') or []) | set(confirmations.get(parent_key, []))
+                if not set(required.get(parent_key, [])).issubset(available):
+                    return False
+            elif not can_progress(parent, visiting | {key}):
+                return False
+        return True
+
+    return any(can_progress(item, set()) for item in intents
+               if isinstance(item, dict) and not item.get('to') and not item.get('concluded_at'))
+
+
 def merge_workbench_results(state: AgentState, facts: list[dict], receipts: dict[str, dict]) -> None:
     evidence = {item.evidence_id: item for item in state.evidence}
     findings = {item.finding_id: item for item in state.findings}

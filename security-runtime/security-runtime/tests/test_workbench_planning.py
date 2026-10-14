@@ -356,6 +356,7 @@ def test_dispatcher_reuses_decision_identity_after_lost_or_rejected_response(fai
             return ApiResult(0, text='lost response')
         return ApiResult(200, {'decision_id': decision_id,
             'snapshot_hash': planning_snapshot_hash(project), 'summary': '公开规划摘要',
+            'validated_outputs': {'A': ['session']},
             'intents': [{'from': ['f001'], 'description': '下一轮探索'}]})
 
     def apply(pid, payload, **kwargs):
@@ -378,3 +379,4 @@ def test_dispatcher_reuses_decision_identity_after_lost_or_rejected_response(fai
     current.project.reason = ProjectReason(worker='worker', trigger='restart', started_at='now', last_heartbeat_at='now')
     assert _run_workbench_reason_task(config, api, current, config.workers[0], cancellation, lease) == 'success'
     assert len(set(requests)) == 1 and len(committed) == 1
+    assert committed[requests[0]]['validated_outputs'] == {'A': ['session']}
