@@ -234,6 +234,7 @@ async def run_live_arm(
             try:
                 answer, meta = await gateway.structured(
                     role="planner",
+                    call_purpose="auxiliary",
                     system_prompt=(
                         "你是安全逆向证据融合器。不要输出隐藏思维链。只返回符合 schema 的 JSON；"
                         "不得把导入存在升级为运行时调用，也不得覆盖工具限制。"

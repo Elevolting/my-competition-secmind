@@ -81,6 +81,7 @@ from secmind.model_router import (
     ModelRouter,
     ModelTaskKind,
 )
+from secmind.model_snapshots import ModelConfiguration, ModelSnapshotStore, SnapshotParent
 from secmind.schemas import ModelUsage
 
 if TYPE_CHECKING:
@@ -163,8 +164,10 @@ class QwenGateway:
         usage_store: InvestigationStore | None = None,
         artifact_store: ContentAddressedArtifactStore | None = None,
         attempt_sink: Callable[[str, list[ProviderAttempt]], None] | None = None,
+        snapshot_store: ModelSnapshotStore | None = None,
     ) -> None:
         self.settings = settings
+        self.snapshot_store = snapshot_store
         try:
             self.policy = ModelPolicy.from_settings(settings, injected_client=client is not None)
         except ModelPolicyError as exc:
@@ -194,6 +197,24 @@ class QwenGateway:
             if usage_store is not None
             else None
         )
+
+    def snapshot_configuration(self, model_id: str) -> ModelConfiguration:
+        return ModelConfiguration(
+            base_url=self.policy.base_url, provider=self.policy.chat_provider, model_id=model_id,
+            planner_model=self.policy.planner.model_id, worker_model=self.policy.worker.model_id,
+            fallback_model=self.policy.fallback.model_id,
+        )
+
+    async def _capture_request(self, payload: dict, parent: SnapshotParent | None, provenance: dict) -> None:
+        if self.snapshot_store is None or parent is None:
+            return
+        try:
+            await asyncio.to_thread(
+                self.snapshot_store.capture, parent=parent,
+                configuration=self.snapshot_configuration(payload["model"]), request=payload, provenance=provenance,
+            )
+        except Exception as exc:
+            logging.getLogger(__name__).warning("Model snapshot capture failed (%s)", type(exc).__name__)
 
     def _http_timeout(self) -> httpx.Timeout:
         """Build phase timeouts; the logical call deadline lives above HTTPX."""
@@ -601,6 +622,9 @@ class QwenGateway:
         parent_logical_call_id: str | None = None,
         lineage_stage: str = "primary",
         thinking_enabled: bool | None = None,
+        call_purpose: str = "auxiliary",
+        step_id: str | None = None,
+        worker_id: str | None = None,
     ) -> tuple[T, ModelCallMeta]:
         setup = self._prepare_structured_call(
             role=role,
@@ -860,6 +884,8 @@ class QwenGateway:
                             route=route_name,
                             route_profile=route_profile,
                             normalize_errors=strict_primary,
+                            snapshot_parent=SnapshotParent(run_id, "secmind", step_id, worker_id)
+                            if run_id and call_purpose == "primary" else None,
                         )
                         if durable_call_key is not None and run_id is not None:
                             slot_attempts = [
@@ -1321,6 +1347,7 @@ class QwenGateway:
         route: str | None = None,
         route_profile: str = PRIMARY_ROUTE_PROFILE,
         normalize_errors: bool = False,
+        snapshot_parent: SnapshotParent | None = None,
     ) -> tuple[str, int, ProviderAttempt]:
         return await request_with_retry(
             self,
@@ -1351,6 +1378,7 @@ class QwenGateway:
             route=route,
             route_profile=route_profile,
             normalize_errors=normalize_errors,
+            snapshot_parent=snapshot_parent,
         )
 
     def _record_attempt(

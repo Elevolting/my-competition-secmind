@@ -21,6 +21,7 @@ from secmind.coordinator import CoordinatorBase  # noqa: E402
 from secmind.execution import ExecutionBase  # noqa: E402
 from secmind.knowledge import KnowledgeBase  # noqa: E402
 from secmind.ledger import Base  # noqa: E402
+from secmind.model_snapshots import SnapshotBase  # noqa: E402
 from secmind.unit_of_work import CognitiveBase  # noqa: E402
 
 config = context.config
@@ -33,6 +34,7 @@ target_metadata = [
     CoordinatorBase.metadata,
     KnowledgeBase.metadata,
     CognitiveBase.metadata,
+    SnapshotBase.metadata,
 ]
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -14,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
 
 from security_agent.config import Settings
+from security_agent.model_snapshots import ModelConfiguration, ModelSnapshotStore, SnapshotParent
 from security_agent.model_usage import normalize_usage
 
 T = TypeVar("T", bound=BaseModel)
@@ -74,12 +76,33 @@ StreamObserver = Callable[[str, dict[str, Any]], Awaitable[None]]
 
 class ModelGateway:
 
-    def __init__(self, settings: Settings, client: httpx.AsyncClient | None = None) -> None:
+    def __init__(self, settings: Settings, client: httpx.AsyncClient | None = None,
+                 *, snapshot_store: ModelSnapshotStore | None = None) -> None:
         self.settings = settings
         self._client = client or httpx.AsyncClient(timeout=settings.model_timeout_seconds)
         self._owns_client = client is None
         self._failures: dict[str, int] = {}
         self._open_until: dict[str, float] = {}
+        self.snapshot_store = snapshot_store
+
+    def snapshot_configuration(self, model_id: str) -> ModelConfiguration:
+        return ModelConfiguration(
+            base_url=self.settings.model_base_url, provider="compatible-api", model_id=model_id,
+            planner_model=self.settings.planner_model, worker_model=self.settings.worker_model,
+            fallback_model=self.settings.fallback_model,
+        )
+
+    async def _capture_request(self, payload: dict, parent: SnapshotParent | None, provenance: dict) -> None:
+        if self.snapshot_store is None or parent is None:
+            return
+        try:
+            # Capture completes before send; observation errors do not interrupt the main task.
+            await asyncio.to_thread(
+                self.snapshot_store.capture, parent=parent,
+                configuration=self.snapshot_configuration(payload["model"]), request=payload, provenance=provenance,
+            )
+        except Exception as exc:
+            logging.getLogger(__name__).warning("Model snapshot capture failed (%s)", type(exc).__name__)
 
     async def close(self) -> None:
         if self._owns_client:
@@ -150,6 +173,10 @@ class ModelGateway:
         stage: str | None = None,
         stream_observer: StreamObserver | None = None,
         timeout_seconds: float | None = None,
+        run_id: str | None = None,
+        step_id: str | None = None,
+        worker_id: str | None = None,
+        call_purpose: str = "auxiliary",
     ) -> tuple[T, ModelCallMeta]:
         if self.settings.demo_mode:
             raise ModelGatewayError("Model calls are disabled in deterministic demo mode")
@@ -157,7 +184,9 @@ class ModelGateway:
             raise ModelGatewayError("SECURITY_AGENT_MODEL_API_KEY is not configured")
         from security_agent.runtime_prompts import RuntimePrompts
 
-        system_prompt, prompt_receipt = RuntimePrompts(self.settings.run_root.parent).compose(stage or role, system_prompt)
+        system_prompt, prompt_receipt = RuntimePrompts(self.settings.run_root.parent).compose(
+            stage or role, system_prompt,
+        )
         if prompt_receipt:
             prompt_version = prompt_receipt["version"]
             if stream_observer is not None:
@@ -179,6 +208,9 @@ class ModelGateway:
                     stage=stage or role,
                     stream_observer=stream_observer,
                     timeout_seconds=timeout_seconds,
+                    snapshot_parent=SnapshotParent(run_id, "workbench", step_id, worker_id)
+                    if run_id and call_purpose == "primary" else None,
+                    prompt_version=prompt_version,
                 )
                 parsed = self._parse_model(raw, output_model)
                 self._failures[model_id] = 0
@@ -255,6 +287,8 @@ class ModelGateway:
         stage: str,
         stream_observer: StreamObserver | None,
         timeout_seconds: float | None,
+        snapshot_parent: SnapshotParent | None = None,
+        prompt_version: str = "",
     ) -> tuple[str, int, dict[str, int]]:
         started = time.monotonic()
         request_timeout = timeout_seconds or self.settings.model_timeout_seconds
@@ -282,6 +316,10 @@ class ModelGateway:
                             "response_format": {"type": "json_object"},
                         }
                     if stream_observer is None:
+                        await self._capture_request(request_payload, snapshot_parent, {
+                            "call_id": trace_id, "stage": stage, "prompt_version": prompt_version,
+                            "attempt": attempt.retry_state.attempt_number,
+                        })
                         response = await self._client.post(
                             f"{self.settings.model_base_url.rstrip('/')}/chat/completions",
                             headers={"Authorization": f"Bearer {self.settings.model_api_key}"},
@@ -311,6 +349,10 @@ class ModelGateway:
                     )
                     request_payload["stream"] = True
                     request_payload["stream_options"] = {"include_usage": True}
+                    await self._capture_request(request_payload, snapshot_parent, {
+                        "call_id": trace_id, "stage": stage, "prompt_version": prompt_version,
+                        "attempt": attempt.retry_state.attempt_number,
+                    })
                     chunks: list[str] = []
                     usage: dict[str, int] = {}
                     finish_reason: str | None = None

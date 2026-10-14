@@ -855,6 +855,7 @@ class QuestionBankService:
         allowed = {item["path"] for item in nodes}
         proposal, meta = await self.gateway.structured(
             role="planner",
+            call_purpose="auxiliary",
             system_prompt=(
                 "你是题库目录结构识别智能体。后端已经完成安全解压和精确层数计算。"
                 "你只负责判断当前层每个目录的语义角色，不能修改 path、depth 或任何统计值。"
@@ -1146,6 +1147,7 @@ class QuestionBankService:
         evidence = [self._classification_evidence(item, files) for item in questions]
         proposal, meta = await self.gateway.structured(
             role="worker",
+            call_purpose="auxiliary",
             system_prompt=(
                 "你是网络安全题型分类智能体。题目边界已经锁定，禁止增加、删除或更改边界。"
                 "只能依据脱敏题面摘要、文件类型统计和真实代表路径判断主类型与最多三个次要类型。"

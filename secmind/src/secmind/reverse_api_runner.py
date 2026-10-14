@@ -1332,6 +1332,7 @@ async def run_api_slot(
         try:
             report, meta = await gateway.structured(
                 role="planner",
+                call_purpose="primary",
                 system_prompt=_system_prompt(),
                 user_prompt=_user_prompt(identity, prompt, model_evidence_case, allowed_refs),
                 output_model=SecurityBusinessReport,

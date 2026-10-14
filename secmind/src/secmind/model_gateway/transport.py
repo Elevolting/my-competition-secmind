@@ -41,6 +41,7 @@ from secmind.model_gateway.recovery_policy import (
     retry_after_milliseconds,
 )
 from secmind.model_router import MODEL_ROUTER_VERSION, PRIMARY_ROUTE_PROFILE, ModelTaskKind
+from secmind.model_snapshots import SnapshotParent
 
 
 async def read_bounded_response(
@@ -112,6 +113,7 @@ async def request_with_retry(
     route: str | None = None,
     route_profile: str = PRIMARY_ROUTE_PROFILE,
     normalize_errors: bool = False,
+    snapshot_parent: SnapshotParent | None = None,
 ) -> tuple[str, int, ProviderAttempt]:
     """Make one bounded provider slot under a shared logical deadline."""
 
@@ -345,6 +347,17 @@ async def request_with_retry(
                 remaining_ms = remaining_budget_ms()
                 if remaining_ms <= 0:
                     raise TimeoutError("Model response deadline exceeded")
+                if snapshot_parent is not None:
+                    async with asyncio.timeout(remaining_ms / 1000):
+                        await gateway._capture_request(request_payload, snapshot_parent, {
+                            "call_id": logical_call_id, "prompt_version": prompt_version,
+                            "prompt_artifact_id": prompt_artifact_id, "task_kind": task_kind,
+                            "lineage_stage": lineage_stage, "route_profile": route_profile,
+                            "attempt": ordinal,
+                        })
+                    remaining_ms = remaining_budget_ms()
+                    if remaining_ms <= 0:
+                        raise TimeoutError("Model response deadline exceeded")
                 stream_context = client.stream(
                     "POST",
                     f"{gateway.policy.base_url}/chat/completions",

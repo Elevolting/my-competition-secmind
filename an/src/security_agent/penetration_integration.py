@@ -98,7 +98,7 @@ async def assess_project_facts(detail: dict[str, Any], cache: dict[str, Any], ga
             model_budget -= 1
             try:
                 answer, _ = await asyncio.wait_for(gateway.structured(
-                    role="worker", stage="penetration_fact_assessment", prompt_version=ASSESSMENT_VERSION,
+                    role="worker", stage="penetration_fact_assessment", call_purpose="auxiliary", prompt_version=ASSESSMENT_VERSION,
                     system_prompt=("Classify a security Fact using only its literal text. Return vulnerability true only "
                                    "for observed successful exploitation. Quote an exact substring proving success; "
                                    "if uncertain return false and UNKNOWN. Severity: CRITICAL only full control or "

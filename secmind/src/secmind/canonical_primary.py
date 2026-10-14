@@ -2121,6 +2121,7 @@ class UniversalPrimaryReviewer:
             prompt_artifact=prompt_artifact,
             durable_call_key=durable_call_key,
             task_kind=ModelTaskKind.PRIMARY_REVIEW,
+            call_purpose="primary",
         )
         if prompt_artifact is not None and self._prompt_service is not None:
             self._prompt_service.record_outcome(

@@ -26,6 +26,7 @@ from secmind.ledger import LedgerStore
 from secmind.llm import QwenGateway, close_gateway_safely
 from secmind.log_parsers import binary_parser_dependency_status
 from secmind.migration_guard import verify_database_at_head
+from secmind.model_snapshots import ModelSnapshotStore, sanitize_snapshot
 from secmind.orchestrator import SecMindOrchestrator
 from secmind.runtime_profile import resolve_runtime_profile
 from secmind.sandbox import SandboxToolSpec, default_allowlist, invocation_input_sha256
@@ -109,6 +110,9 @@ def build_runtime(
         settings,
         usage_store=investigation_store,
         attempt_sink=coordinator.record_model_attempts,
+        snapshot_store=ModelSnapshotStore(
+            coordinator.engine, sanitize=sanitize_snapshot, initialize_schema=initialize_schema,
+        ),
     )
     offline_knowledge = OfflineKnowledgeStore(engine=coordinator.engine, initialize_schema=initialize_schema)
     knowledge_store: OfflineKnowledgeStore = offline_knowledge

@@ -251,6 +251,7 @@ class PlannerAgent(BaseAgent):
                 output, meta = await self.gateway.structured(
                     role=self.model_role,
                     task_kind=ModelTaskKind.PLANNING,
+                    call_purpose="primary",
                     system_prompt=system_prompt,
                     user_prompt=prompt,
                     output_model=PlanOutput,
@@ -699,6 +700,7 @@ class DeltaCriticAgent(BaseAgent):
             output, meta = await self.gateway.structured(
                 role=self.model_role,
                 task_kind=ModelTaskKind.CRITIC_REVIEW,
+                call_purpose="auxiliary",
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 output_model=DeltaCriticDecision,

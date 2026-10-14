@@ -373,7 +373,10 @@ def build_runtime(settings: Settings) -> tuple[RunService, EvaluationService, Mo
     settings.prepare_directories()
     ledger = LedgerStore(settings.database_url)
     hub = EventHub()
-    gateway = ModelGateway(settings)
+    from security_agent.model_snapshots import ModelSnapshotStore
+    from security_agent.trace_redaction import redact_trace
+
+    gateway = ModelGateway(settings, snapshot_store=ModelSnapshotStore(ledger.engine, sanitize=redact_trace))
     experiences = ExperienceStore(ledger.engine)
     experiences.backfill(ledger)
     catalog = MCPCatalog(generated_root=settings.mcp_generated_root, storage_path=settings.run_root.parent / 'mcp-catalog.json')
