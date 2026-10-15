@@ -64,7 +64,7 @@ from secmind.investigation.team import (
     MailboxError,
     TypedMailbox,
 )
-from secmind.ledger import RunRow, canonical_json, redact
+from secmind.ledger import Base, RunRow, assert_run_archive_writable, canonical_json, redact
 from secmind.schemas import AgentState, InvocationStatus, ModelUsage, StepStatus
 from secmind.task_specs import ClarificationRequestRow
 
@@ -361,6 +361,11 @@ class InvestigationStore:
         self._typed_mailbox = TypedMailbox()
         if initialize_schema:
             InvestigationBase.metadata.create_all(engine)
+            # ``run_archive_freezes`` belongs to the shared ledger metadata,
+            # but InvestigationStore is also used standalone in tests and
+            # local services. Ensure the shared ledger tables exist on this
+            # engine before its write guards query the freeze row.
+            Base.metadata.create_all(engine)
 
     def close(self) -> None:
         if self._owns_engine:
@@ -398,6 +403,7 @@ class InvestigationStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             job = session.get(RunJobRow, run_id)
             run = session.get(RunRow, run_id)
             lease_until = _aware(None if job is None else job.lease_until)
@@ -481,6 +487,7 @@ class InvestigationStore:
     ) -> str:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             result = self._put_object_in_session(
                 session,
                 contract,
@@ -517,6 +524,7 @@ class InvestigationStore:
             raise InvestigationConflict("object and authority belong to different runs")
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             self._require_authority(session, authority, now=datetime.now(UTC))
             result = self._put_object_in_session(
                 session,
@@ -597,6 +605,7 @@ class InvestigationStore:
         payload_digest = _digest_json(safe_payload)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, state.run_id)
+            assert_run_archive_writable(session, state.run_id)
             if state.run_id != authority.run_id:
                 raise InvestigationConflict("state and authority belong to different runs")
             self._require_authority(session, authority, now=now)
@@ -748,6 +757,7 @@ class InvestigationStore:
     def reserve_usage(self, reservation: UsageReservation) -> UsageReservation:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, reservation.run_id)
+            assert_run_archive_writable(session, reservation.run_id)
             existing = session.get(UsageReservationRow, reservation.reservation_id)
             if existing is not None:
                 if existing.content_digest != reservation.content_digest:
@@ -809,6 +819,7 @@ class InvestigationStore:
     def settle_usage(self, settlement: UsageSettlement) -> UsageSettlement:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, settlement.run_id)
+            assert_run_archive_writable(session, settlement.run_id)
             reservation_row = session.get(UsageReservationRow, settlement.reservation_id)
             if reservation_row is None or reservation_row.run_id != settlement.run_id:
                 raise InvestigationConflict("settlement has no matching reservation")
@@ -884,6 +895,7 @@ class InvestigationStore:
     def release_usage(self, reservation_id: str, *, run_id: str) -> None:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(UsageReservationRow, reservation_id)
             if row is None or row.run_id != run_id:
                 raise InvestigationConflict("usage reservation does not exist for this run")
@@ -950,6 +962,7 @@ class InvestigationStore:
             raise InvestigationConflict("dispatch permit must be issued with a future expiry")
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, permit.run_id)
+            assert_run_archive_writable(session, permit.run_id)
             self._require_authority(session, authority, now=now)
             step = session.get(StepRunRow, permit.step_run_id)
             step_lease_until = _aware(None if step is None else step.lease_until)
@@ -1011,6 +1024,7 @@ class InvestigationStore:
             row = session.get(DispatchPermitRow, permit_id)
             if row is None:
                 raise InvestigationConflict("dispatch permit does not exist")
+            assert_run_archive_writable(session, row.run_id)
             if row.status != PermitStatus.ISSUED.value:
                 raise InvestigationConflict("dispatch permit is not consumable")
             expires_at = _aware(row.expires_at)
@@ -1058,6 +1072,8 @@ class InvestigationStore:
 
     def revoke_dispatch_permits(self, run_id: str, *, run_fence: int) -> int:
         with self._lock, Session(self.engine) as session:
+            self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             result = session.execute(
                 update(DispatchPermitRow)
                 .where(
@@ -1073,6 +1089,7 @@ class InvestigationStore:
     def record_execution_identity(self, identity: ExecutionIdentity) -> ExecutionIdentity:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, identity.run_id)
+            assert_run_archive_writable(session, identity.run_id)
             now = datetime.now(UTC)
             job = session.get(RunJobRow, identity.run_id)
             step = session.get(StepRunRow, identity.step_run_id)
@@ -1138,6 +1155,7 @@ class InvestigationStore:
     def label_artifact(self, label: ArtifactSecurityLabel) -> ArtifactSecurityLabel:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, label.owner_run_id)
+            assert_run_archive_writable(session, label.owner_run_id)
             existing = session.scalars(
                 select(ArtifactSecurityLabelRow).where(
                     ArtifactSecurityLabelRow.artifact_id == label.artifact_id,
@@ -1200,6 +1218,7 @@ class InvestigationStore:
     def record_secure_projection(self, projection: SecureStateProjection) -> SecureStateProjection:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, projection.run_id)
+            assert_run_archive_writable(session, projection.run_id)
             existing = session.scalars(
                 select(SecureStateProjectionRow).where(SecureStateProjectionRow.source_ref == projection.source_ref)
             ).first()
@@ -1423,6 +1442,7 @@ class InvestigationStore:
     ) -> CompletionSnapshotV2:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, snapshot.run_id)
+            assert_run_archive_writable(session, snapshot.run_id)
             self._require_authority(session, authority, now=datetime.now(UTC))
             result = self._stage_completion_snapshot(session, snapshot, authority)
             session.commit()
@@ -1435,6 +1455,7 @@ class InvestigationStore:
     ) -> CompletionReceipt:
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, receipt.run_id)
+            assert_run_archive_writable(session, receipt.run_id)
             self._require_authority(session, authority, now=datetime.now(UTC))
             result = self._stage_completion_receipt(session, receipt, authority)
             session.commit()
@@ -1444,6 +1465,7 @@ class InvestigationStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, command.run_id)
+            assert_run_archive_writable(session, command.run_id)
             existing = session.scalars(
                 select(RecoveryCommandRow).where(
                     RecoveryCommandRow.run_id == command.run_id,
@@ -1472,6 +1494,7 @@ class InvestigationStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, authority.run_id)
+            assert_run_archive_writable(session, authority.run_id)
             self._require_authority(session, authority, now=now)
             row = session.get(RecoveryCommandRow, command_id)
             if (
@@ -1500,6 +1523,7 @@ class InvestigationStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, authority.run_id)
+            assert_run_archive_writable(session, authority.run_id)
             self._require_authority(session, authority, now=now)
             row = session.get(RecoveryCommandRow, command_id)
             if (
@@ -1579,6 +1603,7 @@ class InvestigationStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, authority.run_id)
+            assert_run_archive_writable(session, authority.run_id)
             self._require_authority(session, authority, now=now)
             self._validate_durable_message(message, authority, now=now)
             existing_id = session.get(InvestigationMessageRow, message.message_id)
@@ -1637,6 +1662,7 @@ class InvestigationStore:
         receipts: list[MessageReceipt] = []
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             self._require_authority(session, authority, now=now)
             messages = session.scalars(
                 select(InvestigationMessageRow)
@@ -1721,6 +1747,7 @@ class InvestigationStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, authority.run_id)
+            assert_run_archive_writable(session, authority.run_id)
             self._require_authority(session, authority, now=now)
             message_row = session.get(InvestigationMessageRow, receipt.message_id)
             if message_row is None:

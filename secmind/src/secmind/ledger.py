@@ -86,6 +86,14 @@ class RunFreezeRow(Base):
     frozen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+def assert_run_archive_writable(session: Session, run_id: str) -> None:
+    """Reject durable writes while a run is pending or sealed for archive."""
+
+    freeze = session.get(RunFreezeRow, run_id)
+    if freeze is not None and freeze.status in {"pending", "complete"}:
+        raise LedgerFrozenError(f"run is frozen for archive: {run_id}")
+
+
 def canonical_json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
 
@@ -405,9 +413,7 @@ class LedgerStore:
 
     @staticmethod
     def _assert_writable(session: Session, run_id: str) -> None:
-        freeze = session.get(RunFreezeRow, run_id)
-        if freeze is not None and freeze.status in {"pending", "complete"}:
-            raise LedgerFrozenError(f"run is frozen for archive: {run_id}")
+        assert_run_archive_writable(session, run_id)
 
     def load_state(self, run_id: str) -> AgentState | None:
         with Session(self.engine) as session:

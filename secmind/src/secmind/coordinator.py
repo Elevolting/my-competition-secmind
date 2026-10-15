@@ -36,7 +36,14 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 from sqlalchemy.pool import StaticPool
 
 from secmind.execution import ExecutionBase, StaleFenceError, ToolInvocationRow
-from secmind.ledger import Base, RunRow, canonical_json, redact
+from secmind.ledger import (
+    Base,
+    LedgerFrozenError,
+    RunRow,
+    assert_run_archive_writable,
+    canonical_json,
+    redact,
+)
 from secmind.model_policy import MODEL_CATALOG
 from secmind.model_router import MODEL_ROUTER_VERSION, ModelLane, ModelTaskKind
 from secmind.schemas import AgentState, InvocationStatus, RunStatus, StepStatus, ToolResult
@@ -327,6 +334,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             if row is not None:
                 if row.status in {"completed", "cancelled"}:
@@ -365,12 +373,18 @@ class CoordinatorStore:
                     and_(RunJobRow.status == "leased", RunJobRow.lease_until <= claimed_at),
                 ),
             )
-            query = (
-                select(RunJobRow).where(eligible).order_by(RunJobRow.next_attempt_at, RunJobRow.created_at).limit(limit)
-            )
+            query = select(RunJobRow).where(eligible).order_by(RunJobRow.next_attempt_at, RunJobRow.created_at)
             if self.engine.dialect.name == "postgresql":
                 query = query.with_for_update(skip_locked=True)
-            rows = list(session.scalars(query).all())
+            rows: list[RunJobRow] = []
+            for candidate in session.scalars(query).all():
+                try:
+                    assert_run_archive_writable(session, candidate.run_id)
+                except LedgerFrozenError:
+                    continue
+                rows.append(candidate)
+                if len(rows) >= limit:
+                    break
             leases: list[RunLease] = []
             for row in rows:
                 previous_status = row.status
@@ -409,6 +423,7 @@ class CoordinatorStore:
         heartbeat_at = now or datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             self._require_lease(row, owner_id=owner_id, fence=fence, now=heartbeat_at)
             if row is None:  # pragma: no cover - established by _require_lease
@@ -428,6 +443,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             self._require_lease(row, owner_id=owner_id, fence=fence, now=now)
             if row is None:  # pragma: no cover - established by _require_lease
@@ -452,6 +468,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             self._require_lease(row, owner_id=owner_id, fence=fence, now=now)
             if row is None:  # pragma: no cover - established by _require_lease
@@ -471,6 +488,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             self._require_lease(row, owner_id=owner_id, fence=fence, now=now)
             if row is None:  # pragma: no cover - established by _require_lease
@@ -490,6 +508,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             if row is None:
                 raise KeyError(run_id)
@@ -508,6 +527,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             if row is None:
                 raise KeyError(run_id)
@@ -533,6 +553,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             row = session.get(RunJobRow, run_id)
             if row is None:
                 raise KeyError(run_id)
@@ -652,6 +673,7 @@ class CoordinatorStore:
         safe_payload = canonical_json(redact(payload))
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, state.run_id)
+            assert_run_archive_writable(session, state.run_id)
             self._require_lease(session.get(RunJobRow, state.run_id), owner_id=owner_id, fence=fence, now=now)
             existing = session.scalars(
                 select(OutboxEventRow).where(
@@ -719,6 +741,7 @@ class CoordinatorStore:
         safe_payload = canonical_json(redact(payload))
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             if lease_owner_id is not None and lease_fence is not None:
                 self._require_lease(
                     session.get(RunJobRow, run_id, with_for_update=True),
@@ -756,6 +779,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             anchor_ordinal = int(
                 session.scalar(
                     select(func.max(OutboxEventRow.transition_ordinal)).where(OutboxEventRow.run_id == run_id)
@@ -1160,6 +1184,7 @@ class CoordinatorStore:
         now = datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             existing = session.get(ModelGatewayFailureRow, failure_id)
             row_values = {
                 "run_id": run_id,
@@ -1306,6 +1331,7 @@ class CoordinatorStore:
         claimed_at = now or datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             self._require_lease(session.get(RunJobRow, run_id), owner_id=owner_id, fence=run_fence, now=claimed_at)
             row = session.scalars(
                 select(StepRunRow)
@@ -1422,6 +1448,7 @@ class CoordinatorStore:
         heartbeat_at = now or datetime.now(UTC)
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, lease.run_id)
+            assert_run_archive_writable(session, lease.run_id)
             row = session.scalars(
                 select(StepRunRow).where(
                     StepRunRow.run_id == lease.run_id,
@@ -1469,6 +1496,7 @@ class CoordinatorStore:
         }
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, lease.run_id)
+            assert_run_archive_writable(session, lease.run_id)
             if lease.run_fence:
                 self._require_lease(
                     session.get(RunJobRow, lease.run_id),
@@ -1579,6 +1607,7 @@ class CoordinatorStore:
         safe_payload = canonical_json(redact(payload))
         with self._lock, Session(self.engine) as session:
             self._database_lock(session, run_id)
+            assert_run_archive_writable(session, run_id)
             self._require_lease(
                 session.get(RunJobRow, run_id, with_for_update=True),
                 owner_id=owner_id,
