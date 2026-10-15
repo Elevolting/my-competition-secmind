@@ -14,13 +14,14 @@ from secmind.archive_restore import (
     ArchiveMember,
     collect_members,
     export_run_archive,
+    freeze_run_for_archive,
     load_manifest,
     restore_archive,
     verify_archive,
     write_manifest,
 )
-from secmind.artifact_store import ContentAddressedArtifactStore
-from secmind.ledger import EventRow, LedgerStore
+from secmind.artifact_store import ArtifactRunFrozenError, ContentAddressedArtifactStore
+from secmind.ledger import EventRow, LedgerFrozenError, LedgerStore
 from secmind.schemas import AgentState, RunStatus, TaskRequest
 
 
@@ -142,6 +143,31 @@ def test_export_run_archive_binds_state_ledger_and_cas_metadata(tmp_path: Path) 
     ledger.save_state(state)
     ledger.append(run_id, "run.completed", {"artifact_id": artifact.artifact_id}, actor="test")
 
+    freeze = freeze_run_for_archive(
+        ledger=ledger,
+        artifact_store=artifact_store,
+        run_id=run_id,
+        freeze_id="freeze-export",
+    )
+    assert freeze.freeze_id == "freeze-export"
+    assert freeze.latest_event_sequence == 2
+    with pytest.raises(LedgerFrozenError, match="frozen for archive"):
+        ledger.append(run_id, "late.event", {"late": True})
+    with pytest.raises(LedgerFrozenError, match="frozen for archive"):
+        ledger.save_state(state)
+    with pytest.raises(LedgerFrozenError, match="frozen for archive"):
+        ledger.save_state_cas(state, expected_version=state.state_version)
+    with pytest.raises(ArtifactRunFrozenError, match="frozen for archive"):
+        artifact_store.put(b"late-bytes", run_id=run_id)
+    with pytest.raises(ArtifactRunFrozenError, match="frozen for archive"):
+        artifact_store.classify(
+            artifact.artifact_id,
+            run_id=run_id,
+            data_view=artifact_store.metadata_for(artifact.artifact_id).data_view,
+            log_layer=artifact_store.metadata_for(artifact.artifact_id).log_layer,
+            media_type=artifact.media_type,
+        )
+
     archive_root = tmp_path / "exported"
     manifest = export_run_archive(
         archive_root,
@@ -153,10 +179,10 @@ def test_export_run_archive_binds_state_ledger_and_cas_metadata(tmp_path: Path) 
     )
 
     assert manifest.source["run_id"] == run_id
-    assert manifest.source["latest_event_sequence"] == 1
+    assert manifest.source["latest_event_sequence"] == 2
     assert manifest.source["ledger_head_hash"] == ledger.latest_event(run_id).hash
     assert manifest.counts == {
-        "ledger_events": 1,
+        "ledger_events": 2,
         "artifacts": 1,
         "artifact_metadata": 1,
         "state_snapshots": 1,
@@ -214,7 +240,7 @@ def test_export_rejects_active_or_corrupt_runs(tmp_path: Path) -> None:
         status=RunStatus.RUNNING,
     )
     ledger.save_state(state)
-    with pytest.raises(ArchiveError, match="not frozen or terminal"):
+    with pytest.raises(ArchiveError, match="archive freeze is required"):
         export_run_archive(
             tmp_path / "active-archive",
             ledger=ledger,
@@ -232,14 +258,50 @@ def test_export_rejects_active_or_corrupt_runs(tmp_path: Path) -> None:
         row.hash = "f" * 64
         session.commit()
     with pytest.raises(ArchiveError, match="hash chain is invalid"):
-        export_run_archive(
-            tmp_path / "corrupt-archive",
+        freeze_run_for_archive(ledger=ledger, artifact_store=artifact_store, run_id="run-active")
+    ledger.close()
+
+
+def test_freeze_failure_compensates_both_persistence_boundaries(tmp_path: Path) -> None:
+    class FailingCompletionLedger(LedgerStore):
+        def complete_archive_freeze(
+            self,
+            run_id: str,
+            *,
+            freeze_id: str,
+            artifact_snapshot_digest: str,
+        ) -> object:
+            raise RuntimeError("injected ledger completion failure")
+
+    ledger = FailingCompletionLedger(f"sqlite:///{tmp_path / 'ledger.db'}")
+    artifact_store = ContentAddressedArtifactStore(tmp_path / "cas")
+    run_id = "run-freeze-compensation"
+    ledger.save_state(
+        AgentState(
+            run_id=run_id,
+            task=TaskRequest(objective="exercise archive compensation"),
+            status=RunStatus.COMPLETED,
+        )
+    )
+    ledger.append(run_id, "run.completed", {"ok": True})
+
+    with pytest.raises(RuntimeError, match="injected ledger completion failure"):
+        freeze_run_for_archive(
             ledger=ledger,
             artifact_store=artifact_store,
-            run_id="run-active",
-            archive_id="archive-corrupt",
-            created_at="2026-10-15T00:00:00Z",
+            run_id=run_id,
+            freeze_id="freeze-compensation",
         )
+
+    ledger_freeze = ledger.archive_freeze(run_id)
+    artifact_freeze = artifact_store.archive_freeze(run_id)
+    assert ledger_freeze is not None
+    assert ledger_freeze.status == "aborted"
+    assert artifact_freeze is not None
+    assert artifact_freeze["status"] == "aborted"
+
+    ledger.append(run_id, "late.event", {"allowed_after_abort": True})
+    artifact_store.put(b"after-abort", run_id=run_id)
     ledger.close()
 
 

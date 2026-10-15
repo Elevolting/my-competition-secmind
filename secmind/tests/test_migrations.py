@@ -37,6 +37,7 @@ def test_business_migration_is_repeatable(tmp_path) -> None:
         "task_spec_revisions",
         "parser_runs",
         "clarification_requests",
+        "run_archive_freezes",
     } <= tables
     run_job_columns = {column["name"] for column in inspect(create_engine(url)).get_columns("run_jobs")}
     assert "wake_requested" in run_job_columns

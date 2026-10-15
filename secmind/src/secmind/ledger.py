@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -20,6 +21,22 @@ ZERO_HASH = "0" * 64
 
 class LedgerDedupeConflict(RuntimeError):
     pass
+
+
+class LedgerFrozenError(RuntimeError):
+    """Raised when a write arrives after an archive freeze boundary."""
+
+
+@dataclass(frozen=True)
+class ArchiveFreeze:
+    run_id: str
+    freeze_id: str
+    status: str
+    state_version: int
+    latest_event_sequence: int
+    ledger_head_hash: str
+    artifact_snapshot_digest: str | None
+    frozen_at: datetime
 
 
 class Base(DeclarativeBase):
@@ -54,6 +71,19 @@ class RunRow(Base):
     state_json: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class RunFreezeRow(Base):
+    __tablename__ = "run_archive_freezes"
+
+    run_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    freeze_id: Mapped[str] = mapped_column(String(200), unique=True, index=True)
+    status: Mapped[str] = mapped_column(String(20), index=True)
+    state_version: Mapped[int] = mapped_column(Integer)
+    latest_event_sequence: Mapped[int] = mapped_column(Integer)
+    ledger_head_hash: Mapped[str] = mapped_column(String(64))
+    artifact_snapshot_digest: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    frozen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 def canonical_json(value: Any) -> str:
@@ -117,6 +147,9 @@ class LedgerStore:
         dedupe_key: str | None = None,
     ) -> EventRow:
         """Stage a ledger event inside a caller-held per-run database lock."""
+        freeze = session.get(RunFreezeRow, run_id)
+        if freeze is not None and freeze.status in {"pending", "complete"}:
+            raise LedgerFrozenError(f"run is frozen for archive: {run_id}")
         safe_payload = redact(payload)
         effective_dedupe_key = dedupe_key or f"event:{uuid4()}"
         existing = session.scalars(
@@ -211,6 +244,7 @@ class LedgerStore:
         now = datetime.now(UTC)
         with self._lock_for(state.run_id), Session(self.engine) as session:
             self._database_lock(session, state.run_id)
+            self._assert_writable(session, state.run_id)
             row = session.get(RunRow, state.run_id)
             if row is None:
                 state.state_version = max(1, state.state_version)
@@ -248,6 +282,7 @@ class LedgerStore:
         serialized = candidate.model_dump_json()
         with self._lock_for(state.run_id), Session(self.engine) as session:
             self._database_lock(session, state.run_id)
+            self._assert_writable(session, state.run_id)
             if expected_version == 0:
                 if session.get(RunRow, state.run_id) is not None:
                     raise RuntimeError("run state version conflict")
@@ -280,6 +315,99 @@ class LedgerStore:
             session.commit()
             state.state_version = next_version
             return next_version
+
+    def begin_archive_freeze(self, run_id: str, *, freeze_id: str | None = None) -> ArchiveFreeze:
+        """Create a durable write fence at the current ledger boundary."""
+
+        now = datetime.now(UTC)
+        effective_freeze_id = freeze_id or f"freeze-{run_id}-{uuid4()}"
+        terminal_statuses = {
+            RunStatus.COMPLETED.value,
+            RunStatus.PARTIAL.value,
+            RunStatus.DENIED.value,
+            RunStatus.FAILED.value,
+            RunStatus.RECOVERY_REQUIRED.value,
+            RunStatus.CANCELLED.value,
+        }
+        with self._lock_for(run_id), Session(self.engine) as session:
+            self._database_lock(session, run_id)
+            run = session.get(RunRow, run_id)
+            if run is None:
+                raise LedgerDedupeConflict(f"run state does not exist: {run_id}")
+            if run.status not in terminal_statuses:
+                raise LedgerDedupeConflict(f"run is not archivable: {run_id}")
+            existing = session.get(RunFreezeRow, run_id)
+            if existing is not None and existing.status in {"pending", "complete"}:
+                raise LedgerDedupeConflict(f"run already has an active archive freeze: {run_id}")
+            event = self.append_in_session(
+                session,
+                run_id,
+                "archive.freeze_started",
+                {"freeze_id": effective_freeze_id, "state_version": run.state_version},
+                actor="archive",
+                dedupe_key=f"archive-freeze:{effective_freeze_id}:started",
+            )
+            if existing is not None:
+                session.delete(existing)
+                session.flush()
+            freeze = RunFreezeRow(
+                run_id=run_id,
+                freeze_id=effective_freeze_id,
+                status="pending",
+                state_version=run.state_version,
+                latest_event_sequence=event.sequence,
+                ledger_head_hash=event.hash,
+                artifact_snapshot_digest=None,
+                frozen_at=now,
+            )
+            session.add(freeze)
+            session.commit()
+            return self._to_freeze(freeze)
+
+    def complete_archive_freeze(
+        self,
+        run_id: str,
+        *,
+        freeze_id: str,
+        artifact_snapshot_digest: str,
+    ) -> ArchiveFreeze:
+        if len(artifact_snapshot_digest) != 64 or any(
+            char not in "0123456789abcdef" for char in artifact_snapshot_digest
+        ):
+            raise ValueError("artifact_snapshot_digest must be a lowercase SHA-256 digest")
+        with self._lock_for(run_id), Session(self.engine) as session:
+            self._database_lock(session, run_id)
+            row = session.get(RunFreezeRow, run_id)
+            if row is None or row.freeze_id != freeze_id or row.status != "pending":
+                raise LedgerDedupeConflict(f"archive freeze is not pending: {run_id}")
+            latest = session.scalars(
+                select(EventRow).where(EventRow.run_id == run_id).order_by(EventRow.sequence.desc()).limit(1)
+            ).first()
+            if latest is None or latest.sequence != row.latest_event_sequence or latest.hash != row.ledger_head_hash:
+                raise LedgerDedupeConflict("ledger changed during archive freeze")
+            row.status = "complete"
+            row.artifact_snapshot_digest = artifact_snapshot_digest
+            session.commit()
+            return self._to_freeze(row)
+
+    def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None:
+        with self._lock_for(run_id), Session(self.engine) as session:
+            self._database_lock(session, run_id)
+            row = session.get(RunFreezeRow, run_id)
+            if row is not None and row.freeze_id == freeze_id and row.status in {"pending", "complete"}:
+                row.status = "aborted"
+                session.commit()
+
+    def archive_freeze(self, run_id: str) -> ArchiveFreeze | None:
+        with Session(self.engine) as session:
+            row = session.get(RunFreezeRow, run_id)
+            return None if row is None else self._to_freeze(row)
+
+    @staticmethod
+    def _assert_writable(session: Session, run_id: str) -> None:
+        freeze = session.get(RunFreezeRow, run_id)
+        if freeze is not None and freeze.status in {"pending", "complete"}:
+            raise LedgerFrozenError(f"run is frozen for archive: {run_id}")
 
     def load_state(self, run_id: str) -> AgentState | None:
         with Session(self.engine) as session:
@@ -335,4 +463,17 @@ class LedgerStore:
             payload=json.loads(row.payload_json),
             prev_hash=row.prev_hash,
             hash=row.hash,
+        )
+
+    @staticmethod
+    def _to_freeze(row: RunFreezeRow) -> ArchiveFreeze:
+        return ArchiveFreeze(
+            run_id=row.run_id,
+            freeze_id=row.freeze_id,
+            status=row.status,
+            state_version=row.state_version,
+            latest_event_sequence=row.latest_event_sequence,
+            ledger_head_hash=row.ledger_head_hash,
+            artifact_snapshot_digest=row.artifact_snapshot_digest,
+            frozen_at=row.frozen_at.replace(tzinfo=row.frozen_at.tzinfo or UTC),
         )

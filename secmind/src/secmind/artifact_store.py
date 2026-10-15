@@ -17,6 +17,10 @@ class ArtifactStoreError(ValueError):
     pass
 
 
+class ArtifactRunFrozenError(ArtifactStoreError):
+    """Raised when artifact bytes or classification arrive after a freeze."""
+
+
 @dataclass(frozen=True)
 class StoredArtifact:
     artifact_id: str
@@ -62,6 +66,7 @@ class ContentAddressedArtifactStore:
         data_view: DataView | str = DataView.RAW_RESTRICTED,
         log_layer: LogLayer | str | None = None,
     ) -> StoredArtifact:
+        self._assert_run_writable(run_id)
         if len(content) > self.max_artifact_bytes:
             raise ArtifactStoreError("artifact exceeds the configured size limit")
         digest = hashlib.sha256(content).hexdigest()
@@ -127,6 +132,7 @@ class ContentAddressedArtifactStore:
 
         digest = artifact_id.lower()
         self.path_for(digest)
+        self._assert_artifact_writable(digest, run_id)
         try:
             view = data_view if isinstance(data_view, DataView) else DataView(data_view)
             layer = log_layer if isinstance(log_layer, LogLayer) else LogLayer(log_layer) if log_layer else None
@@ -178,6 +184,50 @@ class ContentAddressedArtifactStore:
             finally:
                 Path(temporary).unlink(missing_ok=True)
         return self.metadata_for(digest)
+
+    def begin_archive_freeze(self, run_id: str, *, freeze_id: str) -> None:
+        self._validate_run_id(run_id)
+        if not freeze_id or any(ord(character) < 32 for character in freeze_id):
+            raise ArtifactStoreError("invalid archive freeze id")
+        path = self._freeze_path(run_id)
+        existing = self._read_freeze(path)
+        if existing is not None and existing.get("status") in {"pending", "complete"}:
+            raise ArtifactRunFrozenError(f"run is already frozen for archive: {run_id}")
+        self._write_freeze(
+            path,
+            {"run_id": run_id, "freeze_id": freeze_id, "status": "pending"},
+        )
+
+    def complete_archive_freeze(self, run_id: str, *, freeze_id: str, artifact_snapshot_digest: str) -> None:
+        if len(artifact_snapshot_digest) != 64 or any(
+            character not in "0123456789abcdef" for character in artifact_snapshot_digest
+        ):
+            raise ArtifactStoreError("artifact_snapshot_digest must be a lowercase SHA-256 digest")
+        path = self._freeze_path(run_id)
+        existing = self._read_freeze(path)
+        if existing is None or existing.get("freeze_id") != freeze_id or existing.get("status") != "pending":
+            raise ArtifactStoreError("archive freeze is not pending")
+        self._write_freeze(
+            path,
+            {
+                "run_id": run_id,
+                "freeze_id": freeze_id,
+                "status": "complete",
+                "artifact_snapshot_digest": artifact_snapshot_digest,
+            },
+        )
+
+    def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None:
+        path = self._freeze_path(run_id)
+        existing = self._read_freeze(path)
+        if existing is not None and existing.get("freeze_id") == freeze_id and existing.get("status") in {
+            "pending",
+            "complete",
+        }:
+            self._write_freeze(path, {**existing, "status": "aborted"})
+
+    def archive_freeze(self, run_id: str) -> dict[str, object] | None:
+        return self._read_freeze(self._freeze_path(run_id))
 
     def metadata_for(self, artifact_id: str) -> ArtifactAccessMetadata:
         """Return the fail-closed effective classification for an artifact."""
@@ -279,6 +329,64 @@ class ContentAddressedArtifactStore:
         if not directory.is_relative_to(self.root):
             raise ArtifactStoreError("invalid artifact metadata path")
         return directory
+
+    def _freeze_path(self, run_id: str) -> Path:
+        self._validate_run_id(run_id)
+        key = hashlib.sha256(run_id.encode("utf-8")).hexdigest()
+        return self.root / "archive-freezes" / f"{key}.json"
+
+    @staticmethod
+    def _validate_run_id(run_id: str) -> None:
+        if not isinstance(run_id, str) or not run_id.strip() or len(run_id) > 100 or any(
+            ord(character) < 32 for character in run_id
+        ):
+            raise ArtifactStoreError("invalid artifact run binding")
+
+    @staticmethod
+    def _read_freeze(path: Path) -> dict[str, object] | None:
+        if not path.exists():
+            return None
+        if path.is_symlink() or not path.is_file():
+            raise ArtifactStoreError("archive freeze marker is invalid")
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ArtifactStoreError("archive freeze marker is unreadable") from exc
+        if not isinstance(payload, dict):
+            raise ArtifactStoreError("archive freeze marker is invalid")
+        return payload
+
+    @staticmethod
+    def _write_freeze(path: Path, payload: dict[str, object]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary = tempfile.mkstemp(prefix=".freeze-", dir=path.parent)
+        try:
+            serialized = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(serialized)
+                handle.flush()
+                os.fsync(handle.fileno())
+            Path(temporary).replace(path)
+        finally:
+            Path(temporary).unlink(missing_ok=True)
+
+    def _assert_run_writable(self, run_id: str | None) -> None:
+        if run_id is None:
+            return
+        freeze = self._read_freeze(self._freeze_path(run_id))
+        if freeze is not None and freeze.get("status") in {"pending", "complete"}:
+            raise ArtifactRunFrozenError(f"run is frozen for archive: {run_id}")
+
+    def _assert_artifact_writable(self, artifact_id: str, run_id: str | None) -> None:
+        self._assert_run_writable(run_id)
+        marker_directory = self._metadata_directory(artifact_id)
+        if not marker_directory.exists():
+            return
+        metadata = self.metadata_for(artifact_id)
+        for bound_run_id in metadata.run_ids:
+            freeze = self._read_freeze(self._freeze_path(bound_run_id))
+            if freeze is not None and freeze.get("status") in {"pending", "complete"}:
+                raise ArtifactRunFrozenError(f"artifact belongs to a frozen run: {bound_run_id}")
 
     @staticmethod
     def _verify_file(path: Path, expected_sha256: str, expected_size: int) -> None:

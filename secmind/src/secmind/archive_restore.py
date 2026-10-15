@@ -40,11 +40,27 @@ class _LedgerAdapter(Protocol):
 
     def verify(self, run_id: str) -> bool: ...
 
+    def begin_archive_freeze(self, run_id: str, *, freeze_id: str | None = None) -> Any: ...
+
+    def complete_archive_freeze(
+        self, run_id: str, *, freeze_id: str, artifact_snapshot_digest: str
+    ) -> Any: ...
+
+    def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
+
+    def archive_freeze(self, run_id: str) -> Any | None: ...
+
 
 class _ArtifactAdapter(Protocol):
     def read(self, artifact_id: str) -> bytes: ...
 
     def metadata_for(self, artifact_id: str) -> Any: ...
+
+    def begin_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
+
+    def complete_archive_freeze(self, run_id: str, *, freeze_id: str, artifact_snapshot_digest: str) -> None: ...
+
+    def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
 
 
 class ArchiveError(ValueError):
@@ -279,6 +295,17 @@ class RestoreResult:
     already_restored: bool
     execution_allowed: bool = False
     id_map: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class ArchiveFreezeResult:
+    run_id: str
+    freeze_id: str
+    state_version: int
+    latest_event_sequence: int
+    ledger_head_hash: str
+    artifact_snapshot_digest: str
+    frozen_at: str
 
 
 def _hash_file(path: Path) -> tuple[int, str]:
@@ -535,6 +562,87 @@ def _artifact_metadata_payload(metadata: Any) -> dict[str, Any]:
     return payload
 
 
+def _collect_artifact_snapshot(
+    artifact_store: _ArtifactAdapter,
+    state_payload: Any,
+    event_payloads: Any,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    """Read and verify referenced CAS bytes and return a stable snapshot."""
+
+    artifact_ids = sorted(_artifact_ids(state_payload) | _artifact_ids(event_payloads))
+    descriptors: list[dict[str, Any]] = []
+    for artifact_id in artifact_ids:
+        try:
+            content = artifact_store.read(artifact_id)
+            metadata = _artifact_metadata_payload(artifact_store.metadata_for(artifact_id))
+        except Exception as exc:
+            raise ArchiveError(f"artifact {artifact_id} could not be exported") from exc
+        if hashlib.sha256(content).hexdigest() != artifact_id:
+            raise ArchiveError(f"artifact bytes do not match identity: {artifact_id}")
+        if metadata.get("artifact_id") != artifact_id:
+            raise ArchiveError(f"artifact metadata identity mismatch: {artifact_id}")
+        descriptors.append({"artifact_id": artifact_id, "metadata": metadata})
+    return artifact_ids, descriptors
+
+
+def freeze_run_for_archive(
+    *,
+    ledger: _LedgerAdapter,
+    artifact_store: _ArtifactAdapter,
+    run_id: str,
+    freeze_id: str | None = None,
+) -> ArchiveFreezeResult:
+    """Freeze ledger and CAS writes, then seal one consistent archive boundary."""
+
+    try:
+        ledger_freeze = ledger.begin_archive_freeze(run_id, freeze_id=freeze_id)
+    except (AttributeError, TypeError) as exc:
+        raise ArchiveError("ledger adapter does not provide archive freeze fencing") from exc
+    effective_freeze_id = str(getattr(ledger_freeze, "freeze_id", ""))
+    if not effective_freeze_id:
+        raise ArchiveError("ledger freeze did not return a freeze id")
+    artifact_started = False
+    artifact_completed = False
+    try:
+        artifact_store.begin_archive_freeze(run_id, freeze_id=effective_freeze_id)
+        artifact_started = True
+        state = ledger.load_state(run_id)
+        if state is None:
+            raise ArchiveError(f"run state does not exist: {run_id}")
+        events = _all_events(ledger, run_id)
+        if not ledger.verify(run_id):
+            raise ArchiveError(f"ledger hash chain is invalid: {run_id}")
+        state_payload = _jsonable(state)
+        event_payloads = [_jsonable(event) for event in events]
+        _, descriptors = _collect_artifact_snapshot(artifact_store, state_payload, event_payloads)
+        snapshot_digest = hashlib.sha256(_canonical_json(descriptors)).hexdigest()
+        artifact_store.complete_archive_freeze(
+            run_id,
+            freeze_id=effective_freeze_id,
+            artifact_snapshot_digest=snapshot_digest,
+        )
+        artifact_completed = True
+        completed = ledger.complete_archive_freeze(
+            run_id,
+            freeze_id=effective_freeze_id,
+            artifact_snapshot_digest=snapshot_digest,
+        )
+    except Exception:
+        if artifact_started or artifact_completed:
+            artifact_store.abort_archive_freeze(run_id, freeze_id=effective_freeze_id)
+        ledger.abort_archive_freeze(run_id, freeze_id=effective_freeze_id)
+        raise
+    return ArchiveFreezeResult(
+        run_id=run_id,
+        freeze_id=effective_freeze_id,
+        state_version=int(getattr(completed, "state_version", 0)),
+        latest_event_sequence=int(getattr(completed, "latest_event_sequence", 0)),
+        ledger_head_hash=str(getattr(completed, "ledger_head_hash", "")),
+        artifact_snapshot_digest=snapshot_digest,
+        frozen_at=str(getattr(completed, "frozen_at", "")),
+    )
+
+
 def export_run_archive(
     root: Path,
     *,
@@ -549,10 +657,13 @@ def export_run_archive(
 
     This adapter deliberately consumes the existing LedgerStore and CAS
     interfaces.  It does not mutate the run, acquire execution leases, call a
-    model/tool, or infer bytes from untrusted paths.  A future freeze service
-    must fence writes before invoking this function.
+    model/tool, or infer bytes from untrusted paths.  Call
+    :func:`freeze_run_for_archive` before invoking this function.
     """
 
+    freeze = getattr(ledger, "archive_freeze", lambda _run_id: None)(run_id)
+    if freeze is None or getattr(freeze, "status", None) != "complete":
+        raise ArchiveError(f"run archive freeze is required: {run_id}")
     state = ledger.load_state(run_id)
     if state is None:
         raise ArchiveError(f"run state does not exist: {run_id}")
@@ -576,9 +687,15 @@ def export_run_archive(
     else:
         root.mkdir(parents=True, exist_ok=False)
 
-    archive_id = archive_id or f"archive-{run_id}-{getattr(events[-1], 'hash', '0' * 64)[:16]}"
+    requested_freeze_id = freeze_id
+    effective_freeze_id = str(getattr(freeze, "freeze_id", ""))
+    if not effective_freeze_id:
+        raise ArchiveError("archive freeze identity is invalid")
+    if requested_freeze_id is not None and requested_freeze_id != effective_freeze_id:
+        raise ArchiveError("archive freeze identity mismatch")
+    latest_hash_for_id = getattr(events[-1], "hash", "0" * 64) if events else "0" * 64
+    archive_id = archive_id or f"archive-{run_id}-{latest_hash_for_id[:16]}"
     created_at = created_at or datetime.now(UTC).isoformat()
-    freeze_id = freeze_id or f"freeze-{run_id}-{getattr(state, 'state_version', 1)}"
 
     state_payload = _jsonable(state)
     event_payloads = [_jsonable(event) for event in events]
@@ -588,20 +705,15 @@ def export_run_archive(
     ledger_bytes = b"".join(_canonical_json(event) + b"\n" for event in event_payloads)
     _write_bytes(root / Path(ledger_relative), ledger_bytes)
 
-    artifact_ids = sorted(_artifact_ids(state_payload) | _artifact_ids(event_payloads))
+    artifact_ids, artifact_descriptors = _collect_artifact_snapshot(artifact_store, state_payload, event_payloads)
     artifact_members: list[ArchiveMember] = []
-    artifact_descriptors: list[dict[str, Any]] = []
     for artifact_id in artifact_ids:
-        try:
-            content = artifact_store.read(artifact_id)
-            metadata = _artifact_metadata_payload(artifact_store.metadata_for(artifact_id))
-        except Exception as exc:
-            raise ArchiveError(f"artifact {artifact_id} could not be exported") from exc
-        if hashlib.sha256(content).hexdigest() != artifact_id:
-            raise ArchiveError(f"artifact bytes do not match identity: {artifact_id}")
-        metadata_artifact_id = metadata.get("artifact_id")
-        if metadata_artifact_id != artifact_id:
-            raise ArchiveError(f"artifact metadata identity mismatch: {artifact_id}")
+        content = artifact_store.read(artifact_id)
+        metadata = next(
+            descriptor["metadata"]
+            for descriptor in artifact_descriptors
+            if descriptor["artifact_id"] == artifact_id
+        )
         bytes_relative = f"artifacts/sha256/{artifact_id[:2]}/{artifact_id}"
         metadata_relative = f"artifacts/metadata/{artifact_id[:2]}/{artifact_id}.json"
         _write_bytes(root / Path(bytes_relative), content)
@@ -624,7 +736,6 @@ def export_run_archive(
                 source_id=artifact_id,
             )
         )
-        artifact_descriptors.append({"artifact_id": artifact_id, "metadata": metadata})
 
     if events:
         latest_event = events[-1]
@@ -638,7 +749,18 @@ def export_run_archive(
     else:
         latest_sequence = 0
         ledger_head_hash = "0" * 64
+    if int(getattr(freeze, "latest_event_sequence", latest_sequence)) != latest_sequence:
+        raise ArchiveError("ledger changed after archive freeze")
+    if str(getattr(freeze, "ledger_head_hash", ledger_head_hash)) != ledger_head_hash:
+        raise ArchiveError("ledger head changed after archive freeze")
+    if int(getattr(freeze, "state_version", getattr(state, "state_version", 1))) != int(
+        getattr(state, "state_version", 1)
+    ):
+        raise ArchiveError("state changed after archive freeze")
     artifact_snapshot_digest = hashlib.sha256(_canonical_json(artifact_descriptors)).hexdigest()
+    recorded_snapshot_digest = getattr(freeze, "artifact_snapshot_digest", None)
+    if recorded_snapshot_digest != artifact_snapshot_digest:
+        raise ArchiveError("artifact snapshot changed after archive freeze")
     members = tuple(
         sorted(
             (
@@ -664,9 +786,10 @@ def export_run_archive(
             "schema_version": getattr(state, "schema_version", None),
         },
         freeze={
-            "freeze_id": freeze_id,
-            "status": state_status,
-            "frozen_at": created_at,
+            "freeze_id": effective_freeze_id,
+            "status": "terminal",
+            "run_status": state_status,
+            "frozen_at": str(getattr(freeze, "frozen_at", created_at)),
             "ledger_head_hash": ledger_head_hash,
             "artifact_snapshot_digest": artifact_snapshot_digest,
         },
@@ -930,11 +1053,13 @@ def restore_archive(
 
 __all__ = [
     "ArchiveError",
+    "ArchiveFreezeResult",
     "ArchiveManifest",
     "ArchiveMember",
     "RestoreResult",
     "collect_members",
     "export_run_archive",
+    "freeze_run_for_archive",
     "load_manifest",
     "restore_archive",
     "verify_archive",
