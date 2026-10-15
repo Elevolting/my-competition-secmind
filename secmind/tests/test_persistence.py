@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 from langgraph.checkpoint.memory import InMemorySaver
 
+from secmind.checkpoint_archive import FencedCheckpointSaver
 from secmind.guardrail import Guardrail
 from secmind.investigation.contracts import RunAuthority, seal_contract
 from secmind.ledger import LedgerStore
@@ -115,6 +116,8 @@ async def test_development_runtime_uses_memory_checkpointer(settings) -> None:
     runtime = ApplicationRuntime(settings)
     await runtime.startup()
     try:
-        assert isinstance(runtime.service.orchestrator.checkpointer, InMemorySaver)
+        checkpointer = runtime.service.orchestrator.checkpointer
+        assert isinstance(checkpointer, FencedCheckpointSaver)
+        assert isinstance(checkpointer.delegate, InMemorySaver)
     finally:
         await runtime.shutdown()

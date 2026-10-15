@@ -11,7 +11,7 @@ from conftest import seal_execution_contract
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 from starlette.websockets import WebSocketDisconnect
 
 from secmind.api import _purge_expired_uploads, _safe_upload_name, create_app
@@ -416,11 +416,12 @@ async def test_application_runtime_lifecycle_and_postgres_cleanup(tmp_path, monk
             events.append("exit")
 
     fake_service = SimpleNamespace(
+        ledger=SimpleNamespace(engine=create_engine("sqlite:///:memory:")),
         recover_incomplete=AsyncMock(),
         startup=AsyncMock(),
         shutdown=AsyncMock(),
     )
-    fake_gateway = SimpleNamespace(close=AsyncMock())
+    fake_gateway = SimpleNamespace(close=AsyncMock(), snapshot_store=SimpleNamespace())
     monkeypatch.setattr(AsyncPostgresSaver, "from_conn_string", lambda _url: FakeContext())
     monkeypatch.setattr("secmind.runtime.build_runtime", lambda *_args: (fake_service, fake_gateway))
     monkeypatch.setattr("secmind.runtime.close_gateway_safely", AsyncMock())

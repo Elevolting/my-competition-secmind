@@ -421,6 +421,19 @@ class LedgerStore:
             row = session.get(RunFreezeRow, run_id)
             return None if row is None else self._to_freeze(row)
 
+    def assert_checkpoint_writable(self, run_id: str) -> None:
+        """Check the durable archive fence before a checkpointer write.
+
+        LangGraph writes do not use the ledger SQLAlchemy session, so they
+        cannot call ``_assert_writable`` as part of the same transaction.  A
+        fence-aware checkpointer calls this method immediately before its
+        backend write.  The database row remains the source of truth across
+        processes; the checkpointer proxy adds the in-process race guard.
+        """
+
+        with Session(self.engine) as session:
+            assert_run_archive_writable(session, run_id)
+
     @staticmethod
     def _assert_writable(session: Session, run_id: str) -> None:
         assert_run_archive_writable(session, run_id)

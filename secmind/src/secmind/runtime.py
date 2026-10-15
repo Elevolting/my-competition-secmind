@@ -16,6 +16,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from secmind.artifact_store import ContentAddressedArtifactStore
 from secmind.capability import CapabilityTicketIssuer
 from secmind.capsule import FailureCapsuleStore
+from secmind.checkpoint_archive import CheckpointWriteFence, FencedCheckpointSaver
 from secmind.config import Settings
 from secmind.coordinator import CoordinatorStore
 from secmind.execution import ExecutionStore
@@ -216,13 +217,17 @@ def build_runtime(
         investigation_store=investigation_store,
         owned_async_clients=[sandbox_http_client] if sandbox_http_client is not None else None,
     )
+    effective_checkpointer = checkpointer or InMemorySaver()
     orchestrator = SecMindOrchestrator(
         settings,
         ledger,
         gateway,
         broker,
         hub.publish,
-        checkpointer=checkpointer,
+        checkpointer=FencedCheckpointSaver(
+            effective_checkpointer,
+            fence=CheckpointWriteFence(ledger.assert_checkpoint_writable),
+        ),
         coordinator=coordinator,
         knowledge_store=knowledge_store,
         artifact_store=artifact_store,

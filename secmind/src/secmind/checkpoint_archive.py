@@ -8,8 +8,9 @@ event-loop thread (its synchronous facade enforces that rule).
 
 from __future__ import annotations
 
+import threading
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import AsyncIterator, Callable, Iterator, Mapping, Sequence
 from typing import Any, cast
 
 from langchain_core.runnables import RunnableConfig
@@ -21,6 +22,150 @@ from secmind.archive_restore import (
     CheckpointArchiveSnapshot,
     _checkpoint_restore_value,
 )
+
+
+class CheckpointWriteFence:
+    """Shared in-process fence backed optionally by a durable run check."""
+
+    def __init__(self, durable_check: Callable[[str], None] | None = None) -> None:
+        self._durable_check = durable_check
+        self._active: dict[str, str] = {}
+        self._completed: dict[str, str] = {}
+        self._lock = threading.RLock()
+
+    def begin(self, run_id: str, freeze_id: str) -> None:
+        with self._lock:
+            existing = self._active.get(run_id)
+            if existing is not None:
+                raise ArchiveError(f"checkpoint run already has an active archive freeze: {run_id}")
+            self._active[run_id] = freeze_id
+
+    def complete(self, run_id: str, freeze_id: str, digest: str) -> None:
+        if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+            raise ArchiveError("checkpoint_snapshot_digest is invalid")
+        with self._lock:
+            if self._active.get(run_id) != freeze_id:
+                raise ArchiveError(f"checkpoint archive freeze is not pending: {run_id}")
+            self._completed[run_id] = freeze_id
+
+    def abort(self, run_id: str, freeze_id: str) -> None:
+        with self._lock:
+            if self._active.get(run_id) == freeze_id:
+                self._active.pop(run_id, None)
+            if self._completed.get(run_id) == freeze_id:
+                self._completed.pop(run_id, None)
+
+    def assert_writable(self, run_id: str) -> None:
+        if not run_id:
+            raise ArchiveError("checkpoint write is missing configurable.thread_id")
+        if self._durable_check is not None:
+            self._durable_check(run_id)
+        with self._lock:
+            if run_id in self._active or run_id in self._completed:
+                raise ArchiveError(f"checkpoint run is frozen for archive: {run_id}")
+
+
+def _thread_id(config: Mapping[str, Any]) -> str:
+    configurable = config.get("configurable")
+    if not isinstance(configurable, Mapping):
+        return ""
+    value = configurable.get("thread_id")
+    return value if isinstance(value, str) else ""
+
+
+class FencedCheckpointSaver(BaseCheckpointSaver[Any]):
+    """Proxy every LangGraph mutation through a shared archive fence."""
+
+    def __init__(
+        self,
+        delegate: BaseCheckpointSaver[Any],
+        *,
+        fence: CheckpointWriteFence | None = None,
+    ) -> None:
+        super().__init__(serde=delegate.serde)
+        self.delegate = delegate
+        self.fence = fence or CheckpointWriteFence()
+
+    @property
+    def config_specs(self) -> list[Any]:
+        return self.delegate.config_specs
+
+    def get_tuple(self, config: Any) -> Any:
+        return self.delegate.get_tuple(config)
+
+    def list(
+        self,
+        config: Any,
+        *,
+        filter: dict[str, Any] | None = None,
+        before: Any = None,
+        limit: int | None = None,
+    ) -> Iterator[Any]:
+        return self.delegate.list(config, filter=filter, before=before, limit=limit)
+
+    def put(self, config: Any, checkpoint: Any, metadata: Any, new_versions: Any) -> Any:
+        self.fence.assert_writable(_thread_id(config))
+        return self.delegate.put(config, checkpoint, metadata, new_versions)
+
+    def put_writes(
+        self,
+        config: Any,
+        writes: Sequence[tuple[str, Any]],
+        task_id: str,
+        task_path: str = "",
+    ) -> None:
+        self.fence.assert_writable(_thread_id(config))
+        self.delegate.put_writes(config, writes, task_id, task_path)
+
+    async def aget_tuple(self, config: Any) -> Any:
+        return await self.delegate.aget_tuple(config)
+
+    async def alist(
+        self,
+        config: Any,
+        *,
+        filter: dict[str, Any] | None = None,
+        before: Any = None,
+        limit: int | None = None,
+    ) -> AsyncIterator[Any]:
+        async for item in self.delegate.alist(config, filter=filter, before=before, limit=limit):
+            yield item
+
+    async def aput(self, config: Any, checkpoint: Any, metadata: Any, new_versions: Any) -> Any:
+        self.fence.assert_writable(_thread_id(config))
+        return await self.delegate.aput(config, checkpoint, metadata, new_versions)
+
+    async def aput_writes(
+        self,
+        config: Any,
+        writes: Sequence[tuple[str, Any]],
+        task_id: str,
+        task_path: str = "",
+    ) -> None:
+        self.fence.assert_writable(_thread_id(config))
+        await self.delegate.aput_writes(config, writes, task_id, task_path)
+
+    def delete_thread(self, thread_id: str) -> None:
+        self.fence.assert_writable(thread_id)
+        self.delegate.delete_thread(thread_id)
+
+    def delete_for_runs(self, run_ids: Sequence[str]) -> None:
+        for run_id in run_ids:
+            self.fence.assert_writable(run_id)
+        self.delegate.delete_for_runs(run_ids)
+
+    def copy_thread(self, source_thread_id: str, target_thread_id: str) -> None:
+        self.fence.assert_writable(source_thread_id)
+        self.fence.assert_writable(target_thread_id)
+        self.delegate.copy_thread(source_thread_id, target_thread_id)
+
+    def prune(self, thread_ids: Sequence[str], *, strategy: str = "keep_latest") -> None:
+        for run_id in thread_ids:
+            self.fence.assert_writable(run_id)
+        self.delegate.prune(thread_ids, strategy=strategy)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.delegate, name)
 
 
 def _record_from_tuple(item: Any) -> dict[str, Any]:
@@ -47,14 +192,10 @@ class LangGraphCheckpointAdapter(CheckpointArchiveAdapter):
 
     def __init__(self, checkpointer: BaseCheckpointSaver[Any]) -> None:
         self.checkpointer = checkpointer
-        self._fences: dict[str, str] = {}
-        self._completed: dict[str, str] = {}
+        self.fence = checkpointer.fence if isinstance(checkpointer, FencedCheckpointSaver) else CheckpointWriteFence()
 
     def begin_archive_freeze(self, run_id: str, *, freeze_id: str) -> None:
-        existing = self._fences.get(run_id)
-        if existing is not None:
-            raise ArchiveError(f"checkpoint run already has an active archive freeze: {run_id}")
-        self._fences[run_id] = freeze_id
+        self.fence.begin(run_id, freeze_id)
 
     def snapshot(self, run_id: str) -> CheckpointArchiveSnapshot:
         try:
@@ -69,17 +210,10 @@ class LangGraphCheckpointAdapter(CheckpointArchiveAdapter):
     def complete_archive_freeze(
         self, run_id: str, *, freeze_id: str, checkpoint_snapshot_digest: str
     ) -> None:
-        if self._fences.get(run_id) != freeze_id:
-            raise ArchiveError(f"checkpoint archive freeze is not pending: {run_id}")
-        if len(checkpoint_snapshot_digest) != 64:
-            raise ArchiveError("checkpoint_snapshot_digest is invalid")
-        self._completed[run_id] = freeze_id
+        self.fence.complete(run_id, freeze_id, checkpoint_snapshot_digest)
 
     def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None:
-        if self._fences.get(run_id) == freeze_id:
-            self._fences.pop(run_id, None)
-        if self._completed.get(run_id) == freeze_id:
-            self._completed.pop(run_id, None)
+        self.fence.abort(run_id, freeze_id)
 
     def restore(
         self,
@@ -155,4 +289,4 @@ class LangGraphCheckpointAdapter(CheckpointArchiveAdapter):
             raise ArchiveError(f"checkpoint restore failed for {run_id}") from exc
 
 
-__all__ = ["LangGraphCheckpointAdapter"]
+__all__ = ["CheckpointWriteFence", "FencedCheckpointSaver", "LangGraphCheckpointAdapter"]

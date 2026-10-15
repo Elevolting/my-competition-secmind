@@ -16,7 +16,7 @@ from secmind.archive_restore import (
     verify_archive,
 )
 from secmind.artifact_store import ContentAddressedArtifactStore
-from secmind.checkpoint_archive import LangGraphCheckpointAdapter
+from secmind.checkpoint_archive import CheckpointWriteFence, FencedCheckpointSaver, LangGraphCheckpointAdapter
 from secmind.ledger import LedgerStore
 from secmind.schemas import AgentState, RunStatus, TaskRequest
 
@@ -167,3 +167,58 @@ def test_checkpoint_restore_failure_cleans_file_journal_and_staging(tmp_path: Pa
     assert not (target / ".restore-journal.json").exists()
     assert not list(target.glob(".restore-*"))
     assert not (target / "checkpoints").exists()
+
+
+def test_fenced_checkpointer_blocks_sync_and_async_writes_during_archive() -> None:
+    saver = InMemorySaver()
+    fence = CheckpointWriteFence()
+    fenced = FencedCheckpointSaver(saver, fence=fence)
+    run_id = "run-fenced"
+    config = {"configurable": {"thread_id": run_id, "checkpoint_ns": "", "checkpoint_id": "cp-1"}}
+    checkpoint = empty_checkpoint()
+    checkpoint["id"] = "cp-1"
+    checkpoint["channel_versions"] = {"evidence": 1}
+
+    fenced.put(config, checkpoint, {"source": "test"}, {"evidence": 1})
+    fence.begin(run_id, "freeze-fenced")
+    with pytest.raises(ArchiveError, match="frozen for archive"):
+        fenced.put(config, checkpoint, {"source": "test"}, {"evidence": 1})
+    with pytest.raises(ArchiveError, match="frozen for archive"):
+        fenced.put_writes(config, [("evidence", "late")], "task-1")
+
+    async def attempt_async_writes() -> None:
+        with pytest.raises(ArchiveError, match="frozen for archive"):
+            await fenced.aput(config, checkpoint, {"source": "test"}, {"evidence": 1})
+        with pytest.raises(ArchiveError, match="frozen for archive"):
+            await fenced.aput_writes(config, [("evidence", "late")], "task-1")
+
+    import asyncio
+
+    asyncio.run(attempt_async_writes())
+    fence.abort(run_id, "freeze-fenced")
+    fenced.put_writes(config, [("evidence", "after-abort")], "task-2")
+
+
+def test_fenced_checkpointer_reads_the_durable_ledger_archive_boundary(tmp_path: Path) -> None:
+    run_id = "run-durable-fence"
+    ledger = LedgerStore(f"sqlite:///{tmp_path / 'ledger.db'}")
+    ledger.save_state(
+        AgentState(
+            run_id=run_id,
+            task=TaskRequest(objective="durable checkpoint fence"),
+            status=RunStatus.COMPLETED,
+        )
+    )
+    ledger.append(run_id, "run.completed", {}, actor="test")
+    ledger.begin_archive_freeze(run_id, freeze_id="freeze-durable")
+    fenced = FencedCheckpointSaver(
+        InMemorySaver(),
+        fence=CheckpointWriteFence(ledger.assert_checkpoint_writable),
+    )
+    config = {"configurable": {"thread_id": run_id, "checkpoint_id": "cp-1"}}
+    checkpoint = empty_checkpoint()
+    checkpoint["id"] = "cp-1"
+    checkpoint["channel_versions"] = {"evidence": 1}
+    with pytest.raises(RuntimeError, match="frozen for archive"):
+        fenced.put(config, checkpoint, {"source": "test"}, {"evidence": 1})
+    ledger.close()
