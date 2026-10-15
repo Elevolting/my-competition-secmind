@@ -8,6 +8,7 @@ set while keeping restore separate from execution.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import json
@@ -20,6 +21,7 @@ from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
+from uuid import NAMESPACE_URL, uuid5
 
 _SHA256_LENGTH = 64
 _SUPPORTED_FORMAT_VERSIONS = frozenset({1})
@@ -43,7 +45,12 @@ class _LedgerAdapter(Protocol):
     def begin_archive_freeze(self, run_id: str, *, freeze_id: str | None = None) -> Any: ...
 
     def complete_archive_freeze(
-        self, run_id: str, *, freeze_id: str, artifact_snapshot_digest: str
+        self,
+        run_id: str,
+        *,
+        freeze_id: str,
+        artifact_snapshot_digest: str,
+        checkpoint_snapshot_digest: str | None = None,
     ) -> Any: ...
 
     def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
@@ -63,8 +70,157 @@ class _ArtifactAdapter(Protocol):
     def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
 
 
+class CheckpointArchiveAdapter(Protocol):
+    """Storage boundary used to freeze, export, and restore graph checkpoints.
+
+    The archive layer deliberately does not depend on a particular LangGraph
+    backend.  Implementations must make ``snapshot`` stable after
+    ``begin_archive_freeze`` and make ``restore`` atomic from the caller's
+    perspective.  The latter is important because the file journal cannot
+    roll back a database/checkpointer write by itself.
+    """
+
+    def begin_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
+
+    def snapshot(self, run_id: str) -> CheckpointArchiveSnapshot: ...
+
+    def complete_archive_freeze(
+        self, run_id: str, *, freeze_id: str, checkpoint_snapshot_digest: str
+    ) -> None: ...
+
+    def abort_archive_freeze(self, run_id: str, *, freeze_id: str) -> None: ...
+
+    def restore(
+        self,
+        run_id: str,
+        snapshot: CheckpointArchiveSnapshot,
+        *,
+        id_map: Mapping[str, str],
+    ) -> None: ...
+
+
 class ArchiveError(ValueError):
     """Raised when an archive cannot be trusted or safely restored."""
+
+
+_CHECKPOINT_BYTES_TAG = "__secmind_checkpoint_bytes__"
+_CHECKPOINT_SCHEMA_VERSION = "langgraph-checkpoint-v1"
+
+
+def _checkpoint_jsonable(value: Any) -> Any:
+    """Encode checkpoint values without losing bytes or deterministic order."""
+
+    if isinstance(value, bytes):
+        return {_CHECKPOINT_BYTES_TAG: base64.b64encode(value).decode("ascii")}
+    if isinstance(value, Mapping):
+        return {str(key): _checkpoint_jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [_checkpoint_jsonable(item) for item in value]
+    if isinstance(value, Enum):
+        return _checkpoint_jsonable(value.value)
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    if hasattr(value, "model_dump"):
+        return _checkpoint_jsonable(value.model_dump(mode="json"))
+    if hasattr(value, "_asdict"):
+        return _checkpoint_jsonable(value._asdict())
+    if hasattr(value, "__dataclass_fields__"):
+        return _checkpoint_jsonable({key: getattr(value, key) for key in value.__dataclass_fields__})
+    return value
+
+
+def _checkpoint_restore_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        if set(value) == {_CHECKPOINT_BYTES_TAG}:
+            encoded = value.get(_CHECKPOINT_BYTES_TAG)
+            if not isinstance(encoded, str):
+                raise ArchiveError("checkpoint bytes encoding is invalid")
+            try:
+                return base64.b64decode(encoded.encode("ascii"), validate=True)
+            except (ValueError, UnicodeEncodeError) as exc:
+                raise ArchiveError("checkpoint bytes encoding is invalid") from exc
+        return {str(key): _checkpoint_restore_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_checkpoint_restore_value(item) for item in value]
+    return value
+
+
+def _checkpoint_record_id(record: Mapping[str, Any]) -> str:
+    config = record.get("config")
+    if not isinstance(config, Mapping):
+        return ""
+    configurable = config.get("configurable")
+    if not isinstance(configurable, Mapping):
+        return ""
+    value = configurable.get("checkpoint_id")
+    return value if isinstance(value, str) else ""
+
+
+def _checkpoint_record_sort_key(record: Mapping[str, Any]) -> tuple[str, str]:
+    checkpoint = record.get("checkpoint")
+    timestamp = checkpoint.get("ts") if isinstance(checkpoint, Mapping) else None
+    return (str(timestamp or ""), _checkpoint_record_id(record))
+
+
+@dataclass(frozen=True, slots=True)
+class CheckpointArchiveSnapshot:
+    """Canonical, backend-neutral checkpoint snapshot used by the archive."""
+
+    run_id: str
+    records: tuple[dict[str, Any], ...]
+    schema_version: str = _CHECKPOINT_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.run_id or any(ord(char) < 32 for char in self.run_id):
+            raise ArchiveError("checkpoint snapshot run_id is invalid")
+        if not self.schema_version or any(ord(char) < 32 for char in self.schema_version):
+            raise ArchiveError("checkpoint snapshot schema_version is invalid")
+        normalized: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for record in self.records:
+            if not isinstance(record, Mapping):
+                raise ArchiveError("checkpoint snapshot records must be objects")
+            encoded = _checkpoint_jsonable(dict(record))
+            if not isinstance(encoded, dict):
+                raise ArchiveError("checkpoint snapshot record is invalid")
+            checkpoint_id = _checkpoint_record_id(encoded)
+            if not checkpoint_id:
+                raise ArchiveError("checkpoint snapshot record is missing checkpoint_id")
+            if checkpoint_id in seen:
+                raise ArchiveError(f"checkpoint snapshot contains duplicate checkpoint_id: {checkpoint_id}")
+            seen.add(checkpoint_id)
+            normalized.append(encoded)
+        normalized.sort(key=_checkpoint_record_sort_key)
+        object.__setattr__(self, "records", tuple(normalized))
+
+    def unsigned_dict(self) -> dict[str, Any]:
+        return {
+            "run_id": self.run_id,
+            "schema_version": self.schema_version,
+            "records": list(self.records),
+        }
+
+    def digest(self) -> str:
+        return hashlib.sha256(_canonical_json(self.unsigned_dict())).hexdigest()
+
+    def to_jsonl(self) -> bytes:
+        return b"".join(_canonical_json(record) + b"\n" for record in self.records)
+
+    @classmethod
+    def from_jsonl(
+        cls,
+        content: bytes,
+        *,
+        run_id: str,
+        schema_version: str = _CHECKPOINT_SCHEMA_VERSION,
+    ) -> CheckpointArchiveSnapshot:
+        try:
+            rows = [json.loads(line) for line in content.decode("utf-8").splitlines() if line.strip()]
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ArchiveError("checkpoint member is not valid JSONL") from exc
+        if not all(isinstance(row, dict) for row in rows):
+            raise ArchiveError("checkpoint member rows must be objects")
+        return cls(run_id=run_id, records=tuple(rows), schema_version=schema_version)
 
 
 def _jsonable(value: Any) -> Any:
@@ -295,6 +451,7 @@ class RestoreResult:
     already_restored: bool
     execution_allowed: bool = False
     id_map: dict[str, str] = field(default_factory=dict)
+    checkpoint_restored: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -306,6 +463,7 @@ class ArchiveFreezeResult:
     ledger_head_hash: str
     artifact_snapshot_digest: str
     frozen_at: str
+    checkpoint_snapshot_digest: str | None = None
 
 
 def _hash_file(path: Path) -> tuple[int, str]:
@@ -417,6 +575,18 @@ def _recover_restore_journal(target: Path, manifest: ArchiveManifest, target_run
             destination.unlink()
         elif destination.exists():
             raise ArchiveError(f"restore journal destination is not a file: {relative}")
+    parent_dirs = {
+        (target / Path(relative)).parent
+        for relative in planned_paths
+        if Path(relative).parent != Path(".")
+    }
+    for directory in sorted(parent_dirs, key=lambda path: len(path.parts), reverse=True):
+        if directory == target:
+            continue
+        try:
+            directory.rmdir()
+        except OSError:
+            pass
     journal_path.unlink(missing_ok=True)
 
 
@@ -425,6 +595,22 @@ def _restore_id_map(manifest: ArchiveManifest, target_run_id: str) -> dict[str, 
     mapping = dict(manifest.id_map)
     if isinstance(source_run_id, str) and source_run_id:
         mapping[source_run_id] = target_run_id
+    return mapping
+
+
+def _checkpoint_id_map(snapshot: CheckpointArchiveSnapshot, target_run_id: str) -> dict[str, str]:
+    """Create deterministic target checkpoint identities without reusing source IDs."""
+
+    mapping: dict[str, str] = {}
+    for record in snapshot.records:
+        source_id = _checkpoint_record_id(record)
+        target_id = str(uuid5(NAMESPACE_URL, f"secmind:archive-checkpoint:{target_run_id}:{source_id}"))
+        previous = mapping.get(source_id)
+        if previous is not None and previous != target_id:
+            raise ArchiveError(f"checkpoint id mapping conflict: {source_id}")
+        if target_id in mapping.values() and previous != target_id:
+            raise ArchiveError(f"checkpoint target id collision: {target_id}")
+        mapping[source_id] = target_id
     return mapping
 
 
@@ -473,6 +659,15 @@ def _rewrite_ledger_jsonl(content: bytes, id_map: Mapping[str, str]) -> bytes:
 def _rewrite_restore_member(member: ArchiveMember, content: bytes, id_map: Mapping[str, str]) -> bytes:
     if member.kind == "ledger":
         return _rewrite_ledger_jsonl(content, id_map)
+    if member.kind == "checkpoint":
+        try:
+            rows = [json.loads(line) for line in content.decode("utf-8").splitlines() if line.strip()]
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ArchiveError(f"checkpoint member is not valid JSONL: {member.path}") from exc
+        if not rows or not all(isinstance(row, dict) for row in rows):
+            raise ArchiveError("checkpoint member rows must be objects")
+        rewritten = [_rewrite_identity(row, id_map) for row in rows]
+        return b"".join(_canonical_json(row) + b"\n" for row in rewritten)
     if member.kind not in {"state", "metadata"}:
         return content
     try:
@@ -492,6 +687,7 @@ def _member_for_file(
     kind: str,
     media_type: str,
     source_id: str | None = None,
+    schema_version: str | None = None,
 ) -> ArchiveMember:
     path = root / Path(relative)
     size, digest = _hash_file(path)
@@ -502,6 +698,7 @@ def _member_for_file(
         size_bytes=size,
         sha256=digest,
         source_id=source_id,
+        schema_version=schema_version,
     )
 
 
@@ -591,6 +788,7 @@ def freeze_run_for_archive(
     artifact_store: _ArtifactAdapter,
     run_id: str,
     freeze_id: str | None = None,
+    checkpoint_adapter: CheckpointArchiveAdapter | None = None,
 ) -> ArchiveFreezeResult:
     """Freeze ledger and CAS writes, then seal one consistent archive boundary."""
 
@@ -603,9 +801,15 @@ def freeze_run_for_archive(
         raise ArchiveError("ledger freeze did not return a freeze id")
     artifact_started = False
     artifact_completed = False
+    checkpoint_started = False
+    checkpoint_completed = False
+    checkpoint_snapshot_digest: str | None = None
     try:
         artifact_store.begin_archive_freeze(run_id, freeze_id=effective_freeze_id)
         artifact_started = True
+        if checkpoint_adapter is not None:
+            checkpoint_adapter.begin_archive_freeze(run_id, freeze_id=effective_freeze_id)
+            checkpoint_started = True
         state = ledger.load_state(run_id)
         if state is None:
             raise ArchiveError(f"run state does not exist: {run_id}")
@@ -616,18 +820,33 @@ def freeze_run_for_archive(
         event_payloads = [_jsonable(event) for event in events]
         _, descriptors = _collect_artifact_snapshot(artifact_store, state_payload, event_payloads)
         snapshot_digest = hashlib.sha256(_canonical_json(descriptors)).hexdigest()
+        if checkpoint_adapter is not None:
+            checkpoint_snapshot = checkpoint_adapter.snapshot(run_id)
+            if checkpoint_snapshot.run_id != run_id:
+                raise ArchiveError("checkpoint snapshot belongs to another run")
+            checkpoint_snapshot_digest = checkpoint_snapshot.digest()
+            checkpoint_adapter.complete_archive_freeze(
+                run_id,
+                freeze_id=effective_freeze_id,
+                checkpoint_snapshot_digest=checkpoint_snapshot_digest,
+            )
+            checkpoint_completed = True
         artifact_store.complete_archive_freeze(
             run_id,
             freeze_id=effective_freeze_id,
             artifact_snapshot_digest=snapshot_digest,
         )
         artifact_completed = True
-        completed = ledger.complete_archive_freeze(
-            run_id,
-            freeze_id=effective_freeze_id,
-            artifact_snapshot_digest=snapshot_digest,
-        )
+        complete_kwargs: dict[str, Any] = {
+            "freeze_id": effective_freeze_id,
+            "artifact_snapshot_digest": snapshot_digest,
+        }
+        if checkpoint_snapshot_digest is not None:
+            complete_kwargs["checkpoint_snapshot_digest"] = checkpoint_snapshot_digest
+        completed = ledger.complete_archive_freeze(run_id, **complete_kwargs)
     except Exception:
+        if checkpoint_started or checkpoint_completed:
+            checkpoint_adapter.abort_archive_freeze(run_id, freeze_id=effective_freeze_id)  # type: ignore[union-attr]
         if artifact_started or artifact_completed:
             artifact_store.abort_archive_freeze(run_id, freeze_id=effective_freeze_id)
         ledger.abort_archive_freeze(run_id, freeze_id=effective_freeze_id)
@@ -640,6 +859,7 @@ def freeze_run_for_archive(
         ledger_head_hash=str(getattr(completed, "ledger_head_hash", "")),
         artifact_snapshot_digest=snapshot_digest,
         frozen_at=str(getattr(completed, "frozen_at", "")),
+        checkpoint_snapshot_digest=checkpoint_snapshot_digest,
     )
 
 
@@ -652,6 +872,7 @@ def export_run_archive(
     archive_id: str | None = None,
     created_at: str | None = None,
     freeze_id: str | None = None,
+    checkpoint_adapter: CheckpointArchiveAdapter | None = None,
 ) -> ArchiveManifest:
     """Export one terminal run into a verified directory archive.
 
@@ -704,6 +925,19 @@ def export_run_archive(
     _write_bytes(root / Path(state_relative), _canonical_json(state_payload) + b"\n")
     ledger_bytes = b"".join(_canonical_json(event) + b"\n" for event in event_payloads)
     _write_bytes(root / Path(ledger_relative), ledger_bytes)
+
+    checkpoint_snapshot: CheckpointArchiveSnapshot | None = None
+    checkpoint_relative = "checkpoints/checkpoints.jsonl"
+    if checkpoint_adapter is not None:
+        checkpoint_snapshot = checkpoint_adapter.snapshot(run_id)
+        if checkpoint_snapshot.run_id != run_id:
+            raise ArchiveError("checkpoint snapshot belongs to another run")
+        recorded_checkpoint_digest = getattr(freeze, "checkpoint_snapshot_digest", None)
+        if not recorded_checkpoint_digest:
+            raise ArchiveError("checkpoint snapshot digest is missing from archive freeze")
+        if recorded_checkpoint_digest != checkpoint_snapshot.digest():
+            raise ArchiveError("checkpoint snapshot changed after archive freeze")
+        _write_bytes(root / Path(checkpoint_relative), checkpoint_snapshot.to_jsonl())
 
     artifact_ids, artifact_descriptors = _collect_artifact_snapshot(artifact_store, state_payload, event_payloads)
     artifact_members: list[ArchiveMember] = []
@@ -761,6 +995,16 @@ def export_run_archive(
     recorded_snapshot_digest = getattr(freeze, "artifact_snapshot_digest", None)
     if recorded_snapshot_digest != artifact_snapshot_digest:
         raise ArchiveError("artifact snapshot changed after archive freeze")
+    checkpoint_member: ArchiveMember | None = None
+    if checkpoint_snapshot is not None:
+        checkpoint_member = _member_for_file(
+            root,
+            checkpoint_relative,
+            kind="checkpoint",
+            media_type="application/x-ndjson",
+            source_id=run_id,
+            schema_version=checkpoint_snapshot.schema_version,
+        )
     members = tuple(
         sorted(
             (
@@ -768,39 +1012,54 @@ def export_run_archive(
                 _member_for_file(
                     root, ledger_relative, kind="ledger", media_type="application/x-ndjson", source_id=run_id
                 ),
+                *((checkpoint_member,) if checkpoint_member is not None else ()),
                 *artifact_members,
             ),
             key=lambda member: member.path,
         )
     )
+    source_payload: dict[str, Any] = {
+        "run_id": run_id,
+        "state_version": int(getattr(state, "state_version", 1)),
+        "latest_event_sequence": latest_sequence,
+        "ledger_head_hash": ledger_head_hash,
+        "checkpoint_ref": getattr(state, "fork_checkpoint_id", None),
+        "schema_version": getattr(state, "schema_version", None),
+    }
+    freeze_payload: dict[str, Any] = {
+        "freeze_id": effective_freeze_id,
+        "status": "terminal",
+        "run_status": state_status,
+        "frozen_at": str(getattr(freeze, "frozen_at", created_at)),
+        "ledger_head_hash": ledger_head_hash,
+        "artifact_snapshot_digest": artifact_snapshot_digest,
+    }
+    counts_payload = {
+        "ledger_events": len(events),
+        "artifacts": len(artifact_ids),
+        "artifact_metadata": len(artifact_ids),
+        "state_snapshots": 1,
+    }
+    if checkpoint_snapshot is not None:
+        checkpoint_digest = checkpoint_snapshot.digest()
+        source_payload.update(
+            {
+                "checkpoint_count": len(checkpoint_snapshot.records),
+                "checkpoint_snapshot_digest": checkpoint_digest,
+                "checkpoint_schema_version": checkpoint_snapshot.schema_version,
+            }
+        )
+        freeze_payload["checkpoint_snapshot_digest"] = checkpoint_digest
+        counts_payload["checkpoints"] = len(checkpoint_snapshot.records)
     manifest = ArchiveManifest(
         format_version=1,
         archive_id=archive_id,
         created_at=created_at,
-        source={
-            "run_id": run_id,
-            "state_version": int(getattr(state, "state_version", 1)),
-            "latest_event_sequence": latest_sequence,
-            "ledger_head_hash": ledger_head_hash,
-            "checkpoint_ref": getattr(state, "fork_checkpoint_id", None),
-            "schema_version": getattr(state, "schema_version", None),
-        },
-        freeze={
-            "freeze_id": effective_freeze_id,
-            "status": "terminal",
-            "run_status": state_status,
-            "frozen_at": str(getattr(freeze, "frozen_at", created_at)),
-            "ledger_head_hash": ledger_head_hash,
-            "artifact_snapshot_digest": artifact_snapshot_digest,
-        },
+        source=source_payload,
+        freeze=freeze_payload,
         members=members,
         id_map={run_id: run_id},
-        counts={
-            "ledger_events": len(events),
-            "artifacts": len(artifact_ids),
-            "artifact_metadata": len(artifact_ids),
-            "state_snapshots": 1,
-        },
+        counts=counts_payload,
     )
     write_manifest(root, manifest)
     return verify_archive(root)
@@ -915,6 +1174,7 @@ def restore_archive(
     *,
     target_run_id: str,
     manifest: ArchiveManifest | None = None,
+    checkpoint_adapter: CheckpointArchiveAdapter | None = None,
 ) -> RestoreResult:
     """Verify and copy an archive into an isolated target directory.
 
@@ -961,7 +1221,34 @@ def restore_archive(
                 True,
                 False,
                 {str(key): str(value) for key, value in previous_map.items()},
+                bool(previous.get("checkpoint_restored", False)),
             )
+
+        checkpoint_member = next((member for member in manifest.members if member.kind == "checkpoint"), None)
+        checkpoint_source_snapshot: CheckpointArchiveSnapshot | None = None
+        if checkpoint_member is not None:
+            source_run_id = manifest.source.get("run_id")
+            if not isinstance(source_run_id, str) or not source_run_id:
+                raise ArchiveError("checkpoint archive is missing source run identity")
+            checkpoint_source_snapshot = CheckpointArchiveSnapshot.from_jsonl(
+                (root / Path(checkpoint_member.path)).read_bytes(),
+                run_id=source_run_id,
+                schema_version=checkpoint_member.schema_version or _CHECKPOINT_SCHEMA_VERSION,
+            )
+            expected_checkpoint_digest = manifest.source.get("checkpoint_snapshot_digest")
+            if expected_checkpoint_digest != checkpoint_source_snapshot.digest():
+                raise ArchiveError("checkpoint snapshot digest does not match manifest")
+            expected_checkpoint_count = manifest.source.get("checkpoint_count")
+            if expected_checkpoint_count is not None and expected_checkpoint_count != len(
+                checkpoint_source_snapshot.records
+            ):
+                raise ArchiveError("checkpoint snapshot count does not match manifest")
+            frozen_checkpoint_digest = manifest.freeze.get("checkpoint_snapshot_digest")
+            if frozen_checkpoint_digest != checkpoint_source_snapshot.digest():
+                raise ArchiveError("checkpoint snapshot digest does not match freeze boundary")
+            id_map.update(_checkpoint_id_map(checkpoint_source_snapshot, target_run_id))
+        elif manifest.counts.get("checkpoints", 0) != 0:
+            raise ArchiveError("manifest checkpoint count does not match checkpoint member")
 
         _recover_restore_journal(target, manifest, target_run_id)
         planned_paths = [member.path for member in manifest.members]
@@ -994,7 +1281,7 @@ def restore_archive(
                 source_size, source_digest = _hash_file(source)
                 if source_size != member.size_bytes or not hmac.compare_digest(source_digest, member.sha256):
                     raise ArchiveError(f"restored member integrity mismatch: {member.path}")
-                if member.kind in {"state", "ledger", "metadata"}:
+                if member.kind in {"state", "ledger", "metadata", "checkpoint"}:
                     destination.write_bytes(_rewrite_restore_member(member, source.read_bytes(), id_map))
                 else:
                     shutil.copyfile(source, destination)
@@ -1033,6 +1320,24 @@ def restore_archive(
         except Exception:
             _recover_restore_journal(target, manifest, target_run_id)
             raise
+
+        checkpoint_restored = False
+        try:
+            if checkpoint_source_snapshot is not None:
+                if checkpoint_adapter is None:
+                    raise ArchiveError("checkpoint adapter is required to restore checkpoint members")
+                assert checkpoint_member is not None
+                installed_checkpoint = _safe_target_path(target, checkpoint_member.path)
+                target_checkpoint_snapshot = CheckpointArchiveSnapshot.from_jsonl(
+                    installed_checkpoint.read_bytes(),
+                    run_id=target_run_id,
+                    schema_version=checkpoint_source_snapshot.schema_version,
+                )
+                checkpoint_adapter.restore(target_run_id, target_checkpoint_snapshot, id_map=id_map)
+                checkpoint_restored = True
+        except Exception:
+            _recover_restore_journal(target, manifest, target_run_id)
+            raise
         marker_payload = {
             "archive_id": manifest.archive_id,
             "target_run_id": target_run_id,
@@ -1040,10 +1345,19 @@ def restore_archive(
             "restored_paths": sorted(restored),
             "execution_allowed": False,
             "id_map": id_map,
+            "checkpoint_restored": checkpoint_restored,
         }
         _write_json_atomic(marker, marker_payload)
         (target / _RESTORE_JOURNAL_NAME).unlink(missing_ok=True)
-        return RestoreResult(manifest.archive_id, target_run_id, tuple(sorted(restored)), False, False, id_map)
+        return RestoreResult(
+            manifest.archive_id,
+            target_run_id,
+            tuple(sorted(restored)),
+            False,
+            False,
+            id_map,
+            checkpoint_restored,
+        )
     finally:
         lock.unlink(missing_ok=True)
         staging_path = locals().get("staging")
@@ -1056,6 +1370,8 @@ __all__ = [
     "ArchiveFreezeResult",
     "ArchiveManifest",
     "ArchiveMember",
+    "CheckpointArchiveAdapter",
+    "CheckpointArchiveSnapshot",
     "RestoreResult",
     "collect_members",
     "export_run_archive",

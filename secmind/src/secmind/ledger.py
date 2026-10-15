@@ -36,6 +36,7 @@ class ArchiveFreeze:
     latest_event_sequence: int
     ledger_head_hash: str
     artifact_snapshot_digest: str | None
+    checkpoint_snapshot_digest: str | None
     frozen_at: datetime
 
 
@@ -83,6 +84,7 @@ class RunFreezeRow(Base):
     latest_event_sequence: Mapped[int] = mapped_column(Integer)
     ledger_head_hash: Mapped[str] = mapped_column(String(64))
     artifact_snapshot_digest: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    checkpoint_snapshot_digest: Mapped[str | None] = mapped_column(String(64), nullable=True)
     frozen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
@@ -366,6 +368,7 @@ class LedgerStore:
                 latest_event_sequence=event.sequence,
                 ledger_head_hash=event.hash,
                 artifact_snapshot_digest=None,
+                checkpoint_snapshot_digest=None,
                 frozen_at=now,
             )
             session.add(freeze)
@@ -378,11 +381,17 @@ class LedgerStore:
         *,
         freeze_id: str,
         artifact_snapshot_digest: str,
+        checkpoint_snapshot_digest: str | None = None,
     ) -> ArchiveFreeze:
         if len(artifact_snapshot_digest) != 64 or any(
             char not in "0123456789abcdef" for char in artifact_snapshot_digest
         ):
             raise ValueError("artifact_snapshot_digest must be a lowercase SHA-256 digest")
+        if checkpoint_snapshot_digest is not None and (
+            len(checkpoint_snapshot_digest) != 64
+            or any(char not in "0123456789abcdef" for char in checkpoint_snapshot_digest)
+        ):
+            raise ValueError("checkpoint_snapshot_digest must be a lowercase SHA-256 digest")
         with self._lock_for(run_id), Session(self.engine) as session:
             self._database_lock(session, run_id)
             row = session.get(RunFreezeRow, run_id)
@@ -395,6 +404,7 @@ class LedgerStore:
                 raise LedgerDedupeConflict("ledger changed during archive freeze")
             row.status = "complete"
             row.artifact_snapshot_digest = artifact_snapshot_digest
+            row.checkpoint_snapshot_digest = checkpoint_snapshot_digest
             session.commit()
             return self._to_freeze(row)
 
@@ -481,5 +491,6 @@ class LedgerStore:
             latest_event_sequence=row.latest_event_sequence,
             ledger_head_hash=row.ledger_head_hash,
             artifact_snapshot_digest=row.artifact_snapshot_digest,
+            checkpoint_snapshot_digest=row.checkpoint_snapshot_digest,
             frozen_at=row.frozen_at.replace(tzinfo=row.frozen_at.tzinfo or UTC),
         )

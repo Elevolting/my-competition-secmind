@@ -56,11 +56,11 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 
 当前缺口：
 
-1. 没有跨 `RunRow`、ledger、investigation 对象、artifact blob 和 LangGraph checkpoint 的统一归档清单。
-2. 已有 `run_archive_freezes` 持久冻结记录；ledger 的 append/state CAS、CAS artifact 的 put/classify，以及 coordinator/investigation 的 lease、step、outbox、model/tool、对象、用量、dispatch、审批、恢复命令、消息和完成凭据写入，会拒绝 pending/complete 冻结后的写入。checkpoint 事务、PostgreSQL 快照和跨服务故障矩阵仍待接入。
-3. 没有每个归档成员的路径、大小、SHA-256、媒体类型和来源版本清单。
-4. 没有隔离恢复目录、恢复 journal、缺件/篡改/重复恢复的统一错误模型。
-5. 没有恢复目标 run 的新身份和引用重写协议；现有 `run_id` 不能直接假设跨环境唯一。
+1. 已有跨 `RunRow`、ledger、investigation 对象、artifact blob 和 LangGraph checkpoint 的目录级归档清单基础；checkpoint 以 backend-neutral JSONL member 表示，并记录 schema version、数量和稳定 digest。
+2. 已有 `run_archive_freezes` 持久冻结记录；ledger 的 append/state CAS、CAS artifact 的 put/classify，以及 coordinator/investigation 的 lease、step、outbox、model/tool、对象、用量、dispatch、审批、恢复命令、消息和完成凭据写入，会拒绝 pending/complete 冻结后的写入。checkpoint 归档边界和 adapter 级 freeze 已接入，但普通运行时 checkpoint 写入 fencing、数据库事务、PostgreSQL 快照和跨服务故障矩阵仍待接入。
+3. 归档成员已经记录路径、大小、SHA-256、媒体类型和来源版本；跨服务数据库对象仍未全部纳入同一事务快照。
+4. 隔离恢复目录、恢复 journal、缺件/篡改/重复恢复的本地错误边界已经存在；服务级回滚和跨数据库事务仍待完成。
+5. run、checkpoint 的恢复目标身份和引用重写已有文件级协议；artifact/event 等持久 ID 冲突处理和跨数据库事务仍未完成。
 6. 没有把恢复和“继续执行”硬隔离的服务边界及契约测试。
 7. 现有 artifact 分类保证访问策略，但还没有把分类 marker、外部 blob 和 ledger/state 一起纳入归档一致性证明。
 
@@ -73,9 +73,10 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 - 导出拒绝运行中状态和无效账本；归档目录只在新建或空目录中发布。
 - 恢复增加目标锁、持久 `.restore-journal.json` 和 staging 目录；进程中断后下一次恢复先清理 journal 记录的半成品，再重新安装。
 - 恢复到新 run 时会重写 state/ledger 中的 `run_id`，重新计算 ledger 链，分类 metadata 的 run 绑定同步到目标 run，并把 `id_map` 写入结果；artifact bytes 仍按原 SHA-256 保持不变。
+- checkpoint 归档使用 canonical JSONL，bytes 采用显式 base64 标记；导出时校验冻结 digest，恢复时生成确定性的 checkpoint ID 映射、重写 run/checkpoint 引用，并通过 `LangGraphCheckpointAdapter` 写入目标 checkpointer。
 - 重复恢复仍由 `.restore-complete.json` 幂等保护，恢复结果继续固定为 `execution_allowed=false`。
 
-这些内容完成了 M6.1 的 ledger/CAS 与服务写入冻结 fencing、M6.2 的 manifest/成员校验基础、M6.3 的本地 staging/journal 基础和 M6.4 的文件级 run 映射基础。数据库事务接入、artifact/event/checkpoint 的持久 ID 冲突处理、PostgreSQL 快照、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
+这些内容完成了 M6.1 的 ledger/CAS 与服务写入冻结 fencing、M6.2 的 manifest/成员校验基础、M6.3 的本地 staging/journal 基础和 M6.4 的文件级 run/checkpoint 映射基础；checkpoint 专项契约测试已通过。数据库事务接入、运行时 checkpoint 写入 fencing、artifact/event/checkpoint 的持久 ID 冲突处理、PostgreSQL 快照、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
 
 ## 首期 M6 契约
 
@@ -140,7 +141,7 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 
 | 工作包 | 产物 | 验收门槛 |
 |---|---|---|
-| M6.1 范围与冻结 | `run_archive_freezes`、`freeze_run_for_archive`、ledger/CAS fencing | 运行中拒绝；冻结时记录 state version、ledger head 和 artifact snapshot；冻结后 ledger/state/artifact 迟到写入被拒绝 |
+| M6.1 范围与冻结 | `run_archive_freezes`、`freeze_run_for_archive`、ledger/CAS/checkpoint adapter fencing | 运行中拒绝；冻结时记录 state version、ledger head、artifact 和 checkpoint snapshot；冻结后 ledger/state/artifact 迟到写入被拒绝，并补齐真实 checkpoint 写入边界 |
 | M6.2 manifest 与清单 | 版本化 manifest、canonical 序列化、成员 hash/size/count | 同一固定 fixture 多次生成完全一致；成员增删和内容变化必然改变摘要 |
 | M6.3 staging 与发布 | 临时目录、journal、原子发布、路径安全校验 | 中断后可回滚；半包和 traversal/symlink 被拒绝；正式包不暴露半成品 |
 | M6.4 隔离恢复 | 新 run 身份、artifact/ledger/state 导入、引用 mapping | 恢复到空目标后数量、hash、链头和引用一致；不覆盖现有数据 |
@@ -164,6 +165,7 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 8. 恢复后的状态不能创建工具调用、模型请求、lease 或 dispatch permit。
 9. 旧 manifest 版本按迁移表升级；不支持版本明确失败。
 10. 冻结后写入被拒绝或进入明确的迟到事件隔离区。
+11. checkpoint JSONL 的 bytes、pending writes、parent config 和 checkpoint ID 可稳定导出、校验、重映射和恢复；adapter 失败时目标文件和 checkpoint 存储均无可见半恢复结果。
 
 ## 暂不进入 M6 的内容
 

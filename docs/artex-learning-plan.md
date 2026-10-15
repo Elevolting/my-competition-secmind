@@ -20,7 +20,7 @@ M0 包含三项，M1–M8 各一项，共 11 项主要能力，另有两项条�
 | M3 | 技能加载与真实调用留痕 | 看清能力使用和失败原因 | 区分选中、加载成功/失败、调用及重试；可追到原事件；重放不增计数 | 独立分析引擎本地验收完成；其他 Worker 统计仍待扩展 |
 | M4 | 请求边界快照与旁路问答 | 运行中询问依据、进展和阻塞原因 | 独立身份、预算和取消；不影响主任务；刷新和重启保留已保存结果 | M4.1–M4.5 本地验收完成 |
 | M5 | 冷热图、debounce、确定性分组、摘要签名和失效 | 降低长期任务上下文负担，保留活动分支与原证据 | 原记录可展开；重新活跃恢复可见；内容变化失效；上下文接入后验证预算收益 | M5.1–M5.2 已完成；M5.3 已接入 planner round，并将摘要作为 `cold_digest` advisory/L5 派生项接入 ContextManager，支持 provenance、预算裁剪、handle-only、pack digest 和 rehydrate；模型网关适配、两侧运行时、M5.4–M5.5 待完成；操作说明见 `artex-cold-digest-operations.md` |
-| M6 | 冻结、版本清单、哈希与恢复编号映射 | 调查材料可备份、迁移和复查 | 隔离库恢复后数量、引用、哈希一致；缺件/篡改失败明确；恢复不自动执行 | ARTEX 审计、manifest、真实导出、journal、run 映射和 M6.1 写入 fencing 已完成；数据库事务、服务隔离和完整故障矩阵待完成 |
+| M6 | 冻结、版本清单、哈希与恢复编号映射 | 调查材料可备份、迁移和复查 | 隔离库恢复后数量、引用、哈希一致；缺件/篡改失败明确；恢复不自动执行 | ARTEX 审计、manifest、真实导出、journal、run 映射、checkpoint JSONL/adapter/digest 和 M6.1 写入 fencing 已完成并有专项测试；checkpoint 运行时 fencing、PostgreSQL 事务快照、跨对象冲突、服务隔离和完整故障矩阵待完成 |
 | M7 | 持久投递、事件去重、领取租约与重试 | 审批、预算耗尽和终态有可追溯提醒 | 站内收件箱跳回来源；刷新保留已读；重复事件不重复通知；崩溃可恢复 | 待开始 |
 | M8 | ScopeSentry 分页映射、预览与范围校验 | 将外部资产积累接入 M1 | 先差异预览再导入；越界阻止；来源可查；重复导入不增加资产 | 待开始，依赖 M1 与接口版本确认 |
 
@@ -58,7 +58,7 @@ M0 包含三项，M1–M8 各一项，共 11 项主要能力，另有两项条�
 
 | 阶段 | 先阅读 ARTEX | 实施顺序 | 第一份可审查产物 |
 |---|---|---|---|
-| M6 归档恢复 | `db/task_archives.go`、`db/task_archives_restore.go`、`server/task_archive_package.go`、对应 package tests | 已完成源码/测试审计→跨服务清单→冻结协议→导出与哈希→隔离恢复与 ID 映射→页面→损坏/重复恢复验收 | 归档格式、记录范围、版本兼容矩阵与冻结契约；纳入 M4 问答和 M5 摘要；详细差距见 [M6 归档恢复差距](artex-archive-restore-gap.md) |
+| M6 归档恢复 | `db/task_archives.go`、`db/task_archives_restore.go`、`server/task_archive_package.go`、对应 package tests | 已完成源码/测试审计→跨服务清单→冻结协议→导出与哈希→checkpoint adapter/JSONL/digest→隔离恢复与 ID 映射→服务/API→损坏/重复恢复验收 | 归档格式、记录范围、版本兼容矩阵与冻结契约；checkpoint 已有 backend-neutral 契约和 LangGraph 适配器；仍需 PostgreSQL 事务快照、真实运行时 fencing、服务隔离和完整故障矩阵；详细差距见 [M6 归档恢复差距](artex-archive-restore-gap.md) |
 | M7 事件通知 | `db/notification_delivery.go`、`server/notifier.go` | 稳定事件源→持久队列/租约→收件箱/已读→有限重试→重复投递与崩溃验收 | 事件来源清单和投递状态机；首期只接站内通知 |
 | M8 外部资产同步 | `server/sync_scopesentry.go` | 确认工具/schema→分页读取→差异预览→范围校验→幂等导入→部分失败验收 | MCP 接口对照、分页夹具与预览契约；复用 M1 的来源身份 |
 
