@@ -57,7 +57,7 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 当前缺口：
 
 1. 没有跨 `RunRow`、ledger、investigation 对象、artifact blob 和 LangGraph checkpoint 的统一归档清单。
-2. 已有 `run_archive_freezes` 持久冻结记录；ledger 的 append/state CAS 和 CAS artifact 的 put/classify 会拒绝 pending/complete 冻结后的写入。跨 investigation、checkpoint 和 dispatch 表的同事务 fencing 仍待接入。
+2. 已有 `run_archive_freezes` 持久冻结记录；ledger 的 append/state CAS、CAS artifact 的 put/classify，以及 coordinator/investigation 的 lease、step、outbox、model/tool、对象、用量、dispatch、审批、恢复命令、消息和完成凭据写入，会拒绝 pending/complete 冻结后的写入。checkpoint 事务、PostgreSQL 快照和跨服务故障矩阵仍待接入。
 3. 没有每个归档成员的路径、大小、SHA-256、媒体类型和来源版本清单。
 4. 没有隔离恢复目录、恢复 journal、缺件/篡改/重复恢复的统一错误模型。
 5. 没有恢复目标 run 的新身份和引用重写协议；现有 `run_id` 不能直接假设跨环境唯一。
@@ -75,7 +75,7 @@ SecMind 必须把恢复视为离线导入：不创建新的 dispatch permit，�
 - 恢复到新 run 时会重写 state/ledger 中的 `run_id`，重新计算 ledger 链，分类 metadata 的 run 绑定同步到目标 run，并把 `id_map` 写入结果；artifact bytes 仍按原 SHA-256 保持不变。
 - 重复恢复仍由 `.restore-complete.json` 幂等保护，恢复结果继续固定为 `execution_allowed=false`。
 
-这些内容完成了 M6.1 的 ledger/CAS 冻结 fencing、M6.2 的 manifest/成员校验基础、M6.3 的本地 staging/journal 基础和 M6.4 的文件级 run 映射基础。数据库事务接入、artifact/event/checkpoint 的持久 ID 冲突处理、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
+这些内容完成了 M6.1 的 ledger/CAS 与服务写入冻结 fencing、M6.2 的 manifest/成员校验基础、M6.3 的本地 staging/journal 基础和 M6.4 的文件级 run 映射基础。数据库事务接入、artifact/event/checkpoint 的持久 ID 冲突处理、PostgreSQL 快照、恢复后的服务状态隔离和跨服务故障矩阵仍未完成，不能把 M6 标记为完成。
 
 ## 首期 M6 契约
 

@@ -99,5 +99,5 @@ ARTEX 对照版本：`ce42b66a6b1f8150380f2cbdedcd98b34d4bd404d56869ada31a67f067
 
 ## 当前执行点
 
-路线文档和 M6 差距审计已提交。M6 文件级归档契约、`LedgerStore`/`ContentAddressedArtifactStore` 真实导出、目标锁、持久恢复 journal 和文件级 run 映射已完成并有固定 fixture。M6.1 冻结协议已落地：`run_archive_freezes` 持久记录在 ledger 边界写入 `archive.freeze_started` 事件；`append`、`save_state`、`save_state_cas`、CAS artifact `put/classify` 在 pending/complete 冻结期间拒绝写入；artifact 快照摘要和 ledger 头在完成冻结时再次校验。下一步补数据库事务中的 artifact/event/checkpoint 冲突处理，再接入服务状态隔离和跨服务恢复测试。
+路线文档和 M6 差距审计已提交。M6 文件级归档契约、`LedgerStore`/`ContentAddressedArtifactStore` 真实导出、目标锁、持久恢复 journal 和文件级 run 映射已完成并有固定 fixture。M6.1 冻结协议已落地：`run_archive_freezes` 持久记录在 ledger 边界写入 `archive.freeze_started` 事件；`append`、`save_state`、`save_state_cas`、CAS artifact `put/classify`，以及 Coordinator 和 InvestigationStore 的 lease、step、outbox、model/tool、对象、用量、dispatch、审批、恢复命令、消息和完成凭据写入，在 pending/complete 冻结期间拒绝写入；artifact 快照摘要和 ledger 头在完成冻结时再次校验。下一步补数据库事务中的 artifact/event/checkpoint 冲突处理、PostgreSQL 事务快照、完整 ID mapping 和恢复后的服务状态隔离，再做跨服务故障矩阵。
 
