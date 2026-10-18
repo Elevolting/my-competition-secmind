@@ -1,0 +1,58 @@
+services:
+  migrate:
+    environment:
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/secmind
+
+  api:
+    environment:
+      SECMIND_ENV: competition
+      SECMIND_RUNTIME_ROLE: api
+      SECMIND_RUNTIME_PROFILE: competition-full
+      SECMIND_OPERATOR_TOKEN: ${SECMIND_OPERATOR_TOKEN:?Set the operator token}
+      SECMIND_QWEN_API_KEY: ""
+      SECMIND_SANDBOX_TOKEN: ""
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/secmind
+      SECMIND_CHECKPOINT_DATABASE_URL: postgresql://secmind:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/secmind
+
+  worker:
+    environment:
+      SECMIND_ENV: competition
+      SECMIND_RUNTIME_ROLE: worker
+      SECMIND_RUNTIME_PROFILE: competition-full
+      SECMIND_SANDBOX_TICKET_PRIVATE_KEY_FILE: /run/secrets/sandbox-ticket-private.pem
+      SECMIND_TOOL_ASSURANCE_PRIVATE_KEY_FILE: /run/secrets/tool-assurance-private.pem
+      SECMIND_TOOL_ASSURANCE_TRUSTED_PUBLIC_KEY_FILE: /run/secrets/tool-assurance-public.pem
+      SECMIND_TOOL_ASSURANCE_HELDOUT_VERSION: ${SECMIND_TOOL_ASSURANCE_HELDOUT_VERSION:?Set held-out calibration version}
+      SECMIND_TOOL_ASSURANCE_HELDOUT_MANIFEST_DIGEST: ${SECMIND_TOOL_ASSURANCE_HELDOUT_MANIFEST_DIGEST:?Set held-out calibration manifest digest}
+      SECMIND_TOOL_ASSURANCE_HELDOUT_REPORT_DIGEST: ${SECMIND_TOOL_ASSURANCE_HELDOUT_REPORT_DIGEST:?Set held-out calibration report digest}
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/secmind
+      SECMIND_CHECKPOINT_DATABASE_URL: postgresql://secmind:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/secmind
+    volumes:
+      - ./.secrets/sandbox-ticket-private.pem:/run/secrets/sandbox-ticket-private.pem:ro
+      - ./.secrets/tool-assurance-private.pem:/run/secrets/tool-assurance-private.pem:ro
+      - ./.secrets/tool-assurance-public.pem:/run/secrets/tool-assurance-public.pem:ro
+
+  outbox-projector:
+    environment:
+      SECMIND_ENV: competition
+      SECMIND_RUNTIME_ROLE: projector
+      SECMIND_RUNTIME_PROFILE: competition-full
+      SECMIND_DATABASE_URL: postgresql+psycopg://secmind:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/secmind
+
+  sandbox-runner:
+    environment:
+      SECMIND_ENV: competition
+      SECMIND_SANDBOX_TICKET_PUBLIC_KEY_FILE: /run/secrets/sandbox-ticket-public.pem
+      SECMIND_SANDBOX_DOCKER_HOST: unix:///run/secmind/docker.sock
+      SECMIND_SANDBOX_DEDICATED_ROOTLESS: "true"
+    volumes:
+      - ${SECMIND_ROOTLESS_DOCKER_SOCKET:?Set the dedicated rootless Docker socket}:/run/secmind/docker.sock
+      - ./.secrets/sandbox-ticket-public.pem:/run/secrets/sandbox-ticket-public.pem:ro
+    # The runner is the small trusted broker for the dedicated rootless daemon.
+    # Tool containers still run as UID 65532 with their own enforced policy.
+    cap_drop:
+      - ALL
+
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}

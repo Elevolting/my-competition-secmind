@@ -1,0 +1,5 @@
+version = 3
+
+[[package]]
+name = "v3-sbom-empty"
+version = "1.0.0"

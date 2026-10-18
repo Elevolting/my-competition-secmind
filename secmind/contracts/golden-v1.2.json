@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.2",
+  "openapi_sha256": "b1e8b820723e86146874fcd83bf1b9acf0d56a9a76d707dd0d10762a7dbf0e96",
+  "public_models_sha256": "8914b78a2c08f166b9e76624212155a77a9b41c97cd23ed046c06263fc6dd9c9",
+  "tool_manifest_sha256": "426115e750ad919aef5a70632a4aa9158b4e63f656b456aa0df3b38c1955d4cd",
+  "ledger_event_sha256": "744f2a1c27cda7f24d19952e5154a31474753008404b007d670a5a016f6fb7c4",
+  "migration_heads": [
+    "0003_v03_knowledge"
+  ]
+}

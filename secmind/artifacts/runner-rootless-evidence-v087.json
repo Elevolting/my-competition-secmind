@@ -1,0 +1,520 @@
+{
+  "schema_version": "rootless-runner-evidence-v1",
+  "captured_at": "2026-08-18T14:46:08.109906+00:00",
+  "runner": {
+    "backend": "DockerSandboxBackend",
+    "script": "scripts/rootless_runner_smoke.py",
+    "require_rootless": true
+  },
+  "daemon": {
+    "host": "tcp://127.0.0.1:23760",
+    "server_version": "29.0.0",
+    "security_options": [
+      "name=seccomp,profile=builtin",
+      "name=rootless",
+      "name=cgroupns"
+    ],
+    "rootless": true,
+    "engine_id_present": true
+  },
+  "images": {
+    "staging": "sha256:cfdf79f9b13a19b55fbbb0dc1eadecb5625da16a958d4eb1ee83a2a55571c985",
+    "bandit": "sha256:6b20521902e07547cc01560b4e14c7591532dd5501c10f9811b2dc1a5be4a6b5",
+    "cancel": "sha256:fc6dddc4c44b1bfe37f41cae8e67d1693828e8f42a91862816d7953e2c9d3f23"
+  },
+  "health": {
+    "status": "ready",
+    "status_code": 200,
+    "execution_plane": {
+      "backend": "docker",
+      "daemon": "ok",
+      "images": 2,
+      "rootless": true,
+      "volume_limit_mode": "container-tmpfs",
+      "dedicated_rootless": true
+    }
+  },
+  "result": {
+    "schema_version": "1.1",
+    "invocation_id": "rootless-runner-success",
+    "status": "success",
+    "exit_code": 0,
+    "data": {
+      "findings": [
+        {
+          "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+          "col_offset": 0,
+          "end_col_offset": 17,
+          "filename": "/input/probe.py",
+          "issue_confidence": "HIGH",
+          "issue_cwe": {
+            "id": 78,
+            "link": "https://cwe.mitre.org/data/definitions/78.html"
+          },
+          "issue_severity": "LOW",
+          "issue_text": "Consider possible security implications associated with the subprocess module.",
+          "line_number": 1,
+          "line_range": [
+            1
+          ],
+          "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+          "test_id": "B404",
+          "test_name": "blacklist"
+        },
+        {
+          "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+          "col_offset": 0,
+          "end_col_offset": 40,
+          "filename": "/input/probe.py",
+          "issue_confidence": "HIGH",
+          "issue_cwe": {
+            "id": 78,
+            "link": "https://cwe.mitre.org/data/definitions/78.html"
+          },
+          "issue_severity": "LOW",
+          "issue_text": "Starting a process with a partial executable path",
+          "line_number": 2,
+          "line_range": [
+            2
+          ],
+          "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+          "test_id": "B607",
+          "test_name": "start_process_with_partial_path"
+        },
+        {
+          "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+          "col_offset": 0,
+          "end_col_offset": 40,
+          "filename": "/input/probe.py",
+          "issue_confidence": "HIGH",
+          "issue_cwe": {
+            "id": 78,
+            "link": "https://cwe.mitre.org/data/definitions/78.html"
+          },
+          "issue_severity": "LOW",
+          "issue_text": "subprocess call with shell=True seems safe, but may be changed in the future, consider rewriting without shell",
+          "line_number": 2,
+          "line_range": [
+            2
+          ],
+          "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html",
+          "test_id": "B602",
+          "test_name": "subprocess_popen_with_shell_equals_true"
+        }
+      ],
+      "metrics": {
+        "/input/probe.py": {
+          "CONFIDENCE.HIGH": 3,
+          "CONFIDENCE.LOW": 0,
+          "CONFIDENCE.MEDIUM": 0,
+          "CONFIDENCE.UNDEFINED": 0,
+          "SEVERITY.HIGH": 0,
+          "SEVERITY.LOW": 3,
+          "SEVERITY.MEDIUM": 0,
+          "SEVERITY.UNDEFINED": 0,
+          "loc": 2,
+          "nosec": 0,
+          "skipped_tests": 0
+        },
+        "_totals": {
+          "CONFIDENCE.HIGH": 3,
+          "CONFIDENCE.LOW": 0,
+          "CONFIDENCE.MEDIUM": 0,
+          "CONFIDENCE.UNDEFINED": 0,
+          "SEVERITY.HIGH": 0,
+          "SEVERITY.LOW": 3,
+          "SEVERITY.MEDIUM": 0,
+          "SEVERITY.UNDEFINED": 0,
+          "loc": 2,
+          "nosec": 0,
+          "skipped_tests": 0
+        }
+      }
+    },
+    "summary": "Bandit completed with 3 finding(s).",
+    "artifacts": [],
+    "logs": {
+      "tail": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes_seen": 0,
+      "truncated": false
+    },
+    "duration_ms": 937,
+    "error_code": null,
+    "error_message": null,
+    "cleanup_confirmed": true
+  },
+  "resources": {
+    "run_id": "rootless-runner-smoke-success",
+    "resources": []
+  },
+  "policy": {
+    "cpu_cores": 1.0,
+    "image_digest": "sha256:6b20521902e07547cc01560b4e14c7591532dd5501c10f9811b2dc1a5be4a6b5",
+    "memory_bytes": 536870912,
+    "max_artifacts": 128,
+    "max_input_bytes": 67108864,
+    "max_log_tail_bytes": 16384,
+    "max_output_bytes": 16777216,
+    "network": "none",
+    "pids_limit": 64,
+    "read_only": true,
+    "tmpfs_bytes": 67108864,
+    "timeout_seconds": 120,
+    "volume_limit_mode": "container-tmpfs",
+    "input_volume_bytes": 67108864,
+    "output_volume_bytes": 16777216,
+    "input_mount_mode": "write-once-read-only",
+    "output_mount_mode": "bounded-writable",
+    "user": "65532:65532",
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_opt": [
+      "no-new-privileges:true"
+    ],
+    "cleanup_confirmed": true,
+    "daemon_host": "tcp://127.0.0.1:23760"
+  },
+  "scenarios": {
+    "success": {
+      "readiness": {
+        "backend": "docker",
+        "daemon": "ok",
+        "images": 2,
+        "rootless": true,
+        "volume_limit_mode": "container-tmpfs",
+        "dedicated_rootless": true
+      },
+      "run_id": "rootless-runner-smoke-success",
+      "invocation_id": "rootless-runner-success",
+      "result": {
+        "schema_version": "1.1",
+        "invocation_id": "rootless-runner-success",
+        "status": "success",
+        "exit_code": 0,
+        "data": {
+          "findings": [
+            {
+              "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+              "col_offset": 0,
+              "end_col_offset": 17,
+              "filename": "/input/probe.py",
+              "issue_confidence": "HIGH",
+              "issue_cwe": {
+                "id": 78,
+                "link": "https://cwe.mitre.org/data/definitions/78.html"
+              },
+              "issue_severity": "LOW",
+              "issue_text": "Consider possible security implications associated with the subprocess module.",
+              "line_number": 1,
+              "line_range": [
+                1
+              ],
+              "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+              "test_id": "B404",
+              "test_name": "blacklist"
+            },
+            {
+              "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+              "col_offset": 0,
+              "end_col_offset": 40,
+              "filename": "/input/probe.py",
+              "issue_confidence": "HIGH",
+              "issue_cwe": {
+                "id": 78,
+                "link": "https://cwe.mitre.org/data/definitions/78.html"
+              },
+              "issue_severity": "LOW",
+              "issue_text": "Starting a process with a partial executable path",
+              "line_number": 2,
+              "line_range": [
+                2
+              ],
+              "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+              "test_id": "B607",
+              "test_name": "start_process_with_partial_path"
+            },
+            {
+              "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+              "col_offset": 0,
+              "end_col_offset": 40,
+              "filename": "/input/probe.py",
+              "issue_confidence": "HIGH",
+              "issue_cwe": {
+                "id": 78,
+                "link": "https://cwe.mitre.org/data/definitions/78.html"
+              },
+              "issue_severity": "LOW",
+              "issue_text": "subprocess call with shell=True seems safe, but may be changed in the future, consider rewriting without shell",
+              "line_number": 2,
+              "line_range": [
+                2
+              ],
+              "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html",
+              "test_id": "B602",
+              "test_name": "subprocess_popen_with_shell_equals_true"
+            }
+          ],
+          "metrics": {
+            "/input/probe.py": {
+              "CONFIDENCE.HIGH": 3,
+              "CONFIDENCE.LOW": 0,
+              "CONFIDENCE.MEDIUM": 0,
+              "CONFIDENCE.UNDEFINED": 0,
+              "SEVERITY.HIGH": 0,
+              "SEVERITY.LOW": 3,
+              "SEVERITY.MEDIUM": 0,
+              "SEVERITY.UNDEFINED": 0,
+              "loc": 2,
+              "nosec": 0,
+              "skipped_tests": 0
+            },
+            "_totals": {
+              "CONFIDENCE.HIGH": 3,
+              "CONFIDENCE.LOW": 0,
+              "CONFIDENCE.MEDIUM": 0,
+              "CONFIDENCE.UNDEFINED": 0,
+              "SEVERITY.HIGH": 0,
+              "SEVERITY.LOW": 3,
+              "SEVERITY.MEDIUM": 0,
+              "SEVERITY.UNDEFINED": 0,
+              "loc": 2,
+              "nosec": 0,
+              "skipped_tests": 0
+            }
+          }
+        },
+        "summary": "Bandit completed with 3 finding(s).",
+        "artifacts": [],
+        "logs": {
+          "tail": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes_seen": 0,
+          "truncated": false
+        },
+        "duration_ms": 937,
+        "error_code": null,
+        "error_message": null,
+        "cleanup_confirmed": true
+      },
+      "resources_after": [],
+      "orphan_cleanup_removed": 0,
+      "cleanup_confirmed": true
+    },
+    "cancel": {
+      "readiness": {
+        "backend": "docker",
+        "daemon": "ok",
+        "images": 2,
+        "rootless": true,
+        "volume_limit_mode": "container-tmpfs",
+        "dedicated_rootless": true
+      },
+      "run_id": "rootless-runner-smoke-cancel",
+      "invocation_id": "rootless-runner-cancel",
+      "resources_before_cancel": [
+        {
+          "schema_version": "1.1",
+          "run_id": "rootless-runner-smoke-cancel",
+          "resource_id": "container:3971c0cc6aa1b22e60fc7cdf7610db9de807f983dcb5e0c0cd2e1286f9af6ba1",
+          "invocation_id": "rootless-runner-cancel",
+          "fence": 2,
+          "active": true
+        }
+      ],
+      "cancelled": true,
+      "terminal_error": {
+        "code": "SANDBOX_CANCELLED",
+        "message": "sandbox invocation was cancelled"
+      },
+      "resources_after": [],
+      "orphan_cleanup_removed": 0,
+      "cleanup_confirmed": true
+    },
+    "stale_fence": {
+      "status": "success",
+      "run_id": "rootless-runner-stale-fence-fd141236432f",
+      "latest_fence": 2,
+      "resources_before": [
+        {
+          "schema_version": "1.1",
+          "run_id": "rootless-runner-stale-fence-fd141236432f",
+          "resource_id": "container:74fccaa9499dca9066b7ba5e417d2787f58b2ca6d3811d9047a7f511578d77aa",
+          "invocation_id": "stale-fence-7ef13fe5956f-old",
+          "fence": 1,
+          "active": true
+        },
+        {
+          "schema_version": "1.1",
+          "run_id": "rootless-runner-stale-fence-fd141236432f",
+          "resource_id": "container:b9aabc79a0c45e63fd859d6702151412328a22e2df4d05c77d478ae8678d8984",
+          "invocation_id": "stale-fence-b51577172338-new",
+          "fence": 2,
+          "active": true
+        }
+      ],
+      "resources_before_cleanup": [
+        {
+          "schema_version": "1.1",
+          "run_id": "rootless-runner-stale-fence-fd141236432f",
+          "resource_id": "container:74fccaa9499dca9066b7ba5e417d2787f58b2ca6d3811d9047a7f511578d77aa",
+          "invocation_id": "stale-fence-7ef13fe5956f-old",
+          "fence": 1,
+          "active": true
+        },
+        {
+          "schema_version": "1.1",
+          "run_id": "rootless-runner-stale-fence-fd141236432f",
+          "resource_id": "container:b9aabc79a0c45e63fd859d6702151412328a22e2df4d05c77d478ae8678d8984",
+          "invocation_id": "stale-fence-b51577172338-new",
+          "fence": 2,
+          "active": true
+        }
+      ],
+      "removed": 1,
+      "stale_fence_removed": true,
+      "latest_fence_preserved": true,
+      "execution_result": {
+        "schema_version": "1.1",
+        "invocation_id": "stale-fence-current-1d11a3ade8a2",
+        "status": "success",
+        "exit_code": 0,
+        "data": {
+          "findings": [
+            {
+              "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+              "col_offset": 0,
+              "end_col_offset": 17,
+              "filename": "/input/probe.py",
+              "issue_confidence": "HIGH",
+              "issue_cwe": {
+                "id": 78,
+                "link": "https://cwe.mitre.org/data/definitions/78.html"
+              },
+              "issue_severity": "LOW",
+              "issue_text": "Consider possible security implications associated with the subprocess module.",
+              "line_number": 1,
+              "line_range": [
+                1
+              ],
+              "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+              "test_id": "B404",
+              "test_name": "blacklist"
+            },
+            {
+              "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+              "col_offset": 0,
+              "end_col_offset": 40,
+              "filename": "/input/probe.py",
+              "issue_confidence": "HIGH",
+              "issue_cwe": {
+                "id": 78,
+                "link": "https://cwe.mitre.org/data/definitions/78.html"
+              },
+              "issue_severity": "LOW",
+              "issue_text": "Starting a process with a partial executable path",
+              "line_number": 2,
+              "line_range": [
+                2
+              ],
+              "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+              "test_id": "B607",
+              "test_name": "start_process_with_partial_path"
+            },
+            {
+              "code": "1 import subprocess\n2 subprocess.run('echo smoke', shell=True)\n",
+              "col_offset": 0,
+              "end_col_offset": 40,
+              "filename": "/input/probe.py",
+              "issue_confidence": "HIGH",
+              "issue_cwe": {
+                "id": 78,
+                "link": "https://cwe.mitre.org/data/definitions/78.html"
+              },
+              "issue_severity": "LOW",
+              "issue_text": "subprocess call with shell=True seems safe, but may be changed in the future, consider rewriting without shell",
+              "line_number": 2,
+              "line_range": [
+                2
+              ],
+              "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html",
+              "test_id": "B602",
+              "test_name": "subprocess_popen_with_shell_equals_true"
+            }
+          ],
+          "metrics": {
+            "/input/probe.py": {
+              "CONFIDENCE.HIGH": 3,
+              "CONFIDENCE.LOW": 0,
+              "CONFIDENCE.MEDIUM": 0,
+              "CONFIDENCE.UNDEFINED": 0,
+              "SEVERITY.HIGH": 0,
+              "SEVERITY.LOW": 3,
+              "SEVERITY.MEDIUM": 0,
+              "SEVERITY.UNDEFINED": 0,
+              "loc": 2,
+              "nosec": 0,
+              "skipped_tests": 0
+            },
+            "_totals": {
+              "CONFIDENCE.HIGH": 3,
+              "CONFIDENCE.LOW": 0,
+              "CONFIDENCE.MEDIUM": 0,
+              "CONFIDENCE.UNDEFINED": 0,
+              "SEVERITY.HIGH": 0,
+              "SEVERITY.LOW": 3,
+              "SEVERITY.MEDIUM": 0,
+              "SEVERITY.UNDEFINED": 0,
+              "loc": 2,
+              "nosec": 0,
+              "skipped_tests": 0
+            }
+          }
+        },
+        "summary": "Bandit completed with 3 finding(s).",
+        "artifacts": [],
+        "logs": {
+          "tail": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes_seen": 0,
+          "truncated": false
+        },
+        "duration_ms": 796,
+        "error_code": null,
+        "error_message": null,
+        "cleanup_confirmed": true
+      },
+      "resources_after_stale_cleanup": [
+        {
+          "schema_version": "1.1",
+          "run_id": "rootless-runner-stale-fence-fd141236432f",
+          "resource_id": "container:b9aabc79a0c45e63fd859d6702151412328a22e2df4d05c77d478ae8678d8984",
+          "invocation_id": "stale-fence-b51577172338-new",
+          "fence": 2,
+          "active": true
+        }
+      ],
+      "resources_after_explicit_cleanup": []
+    }
+  },
+  "cleanup": {
+    "success_confirmed": true,
+    "cancel_confirmed": true,
+    "cancel_terminal_code": "SANDBOX_CANCELLED",
+    "stale_fence_removed": true,
+    "latest_fence_preserved": true,
+    "stale_fence_resources_after_cleanup": [
+      {
+        "schema_version": "1.1",
+        "run_id": "rootless-runner-stale-fence-fd141236432f",
+        "resource_id": "container:b9aabc79a0c45e63fd859d6702151412328a22e2df4d05c77d478ae8678d8984",
+        "invocation_id": "stale-fence-b51577172338-new",
+        "fence": 2,
+        "active": true
+      }
+    ],
+    "stale_fence_final_resources_empty": true,
+    "all_post_invocation_resources_empty": true
+  }
+}

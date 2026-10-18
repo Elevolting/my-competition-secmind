@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.1",
+  "paths": [
+    "/api/v1/uploads",
+    "/api/v1/tasks",
+    "/api/v1/runs/{run_id}",
+    "/api/v1/runs/{run_id}/report",
+    "/api/v1/runs/{run_id}/ledger",
+    "/api/v1/runs/{run_id}/ledger/export",
+    "/api/v1/runs/{run_id}/approvals/{request_id}",
+    "/api/v1/runs/{run_id}/events"
+  ],
+  "tool_context_fields": [
+    "allowed_paths",
+    "attempt",
+    "idempotency_key",
+    "invocation_id",
+    "run_id",
+    "step_id",
+    "workspace"
+  ],
+  "tool_result_fields": [
+    "artifacts",
+    "data",
+    "duration_ms",
+    "error_code",
+    "error_message",
+    "evidence",
+    "invocation_id",
+    "status",
+    "summary"
+  ]
+}

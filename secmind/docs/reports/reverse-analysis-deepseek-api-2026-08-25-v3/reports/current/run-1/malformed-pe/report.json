@@ -1,0 +1,82 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "partial",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [],
+    "execution_status": "partial",
+    "executive_summary": "样本被识别为畸形PE文件，未发现可利用的有效代码路径，建议隔离处理。",
+    "findings": [
+      {
+        "business_impact": "可能导致依赖该文件的系统或应用出现异常，或被用于规避安全检测。",
+        "confidence": "high",
+        "evidence_refs": [],
+        "severity": "medium",
+        "technical_explanation": "样本无法被正常解析，静态分析未能提取有效的导入表、导出表或代码段。",
+        "title": "畸形PE文件结构异常"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "隔离样本并进行沙箱执行监控，尝试更宽松的文件解析器以获得更多信息。",
+        "decision_role": "安全负责人",
+        "expected_outcome": "确认样本是否具有潜在危害，并更新防护规则。",
+        "priority": "P2",
+        "rationale": "畸形PE可能被用于规避检测或触发解析器漏洞，需要进一步分析。"
+      }
+    ],
+    "limitations": [
+      "静态分析无法确定样本的实际行为"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "尝试使用不同工具或手动解析PE头部以获得更多信息。",
+      "在隔离环境中执行样本，观察其行为。",
+      "更新文件解析器以更好地处理畸形PE。"
+    ],
+    "reverse_analysis": "静态分析表明该文件不符合PE格式规范，存在结构性缺陷，未发现可执行或可利用的代码路径。由于样本畸形，动态分析不可行。",
+    "risk_assessment": {
+      "exploitability": "low",
+      "impact_scope": "limited",
+      "overall_risk": "medium",
+      "urgency": "P2"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": {
+        "code": "MALFORMED_PE"
+      },
+      "facts": {},
+      "status": "partial"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "8511460ad69b648c17f543daeca8e5acc497cddff0af76e5876fc29bee27d7d0",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "样本的原始来源和意图"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "malformed-pe",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "8511460ad69b648c17f543daeca8e5acc497cddff0af76e5876fc29bee27d7d0",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

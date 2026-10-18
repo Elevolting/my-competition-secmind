@@ -1,0 +1,13 @@
+{
+  "arm": "optimized",
+  "case_id": "source-no-signal",
+  "receipt_sha256": "ee04e7da2fd6d3995acd795aa1e41fa4124599ccc4cb43a8563de012cd611368",
+  "repeat_id": 2,
+  "report_html_sha256": "f72acda804e8018f4eb285cd0f7a9568e6dab0f75dcf76ed2494ea6c644317b6",
+  "report_json_sha256": "f6e907551d52e65f70c2e9d1403bca94ea4c6ab28f505789ebf5ab2bf8d14421",
+  "report_md_sha256": "e99bf19e13a56b3dc4104f2dc5eafb37d0dd0a841b7b420c83d4ec6dc489f6c6",
+  "request_sha256": "3afe4163d4e42803302ad1fa39c437d31ad779072b2d8105cd75146e89269efa",
+  "response_sha256": "3cccbb850dc68bfe53cd0bae5375e369d63b6c86db2cdc37522c81c93c35af4d",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

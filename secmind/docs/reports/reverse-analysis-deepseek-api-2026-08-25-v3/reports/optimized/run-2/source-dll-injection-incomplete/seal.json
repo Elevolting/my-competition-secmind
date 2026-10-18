@@ -1,0 +1,13 @@
+{
+  "arm": "optimized",
+  "case_id": "source-dll-injection-incomplete",
+  "receipt_sha256": "e5c17691ace85a969a64279d94e0a6bd78e68e9ebc7cd3f825d1272bb8891b16",
+  "repeat_id": 2,
+  "report_html_sha256": "536a28dc98c9c6152d11d68706d6cdc06f11958d1dcaeba292550565386e57cf",
+  "report_json_sha256": "eec4d7182afac2d50c63f14caad44c1fcf0f40f84b3d3d14aa2dbbbe055a85f4",
+  "report_md_sha256": "6961a1e74a550b6c5eeb5e064a68d5e18a136de0665cd3dea54082cfb470643e",
+  "request_sha256": "5dad9fcec3c0b7e3a90fa35231af7f9a9ab52df54bca0a025fa5f4e31626c48b",
+  "response_sha256": "ec849e14dbe6988928e4ce00b7445c3809866f4d9214b511185799cbe51e029f",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

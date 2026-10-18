@@ -1,0 +1,46 @@
+{
+  "schema_version": "secmind-release-gate-policy-v1",
+  "controls": ["P0-10", "P1-12"],
+  "minimum_randomized_blocks": 5,
+  "itt": {
+    "fixed_denominator": true,
+    "missing_cells_are_failures": true
+  },
+  "domain_gate": {
+    "non_degradation_delta": 0.0,
+    "all_domains_required": true
+  },
+  "statistics": {
+    "bootstrap_confidence": 0.95,
+    "bootstrap_unit": "randomized_block",
+    "bootstrap_lower_bound_strictly_positive": true,
+    "paired_sign_test": true,
+    "sign_ci": "wilson-95"
+  },
+  "accepted_delta_gate": {
+    "tool_net_gain_required": true,
+    "eirs_net_gain_required": true
+  },
+  "provenance": {
+    "agent_git_sha": true,
+    "agent_tree_sha256": true,
+    "agent_git_dirty": true,
+    "working_tree_sha256": true,
+    "wheel_sha256": true,
+    "sdist_sha256": true,
+    "bridge_sha256": true,
+    "adapter_sha256": true,
+    "profile_and_effective_env_digest": true,
+    "model_parameters_digest": true,
+    "prompt_lineage_digest": true,
+    "scorer_sha256": true,
+    "task_set_sha256": true,
+    "dependency_sha256": true,
+    "lockfile_sha256": true
+  },
+  "offline_mode": {
+    "provider_requests_allowed": false,
+    "live_api_allowed": false
+  },
+  "failure_policy": "any_recorded_failure_fails_gate"
+}

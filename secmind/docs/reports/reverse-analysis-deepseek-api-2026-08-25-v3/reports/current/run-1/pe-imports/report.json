@@ -1,0 +1,234 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "分析显示该PE文件（x86-64）导入大量系统与CRT函数，静态存在但未观测到运行时调用。导入类型涵盖线程同步、内存管理、文件I/O、字符串操作等，并存在XOR解码候选与文件操作/字符串比较等静态提示，提示可能具备混淆或打包行为。由于未执行动态分析，无法确认实际调用。",
+    "findings": [
+      {
+        "business_impact": "正常二进制程序通常导入这些函数；但若为恶意软件，可能指示具备文件操作、混淆或反调试能力，需进一步评估。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "info",
+        "technical_explanation": "静态导入集中包括线程同步（EnterCriticalSection等）、内存管理（VirtualProtect、malloc等）、文件I/O（fopen、fwrite等）、字符串比较（strcmp、strncmp）、错误处理（GetLastError）、启动流程（GetStartupInfoA）以及CRT初始化函数（__getmainargs等）。这些函数支持常见程序行为，也可能被恶意代码用于窃取数据、持久化或反分析。但无法仅凭静态证据确认用途。",
+        "title": "大量系统与CRT函数静态导入"
+      },
+      {
+        "business_impact": "XOR解码可能是为了隐藏字符串或配置数据，增加分析难度，但不一定代表恶意。若为恶意，可隐藏C2地址或载荷。",
+        "confidence": "medium",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "medium",
+        "technical_explanation": "静态提示列出多个XOR密钥和值，密钥如0x6e、0x9e等，解码值多为重复模式，其中包含'xn.on'、'llm'等疑似域名片段（如'xn.on'与'llmhmlh.llm'）。但解码为启发式结果，可能存在误报。由于未观测到运行时调用，无法确认解码逻辑是否实际执行。",
+        "title": "存在XOR混淆解码候选"
+      },
+      {
+        "business_impact": "若程序执行文件读写，可能涉及数据外泄或配置读取；字符串比较可能用于检测环境或解析输入，需结合动态分析判断。",
+        "confidence": "medium",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "medium",
+        "technical_explanation": "导入列表包含fopen、fclose、fwrite、fprintf等文件函数，以及strcmp、strncmp、strlen等字符串操作。静态提示明确标记possible_file_io与possible_string_comparison。这些表明程序可能从文件读取或输出，并基于字符串比较做出决策。但静态证据不足以确认实际行为，也无观测到的运行时调用。",
+        "title": "静态提示可能涉及文件操作与字符串比较"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "在受控沙箱中执行样本，捕获API调用与网络流量，验证XOR解码及文件操作是否实际发生。",
+        "decision_role": "security_analyst",
+        "expected_outcome": "获得运行时调用序列和解码后的字符串，明确样本行为。",
+        "priority": "P2",
+        "rationale": "动态执行可确认哪些导入被实际调用，以及解码逻辑产生的真实字符串，从而准确评估风险。"
+      },
+      {
+        "action": "对解码后的疑似域名（如xn.on等）进行威胁情报查询，评估是否关联已知恶意基础设施。",
+        "decision_role": "threat_intel_lead",
+        "expected_outcome": "确认域名信誉，若为恶意则提升风险等级。",
+        "priority": "P2",
+        "rationale": "若解码出真实域名，可能指示C2或外联地址，需进一步判断。"
+      },
+      {
+        "action": "根据动态分析结果，决定是否部署额外检测规则（如针对文件写入或特定字符串比较）。",
+        "decision_role": "security_architect",
+        "expected_outcome": "增强针对该样本行为模式的检测能力。",
+        "priority": "P3",
+        "rationale": "若确认行为，需建立检测机制以防范类似样本。"
+      }
+    ],
+    "limitations": [
+      "未执行动态分析，无法确认运行时调用。",
+      "无完整反汇编引擎，静态分析有限。",
+      "XOR解码为启发式，数据可能不准确。"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "执行样本于隔离沙箱，监控导入调用、文件系统与网络活动。",
+      "对解码结果进行完整解码与验证，排除启发式误报。",
+      "查询解码域名的威胁情报。",
+      "获取完整反汇编，确认XOR解码逻辑所在代码路径。"
+    ],
+    "reverse_analysis": "该文件为x86-64架构的PE格式，包含10个节。静态导入分析显示大量来自kernel32和CRT的导入，包括：线程同步（InitializeCriticalSection等）、内存保护（VirtualProtect等）、文件I/O（fopen等）、字符串处理（strlen等）、错误处理（GetLastError等）。此外，静态提示包括可能的文件操作、字符串比较以及XOR解码候选（含多个XOR密钥，如0x6e、0x9e等）。解码结果多为重复模式，部分可能对应URL或域名。由于无动态执行，所有导入均视为静态存在，并非观测到的运行时调用。",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "local",
+      "overall_risk": "medium",
+      "urgency": "monitor"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": null,
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "unspecified",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x6e",
+          "0x6e",
+          "0x9e",
+          "0x6e",
+          "0x34",
+          "0x50",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x5a",
+          "0x6c",
+          "0x6c",
+          "0x6e",
+          "0x0e",
+          "0x6c",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "444444441444-444I44444444444444444444444444444",
+          "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+          "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "n.onnnnnnnnnnnnnnnnnnn",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "nnnnnnnnnnnn.nnn",
+          "n.onnnnnnnnnnnn",
+          "n.onnnnnnnnnnnv",
+          "sn.onnnnnnnnnnn",
+          "yn.onnnnnnnnnnn"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "实际运行时调用了哪些导入函数。",
+      "XOR解码是否真实执行及输出完整内容。",
+      "文件操作和字符串比较的具体用途。",
+      "样本的恶意性质尚未确定。"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "pe-imports",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "execution_status": "partial",
+  "model_response_sha256": "0d0b33432d01621dc1df468ceef3186b097d09ed7907c5ba7e3693b739ff548e",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "partial",
+    "executive_summary": "Dynamic analysis was unavailable; partial static results were retained. The PE is x86-64 with 10 sections and several decoded string fragments (including XOR-candidate strings). Static hints suggest file I/O, string comparison, and XOR decoding. No runtime behavior was observed.",
+    "findings": [
+      {
+        "business_impact": "Potential unauthorized file access or sensitive data exfiltration if the strings relate to file operations; however, low confidence without runtime confirmation.",
+        "confidence": "Low",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "XOR decoding heuristic produced fragments including 'SECMIND-REVERSE-OK' and path-like strings; imports include fopen/fwrite and strcmp, supporting possible file I/O and string comparisons. No dynamic validation.",
+        "title": "Static XOR-decoded strings suggest possible file-I/O and comparison logic"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "Perform controlled dynamic analysis in a sandbox to observe actual run-time behavior and confirm the static XOR-decoding results.",
+        "decision_role": "Security Operations",
+        "expected_outcome": "Confirmation or refutation of the suspected behaviors, enabling more accurate risk assessment.",
+        "priority": "P2",
+        "rationale": "Static-only results provide insufficient evidence for risk decisions; dynamic analysis is needed to validate suspected file I/O and comparison logic."
+      }
+    ],
+    "limitations": [
+      "No dynamic execution was performed.",
+      "No full disassembly engine is bundled in this helper.",
+      "XOR decoding is heuristic and may include false positives.",
+      "dynamic emulation unavailable"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "Re-run dynamic emulation with a supported sandbox.",
+      "Obtain full disassembly to verify XOR decoding candidates.",
+      "Check antivirus telemetry for the sample hash."
+    ],
+    "reverse_analysis": "Static analysis identified a 32-bit PE with 10 sections. Imports include critical section APIs, file I/O functions (fopen, fclose, fwrite, fprintf), and string functions (strcmp, strncmp). Static hints indicate possible file I/O, string comparison, and XOR decoding. XOR keys and candidate decoded strings were produced heuristically, but without dynamic confirmation. The decoded fragments resemble Windows paths and a marker 'SECMIND-REVERSE-OK', suggesting possible file-related or comparison logic. No confirmed behavior.",
+    "risk_assessment": {
+      "exploitability": "Unknown",
+      "impact_scope": "Unknown",
+      "overall_risk": "Unknown",
+      "urgency": "Low"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "unspecified",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x6e",
+          "0x6e",
+          "0x9e",
+          "0x6e",
+          "0x34",
+          "0x50",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x5a",
+          "0x6c",
+          "0x6c",
+          "0x6e",
+          "0x0e",
+          "0x6c",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "444444441444-444I44444444444444444444444444444",
+          "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+          "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "n.onnnnnnnnnnnnnnnnnnn",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "nnnnnnnnnnnn.nnn",
+          "n.onnnnnnnnnnnn",
+          "n.onnnnnnnnnnnv",
+          "sn.onnnnnnnnnnn",
+          "yn.onnnnnnnnnnn"
+        ]
+      },
+      "status": "partial"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": []
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "current",
+    "case_id": "dynamic-failure-fallback",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

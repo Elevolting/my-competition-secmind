@@ -1,0 +1,36 @@
+{
+  "schema_version": "tool-calibration-report-binding-1.0",
+  "dataset_id": "secmind-heldout-tools-2026-08-v3",
+  "manifest_model_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+  "calibration_version": "secmind-heldout-tools-2026-08-v3",
+  "assurance_source_id": "heldout-rootless-signed-runner",
+  "tool_manifest_snapshot_sha256": "927c64fba2ddb9b5d77d5118f25f45110d68732a787de56da15b2e149d2bc527",
+  "policy": {
+    "required_tools": [
+      "bandit_python_audit",
+      "gitleaks_secret_scan",
+      "java_semantic_sast",
+      "osv_dependency_audit",
+      "python_taint_audit",
+      "secret_pattern_scan",
+      "semgrep_sast",
+      "syft_sbom"
+    ],
+    "minimum_cases_per_tool": 10,
+    "minimum_positive_cases_per_tool": 3,
+    "minimum_negative_cases_per_tool": 3,
+    "minimum_precision": 0.9,
+    "minimum_recall": 0.9,
+    "minimum_component_completeness": 1.0,
+    "minimum_component_accuracy": 1.0,
+    "required_evidence_completeness": 1.0,
+    "require_trusted_signer": true,
+    "require_calibrated_security_claim": true,
+    "expected_independent_source_count": 1,
+    "require_same_source_double_report": true,
+    "require_toolchain_complete": true,
+    "require_untouched_holdout": true
+  },
+  "binding_digest": "8f26827a663be1dd52ac9236a960f98ec10ca84d18cadf9024b66fef48af0df1",
+  "purpose": "Pre-run report commitment used by platform ToolAssurance contracts; scanner metrics are still computed from the single v3 ToolManifest/ToolResult run and are recorded separately in the final report."
+}

@@ -1,0 +1,211 @@
+{
+  "execution_status": "unavailable",
+  "model_response_sha256": "fd458c5856fa3811a3e66132891f4073c235fd7478cd2c8c051309c3169eee18",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "unavailable",
+    "executive_summary": "静态分析显示PE样本包含字符串比较、异或解码和文件写入候选逻辑，但因未执行动态仿真，无法确认正确口令路径的运行时行为、退出代码及文件写入细节。分析受限于静态堆启发，结论为推测性。",
+    "findings": [
+      {
+        "business_impact": "若口令校验存在，弱口令或被绕过可能影响样本所附业务逻辑的完整性；但当前无法确证实际控制流。",
+        "confidence": "low",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "medium",
+        "technical_explanation": "静态hints列出xor_decode_candidate及多个异或密钥（0x6e、0x9e、0x34、0x50等），解码值中出现'SECMIND-REVERSE-OK'及路径类字符串，结合imports中的strcmp/strncmp和fopen/fwrite，推测存在口令比较与条件文件输出。由于无反汇编和动态观测，无法确定正确口令值、分支结构和退出行为。",
+        "title": "静态异或解码与口令校验意图"
+      },
+      {
+        "business_impact": "若程序在口令验证后写文件，可能影响系统上文件完整性或造成信息泄露；退出行为可能影响脚本或服务健康检查。",
+        "confidence": "low",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "medium",
+        "technical_explanation": "导入表含fopen、fwrite、fclose等，静态hints标注possible_file_io；同时有exit/abort导入，暗示分支后退出。但由于静态包不含动态运行记录且未提供完整反汇编，不能确定写文件路径、内容、权限，亦无法确定退出码或是否调用abort。",
+        "title": "可能的文件写入与退出行为片段"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "在隔离沙箱中执行样本，捕获系统调用、文件写入和退出码，以确认正确口令路径。",
+        "decision_role": "安全运营负责人",
+        "expected_outcome": "获得确切口令校验序列、退出行为和文件写入内容/位置。",
+        "priority": "P2",
+        "rationale": "当前仅静态证据，无法验证口令逻辑和文件行为；动态验证可消除高度不确定性。"
+      },
+      {
+        "action": "对样本进行完整反汇编，定位strcmp/strncmp调用点及异或解码后的比较常量。",
+        "decision_role": "逆向分析负责人",
+        "expected_outcome": "还原正确口令路径并确认写文件条件。",
+        "priority": "P2",
+        "rationale": "缺少反汇编导致无法复原口令比较与分支，静态提示需代码级确认。"
+      }
+    ],
+    "limitations": [
+      "未执行动态分析，无法确认真实口令和运行时文件行为",
+      "未捆绑完整反汇编引擎，无法复现控制流",
+      "异或解码为启发式结果，可能含误报",
+      "观测类型仅为静态，不含observed_runtime数据"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "在受控环境运行样本并记录API调用、进程退出码及文件系统变更",
+      "对导入的fopen/fwrite及异或解码函数做交叉引用分析",
+      "提取异或解码后的完整字符串常量以供口令破译"
+    ],
+    "reverse_analysis": "样本为x86-64 PE，含10个节及多个运行时库导入。静态线索（xor_decode_candidate、possible_string_comparison、possible_file_io）表明程序可能先对字符串异或解码（候选密钥0x6e等），再与输入比较，若匹配则写文件。解码片段中出现'SECMIND-REVERSE-OK'，疑似成功标志；其他值为路径或域名形似串，可能为输出目标。但未提供完整反汇编，无法复原口令检查序列、条件跳转及退出/写文件的具体运行时路径。",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "unknown",
+      "overall_risk": "unknown",
+      "urgency": "unknown"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "unspecified",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x6e",
+          "0x6e",
+          "0x9e",
+          "0x6e",
+          "0x34",
+          "0x50",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x5a",
+          "0x6c",
+          "0x6c",
+          "0x6e",
+          "0x0e",
+          "0x6c",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "444444441444-444I44444444444444444444444444444",
+          "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+          "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "n.onnnnnnnnnnnnnnnnnnn",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "nnnnnnnnnnnn.nnn",
+          "n.onnnnnnnnnnnn",
+          "n.onnnnnnnnnnnv",
+          "sn.onnnnnnnnnnn",
+          "yn.onnnnnnnnnnn"
+        ]
+      },
+      "status": "unavailable"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "正确口令或令牌的确切值",
+      "口令校验通过后的具体文件写入路径与内容",
+      "程序退出码及是正常exit还是abort",
+      "写文件是否受权限或环境变量影响"
+    ]
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "current",
+    "case_id": "dynamic-correct-token",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

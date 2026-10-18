@@ -1,0 +1,159 @@
+{
+  "attempts": [
+    {
+      "conservative_reserved_usage": {
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 0,
+        "cost_units": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_requests": 0
+      },
+      "duration_ms": 10092,
+      "logical_call_id": "6b09f2ba-ef0c-486a-868d-54f2d53c5a02",
+      "ordinal": 1,
+      "provider_reported_usage": {
+        "cache_hit_input_tokens": 1792,
+        "cache_miss_input_tokens": 441,
+        "cost_units": 0.013668,
+        "input_tokens": 2233,
+        "output_tokens": 1184,
+        "provider_requests": 1
+      },
+      "provider_request": true,
+      "provider_request_id": "36d91c6c-1a22-4f50-98c8-ff6dc774089b",
+      "request_digest": "ca26e31e1a3f71d4fa4fb5da17c306f44e4f5e5127127d52b9e3047f73cc66f0",
+      "response_digest": "26c5ed298c4b6e747ca6b3535bd6b5347851dc829dbc1591bc655e93198b6a64",
+      "retryable": false,
+      "status_code": 200,
+      "unknown_usage": false,
+      "usage": {
+        "cache_hit_input_tokens": 1792,
+        "cache_miss_input_tokens": 441,
+        "cost_units": 0.013668,
+        "input_tokens": 2233,
+        "output_tokens": 1184,
+        "provider_requests": 1
+      }
+    },
+    {
+      "conservative_reserved_usage": {
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 0,
+        "cost_units": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_requests": 0
+      },
+      "duration_ms": 9093,
+      "logical_call_id": "23ee9ac9-db9d-4fb3-ae29-282fc22953c0",
+      "ordinal": 2,
+      "provider_reported_usage": {
+        "cache_hit_input_tokens": 2176,
+        "cache_miss_input_tokens": 57,
+        "cost_units": 0.013264,
+        "input_tokens": 2233,
+        "output_tokens": 1083,
+        "provider_requests": 1
+      },
+      "provider_request": true,
+      "provider_request_id": "4f1c8d44-0d6f-430b-94b1-2a8d1fbc3984",
+      "request_digest": "ca26e31e1a3f71d4fa4fb5da17c306f44e4f5e5127127d52b9e3047f73cc66f0",
+      "response_digest": "86a5852a0f766492583cae021c5b66bd1f76139dda4051c1e2d4d4744e0129e0",
+      "retryable": false,
+      "status_code": 200,
+      "unknown_usage": false,
+      "usage": {
+        "cache_hit_input_tokens": 2176,
+        "cache_miss_input_tokens": 57,
+        "cost_units": 0.013264,
+        "input_tokens": 2233,
+        "output_tokens": 1083,
+        "provider_requests": 1
+      }
+    }
+  ],
+  "base_url": "https://api.deepseek.com",
+  "error_type": null,
+  "execution_status": "completed",
+  "latency_ms": 19185,
+  "model": "deepseek-v4-flash",
+  "model_receipt_id": "23ee9ac9-db9d-4fb3-ae29-282fc22953c0",
+  "model_request_sha256": "ca26e31e1a3f71d4fa4fb5da17c306f44e4f5e5127127d52b9e3047f73cc66f0",
+  "model_response_sha256": "86a5852a0f766492583cae021c5b66bd1f76139dda4051c1e2d4d4744e0129e0",
+  "pricing": {
+    "estimated_cny": 0.0222938,
+    "formula": "(cache_hit_input*rate + cache_miss_input*rate + output*rate) / 1000000",
+    "priced_at": "2026-08-25T14:13:43.252193+08:00",
+    "pricing_band": "peak",
+    "snapshot": {
+      "currency": "CNY",
+      "model": "deepseek-v4-flash",
+      "off_peak": {
+        "cache_hit_input": 0.05,
+        "cache_miss_input": 1.5,
+        "output": 4.5
+      },
+      "peak": {
+        "cache_hit_input": 0.1,
+        "cache_miss_input": 3.0,
+        "output": 9.0
+      },
+      "peak_beijing_hours": [
+        "09:00-12:00",
+        "14:00-18:00"
+      ],
+      "retrieved_at": "2026-08-24",
+      "schema_version": "1.0",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing-details-cny/",
+      "unit_tokens": 1000000
+    },
+    "usage_components": {
+      "cache_accounting": "provider_reported",
+      "cache_hit_input_tokens": 3968,
+      "cache_miss_input_tokens": 498,
+      "output_tokens": 2267
+    }
+  },
+  "provider": "deepseek",
+  "public_request_sha256": "ae957eca12b010ac7b23d0f486091d07fe235e6f835cda37d6d7583d4db351bd",
+  "retry_count": 1,
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-dll-injection-complete",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  },
+  "usage": {
+    "cache_hit_input_tokens": 3968,
+    "cache_miss_input_tokens": 498,
+    "cost_units": 0.026931999999999998,
+    "input_tokens": 4466,
+    "output_tokens": 2267,
+    "provider_requests": 2,
+    "total_tokens": 6733
+  },
+  "usage_provenance": {
+    "conservative_reserved_usage": {
+      "cache_hit_input_tokens": 0,
+      "cache_miss_input_tokens": 0,
+      "cost_units": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "provider_requests": 0
+    },
+    "provider_reported_usage": {
+      "cache_hit_input_tokens": 3968,
+      "cache_miss_input_tokens": 498,
+      "cost_units": 0.026931999999999998,
+      "input_tokens": 4466,
+      "output_tokens": 2267,
+      "provider_requests": 2
+    },
+    "unknown_usage_attempts": 0
+  }
+}

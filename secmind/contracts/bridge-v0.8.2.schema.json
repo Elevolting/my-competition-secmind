@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secmind.local/contracts/bridge-v0.8.2.schema.json",
+  "title": "SecMind v0.8.2 Bridge execution",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "status", "executions"],
+  "properties": {
+    "schema_version": {"const": "secmind-bridge-v0.8.2"},
+    "status": {"type": "string"},
+    "executions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/execution"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "stream": {
+      "type": "object",
+      "required": ["stream", "sha256", "total_bytes", "retained_bytes", "truncated"],
+      "properties": {
+        "stream": {"enum": ["stdout", "stderr"]},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "total_bytes": {"type": "integer", "minimum": 0},
+        "retained_bytes": {"type": "integer", "minimum": 0},
+        "truncated": {"type": "boolean"},
+        "cas_digest": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]}
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "required": ["attempt_ordinal", "attempt_type", "status", "duration_ms", "stage", "retryable", "request_digest", "stdout_sha256", "stderr_sha256"],
+      "properties": {
+        "attempt_ordinal": {"type": "integer", "minimum": 1},
+        "attempt_type": {"type": "string"},
+        "status": {"type": "string"},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "stage": {"type": "string"},
+        "retryable": {"type": "boolean"},
+        "request_digest": {"$ref": "#/$defs/sha256"},
+        "stdout_sha256": {"$ref": "#/$defs/sha256"},
+        "stderr_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["status", "duration_ms", "stdout", "stderr", "attempt"],
+      "properties": {
+        "status": {"type": "string"},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "stdout": {"$ref": "#/$defs/stream"},
+        "stderr": {"$ref": "#/$defs/stream"},
+        "attempt": {"$ref": "#/$defs/attempt"},
+        "failure_capsule": {"type": ["object", "null"]}
+      }
+    }
+  }
+}

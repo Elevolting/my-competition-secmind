@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secmind.local/contracts/evaluation-v0.8.2.schema.json",
+  "title": "SecMind v0.8.2 sealed evaluation report",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "task_id", "run_id", "status", "findings", "evidence"],
+  "properties": {
+    "schema_version": {"const": "secmind-evidence-v0.8.2"},
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["SUCCESS", "PARTIAL", "FAILED", "TIMEOUT", "CRASH", "POLICY_BLOCKED", "RECOVERY_REQUIRED"]},
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "path": {"type": "string", "pattern": "^(input/)?[^/\\\\.][^\\\\]*$"},
+    "finding": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["finding_id", "path", "file", "line", "file_sha256", "evidence_ids"],
+      "properties": {
+        "finding_id": {"type": "string", "minLength": 1},
+        "id": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "file": {"type": "string", "minLength": 1},
+        "line": {"type": ["integer", "null"], "minimum": 1},
+        "file_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["evidence_id", "id", "path", "file", "line", "file_sha256", "finding_id"],
+      "properties": {
+        "evidence_id": {"type": "string", "minLength": 1},
+        "id": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "file": {"type": "string", "minLength": 1},
+        "line": {"type": ["integer", "null"], "minimum": 1},
+        "file_sha256": {"$ref": "#/$defs/sha256"},
+        "finding_id": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

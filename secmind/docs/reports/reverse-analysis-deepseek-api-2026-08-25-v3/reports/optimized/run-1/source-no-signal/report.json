@@ -1,0 +1,76 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [],
+    "execution_status": "completed",
+    "executive_summary": "封存证据包中未包含可支撑完整逆向分析的运行时或静态信号。分析未能建立任何高置信度的逆向行为链，因此本报告仅给出克制结论，不推测未经验证的威胁或行为。",
+    "findings": [],
+    "human_decision_recommendations": [
+      {
+        "action": "在获得更充分的样本或运行时证据前，暂停对该样本的深入威胁判断，避免基于缺失数据做出假设。",
+        "decision_role": "网络安全负责人/研发负责人",
+        "expected_outcome": "形成基于实际证据的客观决策基础，避免误报或漏报。",
+        "priority": "P3",
+        "rationale": "当前证据不足，任何进一步分析都可能导致错误的资源投入或风险判断。"
+      }
+    ],
+    "limitations": [
+      "证据包仅包含静态观察类型，无运行时数据",
+      "未提供可分析的样本文件或元数据",
+      "无明确逆向信号可引用"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "补充收集样本的静态特征（如PE头、导入表、字符串、哈希）",
+      "在隔离环境执行动态分析以获取运行时行为",
+      "关联外部威胁情报源以补充背景信息",
+      "重新触发分析管道并生成更新的证据包"
+    ],
+    "reverse_analysis": "基于封存证据包（observation_type=static），未发现明确的逆向信号。证据包中未提供可执行文件特征、反汇编结果、动态行为记录或任何可支撑行为推断的指标。因此，无法对样本的逆向行为进行实质性分析，仅能记录证据不足的状态。",
+    "risk_assessment": {
+      "exploitability": "未知",
+      "impact_scope": "未知",
+      "overall_risk": "未知",
+      "urgency": "低"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": null,
+      "facts": {
+        "mitre": []
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "c5e3ba81dc533b7218456b35f45213c332456b8fb774971d9c98ddd780535bd8",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "No complete high-confidence reverse behavior chain was established."
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "source-no-signal",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "c5e3ba81dc533b7218456b35f45213c332456b8fb774971d9c98ddd780535bd8",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

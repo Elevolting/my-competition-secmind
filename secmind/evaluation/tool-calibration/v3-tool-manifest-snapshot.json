@@ -1,0 +1,557 @@
+{
+  "schema_version": "tool-calibration-platform-manifest-snapshot-1.0",
+  "dataset_id": "secmind-heldout-tools-2026-08-v3",
+  "manifest_path": "evaluation/tool-calibration/manifest-v3.json",
+  "manifest_model_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+  "trust_root": {
+    "path": "evaluation/tool-calibration/v3-platform-trust-root.pub",
+    "file_sha256": "32adbb0c2bbb826bd105110bd6f22b0ca1338b8635d324c12cc50263b9e67ea1",
+    "key_id": "ed25519-3bb6ac5c8bb43e3d"
+  },
+  "tools": [
+    {
+      "tool_name": "bandit_python_audit",
+      "manifest": {
+        "name": "bandit_python_audit",
+        "version": "1",
+        "description": "Run Bandit static security analysis over Python source in the controlled workspace.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 120,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": null,
+          "entrypoint": [],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 10485760
+        },
+        "capability_tags": [
+          "sast"
+        ],
+        "supported_languages": [
+          "python"
+        ],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+        "rule_bundle_digest": "63d7dcfa513ce2ec352c49d77f9ff44795ff5dea1c968450d59c7628b7133178",
+        "evidence_types": [
+          "sast_finding"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "sast",
+        "max_parallelism": 2,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "956290181f2def9ef9fe72d674db5193f0737c8e582809e1775af0b1c2f5a2aa",
+      "source": "platform_default_registry"
+    },
+    {
+      "tool_name": "gitleaks_secret_scan",
+      "manifest": {
+        "name": "gitleaks_secret_scan",
+        "version": "adapter-1",
+        "description": "Gitleaks directory scan with complete secret-value redaction.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 300,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+          "entrypoint": [
+            "python",
+            "/opt/secmind-tools/run-gitleaks.py"
+          ],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 16777216
+        },
+        "capability_tags": [
+          "secret_scan"
+        ],
+        "supported_languages": [],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+          "rule_bundle_digest": "edb55ed8c437e1cb6c56e503ccc067593161a3fb90c7f4eda5956bb051c4ce33",
+        "evidence_types": [
+          "redacted_secret_finding"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "secret_scan",
+        "max_parallelism": 1,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "cc37ccbbb9a842cf42805c09c48e96a12670d60dc8c499c19c6d34c9a3cddd22",
+      "source": "platform_external_allowlist"
+    },
+    {
+      "tool_name": "java_semantic_sast",
+      "manifest": {
+        "name": "java_semantic_sast",
+        "version": "1",
+        "description": "Deterministic Java semantic SAST for security-sensitive weak MessageDigest use; checksum and ETag uses are excluded.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 30,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": null,
+          "entrypoint": [],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 10485760
+        },
+        "capability_tags": [
+          "sast"
+        ],
+        "supported_languages": [
+          "java"
+        ],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+        "rule_bundle_digest": "93fc4303cdfe8d95b8c39bc83575a4524fe46cf71f12a653276879a5c249f7e7",
+        "evidence_types": [
+          "sast_flow"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "sast",
+        "max_parallelism": 2,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "1aef428ba2b4964604e6c602ee35e90f058ba6073fb8cf97652377d9fe83b226",
+      "source": "platform_default_registry"
+    },
+    {
+      "tool_name": "osv_dependency_audit",
+      "manifest": {
+        "name": "osv_dependency_audit",
+        "version": "adapter-1",
+        "description": "Match lockfiles and SBOMs against a pinned offline OSV database.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            },
+            "cyclonedx_sbom": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "target",
+            "cyclonedx_sbom"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 300,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+          "entrypoint": [
+            "python",
+            "/opt/secmind-tools/run-osv.py"
+          ],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 16777216
+        },
+        "capability_tags": [
+          "dependency_audit"
+        ],
+        "supported_languages": [],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+        "rule_bundle_digest": "5dbbb9c04d50448207c3d114670108092876ccc79ea3eddb737a465b0c99f52c",
+        "evidence_types": [
+          "dependency_vulnerability"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "dependency",
+        "max_parallelism": 1,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "dc97c4a5fee2822b868f7ef81c513844cfbe96689c4ac71e575e9dd6db0f1b16",
+      "source": "platform_external_allowlist"
+    },
+    {
+      "tool_name": "python_taint_audit",
+      "manifest": {
+        "name": "python_taint_audit",
+        "version": "1",
+        "description": "Deterministic intra-procedural Python source-to-sink analysis for high-value security sinks.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 60,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": null,
+          "entrypoint": [],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 10485760
+        },
+        "capability_tags": [
+          "sast"
+        ],
+        "supported_languages": [
+          "python"
+        ],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+        "rule_bundle_digest": "c2932d5eaefc47630e955e1800c53f867a2f396af5149a64461977669769ed03",
+        "evidence_types": [
+          "sast_flow"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "sast",
+        "max_parallelism": 2,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "340a5c29307f53d36e23e4649684f7215d490c87bb87a4ae3329da5fe3f0e22c",
+      "source": "platform_default_registry"
+    },
+    {
+      "tool_name": "secret_pattern_scan",
+      "manifest": {
+        "name": "secret_pattern_scan",
+        "version": "1",
+        "description": "Detect likely hard-coded credentials while never persisting the matched value.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 60,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": null,
+          "entrypoint": [],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 10485760
+        },
+        "capability_tags": [
+          "secret_scan"
+        ],
+        "supported_languages": [],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+        "rule_bundle_digest": "09fa6efc8ced7f9c408e5a93b9c1262ea67d8dfa33ffc9b2cceb8cd38f94cc71",
+        "evidence_types": [
+          "redacted_secret_finding"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "secret_scan",
+        "max_parallelism": 2,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "ab8107d030cef7c9bd3ddb847fb45c9a0bc9a2f2c0f3441cd576fcfb8dc4d0c8",
+      "source": "platform_default_registry"
+    },
+    {
+      "tool_name": "semgrep_sast",
+      "manifest": {
+        "name": "semgrep_sast",
+        "version": "adapter-1",
+        "description": "Semgrep CE using an immutable offline rule bundle.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "findings": {
+              "type": "array"
+            }
+          }
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 300,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": "sha256:5c4bc18bfb9bf178afaf3009675f6ba444e967b34b675c9de478aea65d225974",
+          "entrypoint": [
+            "python",
+            "/opt/secmind-tools/run-semgrep"
+          ],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 16777216
+        },
+        "capability_tags": [
+          "sast"
+        ],
+        "supported_languages": [
+          "java",
+          "javascript",
+          "python",
+          "typescript"
+        ],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+        "rule_bundle_digest": "358d2fdefe8949bdfe0fc02e616f904a4d59a3baf88380d90552107004a09ac1",
+        "evidence_types": [
+          "sast_finding"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "sast",
+        "max_parallelism": 1,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "69c9b61c9a7311025764b3e7e6e4b6e87a0c16126797ffd9e6aa479de59915d9",
+      "source": "platform_external_allowlist"
+    },
+    {
+      "tool_name": "syft_sbom",
+      "manifest": {
+        "name": "syft_sbom",
+        "version": "adapter-1",
+        "description": "Generate a CycloneDX software bill of materials using Syft.",
+        "scenarios": [
+          "code_audit"
+        ],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object"
+        },
+        "risk_level": 1,
+        "permissions": [
+          "workspace:read"
+        ],
+        "timeout_seconds": 300,
+        "idempotent": true,
+        "requires_network": false,
+        "execution": {
+          "image_digest": "sha256:90a86e10c9c4fef32b2eab4af2ce3c2217ae853d25656b250436abf4ca59987c",
+          "entrypoint": [
+            "python",
+            "/opt/secmind-tools/run-syft.py"
+          ],
+          "network_policy": "none",
+          "cpu_limit": 1.0,
+          "memory_mb": 512,
+          "pids_limit": 64,
+          "tmpfs_mb": 64,
+          "output_limit_bytes": 16777216
+        },
+        "capability_tags": [
+          "sbom"
+        ],
+        "supported_languages": [],
+        "accepted_media_types": [
+          "application/octet-stream"
+        ],
+          "rule_bundle_digest": "0f5f675b860d7e2a57c32d1283643fbb50628d0f074682285d76d946c4f70a42",
+        "evidence_types": [
+          "cyclonedx_sbom"
+        ],
+        "platform_risk": null,
+        "concurrency_key": "dependency",
+        "max_parallelism": 1,
+        "health_status": "healthy"
+      },
+      "manifest_digest": "09e74eeb60394bb9aacac52c886586dc1277735a11a9e85ba6802506eed5c1ed",
+      "source": "platform_external_allowlist"
+    }
+  ],
+  "signature_status": "sealed_v3_platform_tool_result_signer"
+}

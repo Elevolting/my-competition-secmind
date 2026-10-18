@@ -1,0 +1,110 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-937686b53fcd89a436e301b73df4f2907393c14241fc73b2b211febfe6cdf25d",
+      "evidence-18d6f448a0cc75e27fc20c8235a4ba18bcb8d4660b1e08ade978011f959ac576",
+      "evidence-414cf2a19b50ce82d591693872db8f92e1e55696e8762121aaf52fad6b233f79",
+      "evidence-c4fb882bfdaf44cf52e52710d51ec7f6d6ccc2475466439a299caf5397491994",
+      "evidence-623e4a48111edb792c4fa38d3318ab00585e9b8f98c5f7d9c9cd43e264030b11"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "目标样本中检测到完整的DLL注入链，对应MITRE ATT&CK技术T1055.001。攻击者可能利用该链在目标进程中加载恶意动态链接库，实现代码执行与持久化。",
+    "findings": [
+      {
+        "business_impact": "攻击者可在目标系统上以受害进程权限执行任意代码，可能导致敏感数据泄露、系统控制权丢失及业务中断。",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-937686b53fcd89a436e301b73df4f2907393c14241fc73b2b211febfe6cdf25d",
+          "evidence-18d6f448a0cc75e27fc20c8235a4ba18bcb8d4660b1e08ade978011f959ac576",
+          "evidence-414cf2a19b50ce82d591693872db8f92e1e55696e8762121aaf52fad6b233f79",
+          "evidence-c4fb882bfdaf44cf52e52710d51ec7f6d6ccc2475466439a299caf5397491994",
+          "evidence-623e4a48111edb792c4fa38d3318ab00585e9b8f98c5f7d9c9cd43e264030b11"
+        ],
+        "severity": "High",
+        "technical_explanation": "样本展示动态链接库注入（T1055.001）的完整技术链，包括在目标进程中分配内存、写入DLL路径及创建远程线程以触发加载。静态证据表明该行为明确存在，但未提供运行时观测数据。",
+        "title": "完整DLL注入链识别"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "隔离受影响主机并收集内存与进程转储",
+        "decision_role": "安全运营负责人",
+        "expected_outcome": "防止攻击横向移动并支持后续调查。",
+        "priority": "P1",
+        "rationale": "DLL注入表明攻击者已获得代码执行能力，必须立即遏制扩散并保留取证证据。"
+      },
+      {
+        "action": "审查进程加载的DLL列表并实施应用程序白名单",
+        "decision_role": "研发负责人",
+        "expected_outcome": "降低类似攻击的成功率并加强供应链安全。",
+        "priority": "P2",
+        "rationale": "阻断恶意DLL的加载路径，提升系统对注入攻击的免疫力。"
+      }
+    ],
+    "limitations": [
+      "仅基于静态证据，未包含运行时观察数据",
+      "未确认DLL注入的实际目标进程与载荷内容"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "在隔离环境中动态执行样本以观察注入行为",
+      "审计相关进程的DLL加载日志并检测异常",
+      "更新端点防护规则以拦截T1055.001相关技术",
+      "评估受影响系统的数据泄露风险并通知相关方"
+    ],
+    "reverse_analysis": "静态分析显示样本包含动态链接库注入的行为特征，具体涉及将恶意DLL写入目标进程并触发其执行。该链路包括分配远程内存、写入DLL路径、创建远程线程等典型步骤。由于证据为静态观察，未确认运行时动态行为。",
+    "risk_assessment": {
+      "exploitability": "中等（需结合其他漏洞或用户交互）",
+      "impact_scope": "本地主机与受影响进程",
+      "overall_risk": "High",
+      "urgency": "高，需立即响应"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "dll_injection"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001",
+          "dll_injection"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "DLL注入的确切目标进程",
+      "注入的DLL具体功能与来源"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-dll-injection-complete",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

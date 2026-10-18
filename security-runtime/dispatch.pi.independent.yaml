@@ -1,0 +1,47 @@
+# Optional Pi Worker with an independent provider from .env.pi.
+server: "http://127.0.0.1:8000"
+
+common_env:
+  TSEC_SERVER_HOST: "127.0.0.1:8000"
+  TSEC_AGENT_TOKEN: "xxx"
+
+runtime:
+  interval: 3
+  max_workers: 2
+  max_running_projects: 1
+  max_project_workers: 1
+  healthcheck_timeout: 30
+  worker_healthcheck: "startup_and_task"
+  execution: "local"
+  prompt_group: "default"
+  reason_provider: "workbench"
+
+local:
+  workspace_root: "./datas/dispatcher-workspaces"
+  completed_action: "keep"
+
+tasks:
+  bootstrap:
+    timeout: 300
+    conclude_timeout: 90
+  reason:
+    timeout: 300
+    max_intents: 2
+  explore:
+    timeout: 300
+    conclude_timeout: 90
+
+workers:
+  - name: "pi_default"
+    type: "pi"
+    pi_blackboard_extension: "./security-runtime/src/security_runtime/dispatcher/workers/adapters/pi_blackboard.ts"
+    workbench_url: "http://127.0.0.1:8001"
+    task_types: [bootstrap, reason, explore]
+    max_running: 1
+    priority: 0
+    env:
+      PI_MODEL: "${PI_MODEL}"
+      PI_BASE_URL: "${PI_BASE_URL}"
+      PI_API_KEY: "${PI_API_KEY}"
+      PI_PROVIDER_API: "${PI_PROVIDER_API}"
+      PI_MODEL_CONTEXT_WINDOW: "${PI_MODEL_CONTEXT_WINDOW}"

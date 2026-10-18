@@ -1,0 +1,90 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "127.0.0.1:5173:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+      - /var/cache/nginx:size=32m,mode=0755
+      - /var/run:size=1m,mode=0755
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  api:
+    build: .
+    environment:
+      SECURITY_AGENT_ENV: production
+      SECURITY_AGENT_API_HOST: 0.0.0.0
+      SECURITY_AGENT_API_PORT: 8000
+      SECURITY_AGENT_DEMO_MODE: ${SECURITY_AGENT_DEMO_MODE:-true}
+      SECURITY_AGENT_DATABASE_URL: postgresql+psycopg://security_agent:${POSTGRES_PASSWORD:-security_agent_dev}@postgres:5432/security_agent
+      SECURITY_AGENT_INPUT_ROOT: /app/data/inputs
+      SECURITY_AGENT_UPLOAD_ROOT: /app/data/uploads
+      SECURITY_AGENT_RUN_ROOT: /app/data/runs
+      SECURITY_AGENT_EVALUATION_ROOT: /app/data/evaluations
+      SECURITY_AGENT_BENCHMARK_DATASET_ROOT: ${SECURITY_AGENT_BENCHMARK_DATASET_ROOT:-}
+      SECURITY_AGENT_BENCHMARK_PRIVATE_ROOT: ${SECURITY_AGENT_BENCHMARK_PRIVATE_ROOT:-}
+      SECURITY_AGENT_BENCHMARK_SCORER_ROOT: ${SECURITY_AGENT_BENCHMARK_SCORER_ROOT:-}
+      SECURITY_AGENT_BENCHMARK_PYTHON_EXECUTABLE: ${SECURITY_AGENT_BENCHMARK_PYTHON_EXECUTABLE:-python}
+      SECURITY_AGENT_MODEL_BASE_URL: ${SECURITY_AGENT_MODEL_BASE_URL:-https://model-gateway.example/v1}
+      SECURITY_AGENT_MODEL_API_KEY: ${SECURITY_AGENT_MODEL_API_KEY:-}
+      SECURITY_AGENT_PLANNER_MODEL: ${SECURITY_AGENT_PLANNER_MODEL:-planner-model}
+      SECURITY_AGENT_WORKER_MODEL: ${SECURITY_AGENT_WORKER_MODEL:-worker-model}
+      SECURITY_AGENT_FALLBACK_MODEL: ${SECURITY_AGENT_FALLBACK_MODEL:-fallback-model}
+      SECURITY_AGENT_EMBEDDING_MODEL: ${SECURITY_AGENT_EMBEDDING_MODEL:-text-embedding-v3}
+      SECURITY_AGENT_QDRANT_URL: http://qdrant:6333
+      SECURITY_AGENT_QDRANT_COLLECTION: ${SECURITY_AGENT_QDRANT_COLLECTION:-security_agent_knowledge}
+      SECURITY_AGENT_REVERSE_BASE_URL: ${SECURITY_AGENT_REVERSE_BASE_URL:-http://host.docker.internal:8002}
+      SECURITY_AGENT_PENETRATION_BASE_URL: ${SECURITY_AGENT_PENETRATION_BASE_URL:-http://host.docker.internal:8011}
+      SECURITY_AGENT_MODULE_TIMEOUT_SECONDS: ${SECURITY_AGENT_MODULE_TIMEOUT_SECONDS:-20}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - security_agent_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: security_agent
+      POSTGRES_USER: security_agent
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-security_agent_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U security_agent -d security_agent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+volumes:
+  security_agent_data:
+  postgres_data:
+  qdrant_data:

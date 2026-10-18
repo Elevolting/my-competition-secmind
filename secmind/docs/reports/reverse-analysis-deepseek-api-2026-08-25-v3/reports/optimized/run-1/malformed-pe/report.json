@@ -1,0 +1,85 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "partial",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [],
+    "execution_status": "partial",
+    "executive_summary": "检测到畸形 PE 文件，静态分析无法正常完成，判定为 MALFORMED_PE。未发现可动态确认的运行时行为。",
+    "findings": [
+      {
+        "business_impact": "导致安全分析流程受阻，无法评估潜在恶意行为，可能延误威胁响应。",
+        "confidence": "high",
+        "evidence_refs": [],
+        "severity": "high",
+        "technical_explanation": "静态分析器报告 MALFORMED_PE 错误，表明 PE 头或节区结构不符合规范，无法安全加载或解析。由于证据包未提供任何可观测的运行时数据，无法进一步判断其是否可执行或包含恶意载荷。",
+        "title": "畸形 PE 文件无法解析"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "重新获取样本并验证其完整性，使用官方或可信来源的 PE 解析工具进行复检。",
+        "decision_role": "安全运营负责人",
+        "expected_outcome": "获得可解析的样本，从而继续深入分析。",
+        "priority": "P1",
+        "rationale": "当前样本无法被现有工具解析，可能导致漏报。重新获取可确认是否为传输损坏。"
+      }
+    ],
+    "limitations": [
+      "证据包未提供任何静态或动态证据",
+      "分析仅基于 MALFORMED_PE 错误码，无法获取文件内容"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "重新下载或请求发送方提供原始样本",
+      "使用独立 PE 解析器验证文件格式",
+      "若确认畸形，则评估其来源与传播途径"
+    ],
+    "reverse_analysis": "输入证据包标记为畸形 PE（MALFORMED_PE），且无可用的静态或动态证据（evidence_refs 为空）。因此无法进行有效的逆向分析，结论为输入文件格式异常，需要重新获取或修复样本。",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "unknown",
+      "overall_risk": "unknown",
+      "urgency": "high"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": {
+        "code": "MALFORMED_PE"
+      },
+      "facts": {},
+      "status": "partial"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "8511460ad69b648c17f543daeca8e5acc497cddff0af76e5876fc29bee27d7d0",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "样本真实内容",
+      "是否包含恶意代码",
+      "是否可执行"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "malformed-pe",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "8511460ad69b648c17f543daeca8e5acc497cddff0af76e5876fc29bee27d7d0",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

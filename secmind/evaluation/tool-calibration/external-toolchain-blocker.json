@@ -1,0 +1,75 @@
+{
+  "schema_version": "tool-calibration-external-blocker-1.0",
+  "captured_at": "2026-08-17",
+  "repository": "F:/BaiduSyncdisk/2026竞赛/2026-挑战杯/合并/v0.8.3",
+  "branch": "codex/v0.8.5",
+  "status": "resolved_for_qualification_only",
+  "qualification_dataset": "secmind-heldout-tools-2026-08-v2",
+  "manifest_model_digest": "cf172c6d2c8982df3e758cdb1adf0fa795dfdc8bbd6718f3033a1ad10bac92a8",
+  "fixture_tree_digest": "084748bb0bfba0858c61428c0485f0bfc0fa7721f9d34e514069c6c389b337e4",
+  "qualification_reports": {
+    "observations_digest": "21724d66f18e91fdd80c30ac9cfc295fd4d35c0c4365258100ed61482a14f719",
+    "report_digest": "cb320732ff3a3731d86513bc87c0c268425dfb4fe1fb4e41020dbb981453b43a",
+    "strict_observations_digest": "7b416d8064f8b16273cbf231a7e7561cf37ccdb69f199775fb5a458ff524dd81",
+    "strict_report_digest": "3b5e307ddd1163e40fbeda60b63718f20bc2dcc3cee004b6eb85ad754be0e9e3",
+    "platform_strict_blocked_report_digest": "f29caaf5a8d871de74392b06f3abfc6741594741730a52449f74aaa912f95c0d"
+  },
+  "rootless_runner": {
+    "docker_host": "tcp://127.0.0.1:23760",
+    "security_option": "name=rootless",
+    "staging_image_digest": "sha256:cfdf79f9b13a19b55fbbb0dc1eadecb5625da16a958d4eb1ee83a2a55571c985",
+    "base_image": "python:3.11-slim-bookworm",
+    "base_image_digest": "sha256:2e32f7d302adc1c37428355c1e646897c0c53f4fd60b6a551245fb90ee129f91",
+    "external_image_digest": "sha256:e3aae4eeed7bc1bbdc5e5d169efe12895efcdb0006de95fabacf1a61a36791ea",
+    "readiness": "passed; dedicated rootless Docker backend; 40 external cases executed"
+  },
+  "external_manifests": [
+    {
+      "name": "semgrep_sast",
+      "health": "available",
+      "version": "1.110.0",
+      "image_digest": "sha256:5c4bc18bfb9bf178afaf3009675f6ba444e967b34b675c9de478aea65d225974",
+      "entrypoint": ["python", "/opt/secmind-tools/run-semgrep"],
+      "rule_bundle_digest": "358d2fdefe8949bdfe0fc02e616f904a4d59a3baf88380d90552107004a09ac1"
+    },
+    {
+      "name": "gitleaks_secret_scan",
+      "health": "available",
+      "version": "8.30.1",
+      "image_digest": "sha256:e3aae4eeed7bc1bbdc5e5d169efe12895efcdb0006de95fabacf1a61a36791ea",
+      "entrypoint": ["python", "/opt/secmind-tools/run-gitleaks.py"],
+      "rule_bundle_digest": "88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509",
+      "official_artifact_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+    },
+    {
+      "name": "syft_sbom",
+      "health": "available",
+      "version": "1.51.0",
+      "image_digest": "sha256:e3aae4eeed7bc1bbdc5e5d169efe12895efcdb0006de95fabacf1a61a36791ea",
+      "entrypoint": ["python", "/opt/secmind-tools/run-syft.py"],
+      "rule_bundle_digest": "5a8b71e94f4607973145f02e27e01d50b9f7c7bc41e38d40b39606ad138b43b5",
+      "official_artifact_sha256": "2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f"
+    },
+    {
+      "name": "osv_dependency_audit",
+      "health": "available",
+      "version": "2.5.1",
+      "image_digest": "sha256:e3aae4eeed7bc1bbdc5e5d169efe12895efcdb0006de95fabacf1a61a36791ea",
+      "entrypoint": ["python", "/opt/secmind-tools/run-osv.py"],
+      "rule_bundle_digest": "5dbbb9c04d50448207c3d114670108092876ccc79ea3eddb737a465b0c99f52c",
+      "offline_database_ecosystems": ["Go", "Maven", "PyPI", "crates.io", "npm"],
+      "offline_database_manifest_digest": "5dbbb9c04d50448207c3d114670108092876ccc79ea3eddb737a465b0c99f52c"
+    }
+  ],
+  "official_sources": {
+    "gitleaks": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+    "syft": "https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_linux_amd64.tar.gz",
+    "osv_scanner": "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64"
+  },
+  "unavailable_external_conditions": [],
+  "qualification_blockers": [
+    "v2 was corrected after v1 diagnostic observations and is not an untouched unbiased holdout.",
+    "The qualification Ed25519 key is not the platform-approved ToolManifest/ToolResult trust root."
+  ],
+  "required_final_action": "Author and freeze a fresh untouched release holdout, then bind its real observations to the platform-approved signer and calibrated assurance receipt before publication."
+}

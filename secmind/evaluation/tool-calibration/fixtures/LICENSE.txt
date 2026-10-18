@@ -1,0 +1,5 @@
+CC0 1.0 UNIVERSAL
+
+The fixture source files in this directory are original-authored calibration
+material released to the public domain under CC0 1.0. They contain placeholders
+only; no production credential or copied benchmark sample is included.

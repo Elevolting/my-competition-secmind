@@ -1,0 +1,37 @@
+{
+  "sample_id": "safe-demo-v1",
+  "description": "由团队自行编写的无害 Windows PE 静态逆向测试样本",
+  "format": "PE",
+  "architecture": "x86-64（使用本机 gcc 编译时）",
+  "source": "reverse_demo.c",
+  "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+  "encoded_strings": {
+    "xor_key": "0x5A",
+    "decoded_token": "SECMIND-REVERSE-OK",
+    "decoded_domain": "training.example.invalid"
+  },
+  "expected_behaviors": [
+    "读取一个命令行参数",
+    "使用 XOR 0x5A 解码内置字符串",
+    "比较命令行参数和隐藏测试口令",
+    "口令正确时在当前目录创建 reverse_demo_result.txt",
+    "写入结果文件中的测试域名只是文本，不会发起网络连接"
+  ],
+  "expected_imports_or_apis": [
+    "strcmp",
+    "fopen",
+    "fprintf",
+    "fclose",
+    "puts"
+  ],
+  "forbidden_behaviors": [
+    "网络连接",
+    "启动其他进程",
+    "注册表修改",
+    "进程注入",
+    "持久化",
+    "提权"
+  ],
+  "success_exit_code": 0,
+  "wrong_token_exit_code": 2
+}

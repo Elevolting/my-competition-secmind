@@ -1,0 +1,31 @@
+{
+  "schema_version": "tool-calibration-freeze-receipt-1.0",
+  "dataset_id": "secmind-heldout-tools-2026-08-v3",
+  "frozen_at_utc": "2026-08-17T13:57:32.907456Z",
+  "manifest_path": "evaluation/tool-calibration/manifest-v3.json",
+  "manifest_file_sha256": "f06360efeeeffd568326f5337b1232c9970dbe518ae72bc54d21ebffe8e55d19",
+  "manifest_model_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+  "fixture_tree_digest": "999a4bc8adc636ab0e602c6ba18a0e383195976888d9cee21278241792b8d0dc",
+  "case_count": 80,
+  "case_label_commitments": 80,
+  "fixture_hash_intersection_with_v2": 0,
+  "platform_report_binding_digest": "8f26827a663be1dd52ac9236a960f98ec10ca84d18cadf9024b66fef48af0df1",
+  "freeze_attestation": "The 80 case paths, bytes, expected labels, label commitments, and fixture tree digest were sealed before any v3 scanner invocation. v3 fixture byte hashes were compared with the existing v2 fixture tree and had zero intersections.",
+  "scanner_invocations_before_freeze": 0,
+  "approved_platform_trust_root": "evaluation/tool-calibration/v3-platform-trust-root.pub",
+  "approved_platform_trust_root_file_sha256": "32adbb0c2bbb826bd105110bd6f22b0ca1338b8635d324c12cc50263b9e67ea1",
+  "approved_platform_trust_root_key_id": "ed25519-3bb6ac5c8bb43e3d",
+  "signature_algorithm": "Ed25519",
+  "manifest_signature_payload": {
+    "schema_version": "tool-calibration-manifest-signature-1.0",
+    "dataset_id": "secmind-heldout-tools-2026-08-v3",
+    "manifest_model_digest": "fb872693846df996c44bf596b334cc34c63a1b77d63421fe911634746031a4d4",
+    "manifest_file_sha256": "f06360efeeeffd568326f5337b1232c9970dbe518ae72bc54d21ebffe8e55d19",
+    "fixture_tree_digest": "999a4bc8adc636ab0e602c6ba18a0e383195976888d9cee21278241792b8d0dc",
+    "case_count": 80,
+    "frozen": true
+  },
+  "manifest_signature": "ERDfrdwqdb8M91odBfnW4tbIkxL7IaaSSJzV2CfDANqW-j_DRv-B8wkYsq96Ly099vm-IYdKjxJCItYpmkb9DA",
+  "signature_status": "sealed_before_scanner_invocation",
+  "reason": "Manifest signature was produced by the dedicated v3 platform trust root before any v3 scanner invocation. The v2 evaluator key is intentionally not used; its private key is not present in repository artifacts."
+}

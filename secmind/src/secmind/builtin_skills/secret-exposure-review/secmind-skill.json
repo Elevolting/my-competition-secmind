@@ -1,0 +1,18 @@
+{
+  "skill_id": "secret-exposure-review",
+  "version": "1.0.0",
+  "description": "Detect credential candidates with mandatory redaction and evidence minimization.",
+  "trigger_terms": ["secret", "credential", "token", "password", "密钥", "凭据", "口令"],
+  "supported_languages": [],
+  "scenarios": ["code_audit"],
+  "required_capabilities": ["secret_scan"],
+  "allowed_agent_profiles": ["secret-reviewer"],
+  "risk_ceiling": 1,
+  "max_turns": 2,
+  "input_contract": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+  "output_contract": {"type": "object", "required": ["findings"], "properties": {"findings": {"type": "array"}, "redacted": {"const": true}}},
+  "eval_case_ids": ["secret-redaction", "secret-safe-negative"],
+  "package_digest": "0e358427e43d8faa6780fb94b552f4ee58ba03a7bd951ba3513a09fa789379d0",
+  "signer": "secmind-platform-v1",
+  "signature": "P7DRdR89e3Cla0CrjhyIrDIT2UdLmExNtQIEjX4rTqPHKa2a_Ir0_oSMCcMb-D2WoJwc_zYtKMEiAiurDAmjAQ"
+}

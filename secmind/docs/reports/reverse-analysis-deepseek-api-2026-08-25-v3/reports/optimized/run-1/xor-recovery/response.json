@@ -1,0 +1,161 @@
+{
+  "execution_status": "completed",
+  "model_response_sha256": "67bd674c5c38fefdcdafea9e22a810f5d47e0d11910ff08786bbd9c3d911daf8",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "分析确认样本使用 XOR 编码隐藏训练 token、测试域名和 key。已恢复关键数据，但部分值因静态启发式可能包含误报，建议动态验证。",
+    "findings": [
+      {
+        "business_impact": "攻击者可利用此机制解密隐藏配置，暴露训练数据和测试基础设施。",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "静态分析发现 XOR 解码候选，密钥序列和值列表被提取，确认数据通过 XOR 隐藏。",
+        "title": "XOR 编码机制确认"
+      },
+      {
+        "business_impact": "恢复的域名可能指向测试 C2 或训练数据服务器，暴露网络基础设施。",
+        "confidence": "Medium",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "解码值包括 training.example.invalid 和 xllmhmlh.llmlllmlllmhmlh 等域名，但部分值可能是误报。",
+        "title": "隐藏测试域名的恢复"
+      },
+      {
+        "business_impact": "暴露的 key 可能用于认证或数据解密，造成更深层泄露。",
+        "confidence": "Medium",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "SECMIND-REVERSE-OK 和 SYYY-62 等值被恢复，但需要动态验证其真实用途。",
+        "title": "关键 key 的恢复"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "动态执行样本并监控网络流量，验证解码域名是否被访问",
+        "decision_role": "安全运营负责人",
+        "expected_outcome": "确认域名和 key 的真实用途，指导进一步响应。",
+        "priority": "P1",
+        "rationale": "静态解码可能包含误报，动态验证可确认实际行为。"
+      },
+      {
+        "action": "对解码出的域名进行威胁情报查询，评估基础设施归属",
+        "decision_role": "威胁情报负责人",
+        "expected_outcome": "扩展检测规则，提前发现相关活动。",
+        "priority": "P1",
+        "rationale": "恢复的域名可能关联已知恶意基础设施，可扩展 IoC。"
+      },
+      {
+        "action": "评估训练 token 泄露情况，如需轮换密钥",
+        "decision_role": "研发负责人",
+        "expected_outcome": "降低数据泄露风险，保护知识产权。",
+        "priority": "P2",
+        "rationale": "key 可能用于训练数据保护，泄露后需应对。"
+      }
+    ],
+    "limitations": [
+      "未执行动态分析",
+      "未使用完整反汇编引擎",
+      "XOR 解码启发式可能包含误报"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "动态分析样本，确认 XOR 解码值的运行时使用",
+      "对恢复的域名进行被动 DNS 和证书透明度查询",
+      "检查样本是否包含更多未解码的敏感数据",
+      "评估训练 token 的暴露范围并启动应急响应"
+    ],
+    "reverse_analysis": "样本为 x86-64 PE 文件，包含 10 个节区，静态导入显示文件 I/O 和字符串比较操作。静态分析发现 XOR 解码候选。通过 XOR 密钥序列 0x5a,0x4f,0x5a,0x4f,0x4f,0x34,0x59,0x9e,0x6c,0x6c,0x0e,0x6c,0x03,0x0e,0x6c,0x0e,0x6c,0x0e,0x0e,0x6e 解码得到多个字符串，包括疑似测试域名（training.example.invalid, xllmhmlh.llmlllmlllmhmlh）和 key 相关值（SECMIND-REVERSE-OK, SYYY-62）。部分值（如 OONOOONOOONKNOK-OONDIOD）格式异常，可能为误报。",
+    "risk_assessment": {
+      "exploitability": "需要样本访问权，静态可提取",
+      "impact_scope": "训练数据和测试基础设施可能暴露",
+      "overall_risk": "Medium",
+      "urgency": "Medium"
+    },
+    "scoring_claims": {
+      "behaviors": [],
+      "error": null,
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "xor_keys": [
+          "0x5a",
+          "0x4f",
+          "0x5a",
+          "0x4f",
+          "0x4f",
+          "0x34",
+          "0x59",
+          "0x9e",
+          "0x6c",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x03",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x6c",
+          "0x0e",
+          "0x0e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "解码字符串的实际运行时用途",
+      "密钥序列的完整性和准确性"
+    ]
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "xor-recovery",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

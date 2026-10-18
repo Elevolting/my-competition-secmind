@@ -1,0 +1,96 @@
+{
+  "execution_status": "completed",
+  "model_response_sha256": "5f8cc9b3f7ddfa4691b6021dc0d9a935867f9c0e3b25db27d06b8960092e8456",
+  "report": {
+    "evidence_refs": [
+      "evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691",
+      "evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87",
+      "evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f",
+      "evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04",
+      "evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c",
+      "evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a",
+      "evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "分析确认样本存在完整的进程镂空（Process Hollowing, T1055.012）攻击链，涉及创建挂起进程、写入恶意代码、修改入口点并恢复线程执行。该技术用于逃避检测并在合法进程上下文中执行恶意负载，对企业环境构成严重威胁。",
+    "findings": [
+      {
+        "business_impact": "攻击者可在合法进程伪装下执行任意代码，绕过安全监控和端点防护，可能导致数据泄露、系统控制或横向移动，直接影响业务连续性和数据保密性。",
+        "confidence": "high",
+        "evidence_refs": [
+          "evidence-c4d7e66f33647bb267aaafa473ca322247fab8a58646acb453a8e44fefe5b691",
+          "evidence-6251b80e80e115c8deb2baf3c5d04e22a9288add980bf60235171a82ff71ae87",
+          "evidence-e87c17ba429fdd21b61f8ce2cb0789d21b011afbb051b43a6fe63b2118cdc82f",
+          "evidence-69de2330976eb31cd7eebe47d0aea94a235b09b93cda76d74af8571c22d77f04",
+          "evidence-934c4d26471637b6a97510e2ea4ac498d9b22a0ed1efddfa94b2993e057df82c",
+          "evidence-820fafe99d94ca01fa929e68515840c2da5cff4327455e33c85e2327ea6eed4a",
+          "evidence-1b81a42ed8d17fb2059de674a86068f23b70e3eb50a03c27fa0fe8f98f52a0fc"
+        ],
+        "severity": "critical",
+        "technical_explanation": "样本执行了完整的进程镂空技术流程：通过创建挂起状态的合法进程，利用内存写入API将恶意负载注入目标进程空间，修改入口点指向恶意代码，最后恢复线程执行。该技术有效规避静态检测和基于进程白名单的安全控制。",
+        "title": "Process Hollowing chain confirmed"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "立即隔离受影响主机并收集内存和进程快照进行取证分析",
+        "decision_role": "CISO",
+        "expected_outcome": "遏制攻击扩散，获取完整攻击链证据",
+        "priority": "P0",
+        "rationale": "进程镂空表明攻击者已获得代码执行能力，可能已建立持久化或横向移动基础"
+      }
+    ],
+    "limitations": [
+      "证据为静态分析结果，未包含运行时行为验证"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "执行端点检测响应（EDR）扫描以发现其他受影响系统",
+      "审查进程创建和内存修改相关日志以确定攻击入口",
+      "评估是否需要启动事件响应流程并通知相关监管机构"
+    ],
+    "reverse_analysis": "进程镂空攻击链完整识别：1) 创建挂起进程以获取合法进程句柄；2) 卸载原进程内存并写入恶意负载；3) 修改目标进程入口点指向恶意代码；4) 恢复线程执行以启动恶意代码。整个链条符合MITRE ATT&CK T1055.012技术定义。",
+    "risk_assessment": {
+      "exploitability": "moderate",
+      "impact_scope": "host",
+      "overall_risk": "high",
+      "urgency": "P0"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "process_hollowing"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Process Injection: Process Hollowing",
+          "T1055.012",
+          "process_hollowing"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "恶意负载的具体功能和C2通信目标尚未确定"
+    ]
+  },
+  "schema_version": "1.0",
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "source-process-hollowing",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "5c4309387a4a420cb1e962c429481121faca936f79932cb335caa0ddfee9bf56",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

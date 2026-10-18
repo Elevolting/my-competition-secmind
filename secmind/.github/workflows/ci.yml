@@ -1,0 +1,362 @@
+name: ci
+
+on:
+  # Feature branches are validated by pull_request. Running the same SHA again
+  # on push creates duplicate check suites and can leave cancelled red checks.
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+# CI must never contact a live model provider. Tests that need model behavior
+# inject a deterministic MockTransport and the evaluation runs fully offline.
+env:
+  SECMIND_MODEL_MODE: offline
+  SECMIND_ALLOW_LIVE_MODELS: "false"
+  SECMIND_MAX_MODEL_TIER: "5.4"
+  SECMIND_QWEN_API_KEY: ""
+  PYTHONPATH: .:src
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked --all-extras
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy src scripts/check_engineering_gate.py scripts/check_clean_wheel.py
+      - run: uv run python scripts/check_architecture_budget.py --output architecture-gate.json
+      - name: Unit, contract, migration, and golden snapshot tests
+        run: |
+          set -euo pipefail
+          uv run coverage run -m pytest -m "not integration" --junitxml=unit-tests.xml 2>&1 | tee unit-tests.log
+          uv run coverage json -o coverage.json
+          uv run coverage xml -o coverage.xml
+      - name: Render precise coverage summary
+        run: uv run coverage report --precision=6 --fail-under=0
+      - name: Enforce exact total, branch, and changed-lines coverage gates
+        env:
+          # Changed-line coverage is a release-delta metric.  This PR contains
+          # the repository bootstrap history, so comparing it with main would
+          # incorrectly classify the whole product as v0.8.7 code.  Pin the
+          # last qualified release commit and advance this SHA once per release.
+          ENGINEERING_GATE_BASE: 183596f5f17b073101e741192940ba116f2ed41b
+        run: >-
+          uv run python scripts/check_engineering_gate.py coverage
+          --coverage-json coverage.json
+          --base-ref "$ENGINEERING_GATE_BASE"
+          --total-floor 85.69
+          --branch-floor 75.28
+          --changed-lines-floor 90
+          --output engineering-gate.json
+      - run: uv run bandit -r src -q
+      - name: Export locked dependencies
+        run: uv export --frozen --all-extras --no-hashes --no-emit-project --output-file requirements-audit.txt
+      - name: Audit Python dependencies
+        run: uv tool run pip-audit --requirement requirements-audit.txt
+      - run: uv build
+      - name: Enforce clean wheel gate
+        run: uv run python scripts/check_clean_wheel.py --output clean-wheel-gate.json
+      - name: Upload test and coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secmind-quality-evidence
+          path: |
+            unit-tests.xml
+            unit-tests.log
+            coverage.json
+            coverage.xml
+            engineering-gate.json
+            architecture-gate.json
+            clean-wheel-gate.json
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        with:
+          name: secmind-python-package
+          path: dist/*
+
+  evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked --all-extras
+      - name: Run 40-case synthetic offline smoke for three repetitions
+        run: >-
+          uv run python scripts/evaluate.py
+          --profile synthetic-smoke
+          --repetitions 3
+          --output evaluation-smoke.json
+      - name: Upload synthetic smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secmind-synthetic-smoke-report
+          path: evaluation-smoke.json
+          if-no-files-found: error
+
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: secmind
+          POSTGRES_USER: secmind
+          POSTGRES_PASSWORD: integration
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U secmind -d secmind"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      SECMIND_TEST_DATABASE_URL: postgresql+psycopg://secmind:integration@127.0.0.1:5432/secmind
+      SECMIND_TEST_CHECKPOINT_URL: postgresql://secmind:integration@127.0.0.1:5432/secmind
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked --all-extras
+      - name: Apply business migrations twice and verify head
+        env:
+          SECMIND_DATABASE_URL: postgresql+psycopg://secmind:integration@127.0.0.1:5432/secmind
+        run: |
+          set -euo pipefail
+          {
+            uv run alembic upgrade head
+            uv run alembic upgrade head
+            uv run alembic current --check-heads
+          } 2>&1 | tee migration.log
+      - name: Run PostgreSQL integration tests with machine-readable evidence
+        run: |
+          set -euo pipefail
+          uv run pytest -m integration --junitxml=postgres-integration.xml 2>&1 | tee postgres-integration.log
+      - name: Enforce nonzero PostgreSQL execution and test success
+        if: always()
+        run: uv run python scripts/check_engineering_gate.py postgres --junitxml postgres-integration.xml --output postgres-gate.json
+      - name: Upload PostgreSQL test and migration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secmind-postgres-evidence
+          path: |
+            migration.log
+            postgres-integration.xml
+            postgres-integration.log
+            postgres-gate.json
+          if-no-files-found: warn
+
+  docker-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked --all-extras
+      - name: Build immutable tool and staging images
+        run: |
+          docker build -f docker/tools/bandit/Dockerfile -t secmind-bandit:local .
+          docker build -f docker/sandbox/staging.Dockerfile -t secmind-staging:local .
+          docker build -f docker/tools/semgrep/Dockerfile -t secmind-semgrep:local .
+          echo "SECMIND_SANDBOX_BANDIT_IMAGE=$(docker image inspect secmind-bandit:local --format '{{.Id}}')" >> "$GITHUB_ENV"
+          echo "SECMIND_SANDBOX_STAGING_IMAGE=$(docker image inspect secmind-staging:local --format '{{.Id}}')" >> "$GITHUB_ENV"
+          echo "SECMIND_SANDBOX_SEMGREP_IMAGE=$(docker image inspect secmind-semgrep:local --format '{{.Id}}')" >> "$GITHUB_ENV"
+          echo "SECMIND_SEMGREP_SAST_RULE_BUNDLE_DIGEST=$(uv run python -c 'from secmind.tools import SEMGREP_REVIEWED_RULE_BUNDLE_DIGEST; print(SEMGREP_REVIEWED_RULE_BUNDLE_DIGEST)')" >> "$GITHUB_ENV"
+          sandbox_token=$(openssl rand -hex 32)
+          sandbox_control_token=$(openssl rand -hex 32)
+          echo "::add-mask::$sandbox_token"
+          echo "::add-mask::$sandbox_control_token"
+          echo "SECMIND_SANDBOX_TOKEN=$sandbox_token" >> "$GITHUB_ENV"
+          echo "SECMIND_SANDBOX_CONTROL_TOKEN=$sandbox_control_token" >> "$GITHUB_ENV"
+          echo "SECMIND_DOCKER_SOCKET=/var/run/docker.sock" >> "$GITHUB_ENV"
+      - name: Validate Compose configuration
+        run: docker compose config --quiet
+      - name: Build and start SecMind
+        run: docker compose up --build -d
+      - name: Verify repeated migration inside the API image
+        run: |
+          docker compose exec -T api alembic upgrade head
+          docker compose exec -T api alembic current --check-heads
+      - name: Wait for API and run HTTP smoke test
+        run: bash scripts/e2e.sh
+      - name: Upload HTTP E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secmind-http-e2e-evidence
+          path: e2e-artifacts
+          if-no-files-found: warn
+      - name: Capture Runner API, resource, and cleanup evidence
+        run: |
+          set -euo pipefail
+          set +e
+          docker compose exec -T sandbox-runner python - <<'PY' > runner-api.json
+          import base64
+          import json
+          import os
+          import time
+          import urllib.request
+
+          base_url = "http://127.0.0.1:8010"
+          service_token = os.environ["SECMIND_SANDBOX_TOKEN"]
+          control_token = os.environ["SECMIND_SANDBOX_CONTROL_TOKEN"]
+
+          def call(path, token, payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              request = urllib.request.Request(
+                  base_url + path,
+                  data=data,
+                  headers={
+                      "Authorization": f"Bearer {token}",
+                      "Content-Type": "application/json",
+                  },
+              )
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return json.load(response)
+
+          health = None
+          for _ in range(60):
+              try:
+                  health = call("/health/ready", service_token)
+                  if health.get("status") == "ready":
+                      break
+              except Exception:
+                  time.sleep(1)
+          if not isinstance(health, dict) or health.get("status") != "ready":
+              raise RuntimeError("sandbox runner did not become ready")
+
+          content = base64.b64encode(b"print(1)\n").decode()
+          result = call(
+              "/internal/v1/invocations",
+              service_token,
+              {
+                  "schema_version": "1.1",
+                  "run_id": "ci-engineering-gate",
+                  "invocation_id": "ci-engineering-gate",
+                  "tool_name": "bandit_python_audit",
+                  "lease_fence": 1,
+                  "files": [{"path": "probe.py", "content_base64": content}],
+              },
+          )
+          resources = call(
+              "/internal/v1/resources?run_id=ci-engineering-gate",
+              control_token,
+          )
+          print(json.dumps({"health": health, "result": result, "resources": resources}, sort_keys=True))
+          PY
+          capture_status=$?
+          set -e
+          if [ "$capture_status" -ne 0 ] || [ ! -s runner-api.json ]; then
+            printf '%s\n' '{"capture_error":true,"health":{},"result":{},"resources":{}}' > runner-api.json
+          fi
+      - name: Probe Docker isolation policy and cleanup
+        run: |
+          set -euo pipefail
+          probe_name=secmind-engineering-gate
+          docker rm -f "$probe_name" >/dev/null 2>&1 || true
+          set +e
+          docker run -d \
+            --name "$probe_name" \
+            --network none \
+            --user 65532:65532 \
+            --cap-drop ALL \
+            --security-opt no-new-privileges:true \
+            --read-only \
+            --entrypoint /bin/sleep \
+            "$SECMIND_SANDBOX_STAGING_IMAGE" 30 > docker-probe-id.txt
+          run_status=$?
+          set -e
+          if [ "$run_status" -eq 0 ]; then
+            docker inspect "$probe_name" > docker-probe-inspect.json
+          else
+            printf '{"run_status":%s}\n' "$run_status" > docker-probe-inspect.json
+          fi
+          docker rm -f "$probe_name" >/dev/null 2>&1 || true
+          if docker inspect "$probe_name" >/dev/null 2>&1; then
+            cleanup_confirmed=false
+          else
+            cleanup_confirmed=true
+          fi
+          uv run python - runner-api.json docker-probe-inspect.json "$cleanup_confirmed" "$run_status" <<'PY' > docker-snapshot.json
+          import json
+          import sys
+          from pathlib import Path
+
+          try:
+              api_snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          except (OSError, json.JSONDecodeError):
+              api_snapshot = {}
+          try:
+              inspection = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          except (OSError, json.JSONDecodeError):
+              inspection = {}
+          if not isinstance(api_snapshot, dict):
+              api_snapshot = {}
+          record = inspection[0] if isinstance(inspection, list) and inspection else {}
+          host_config = record.get("HostConfig", {}) if isinstance(record, dict) else {}
+          config = record.get("Config", {}) if isinstance(record, dict) else {}
+          policy = {
+              "network": host_config.get("NetworkMode"),
+              "user": config.get("User"),
+              "cap_drop": host_config.get("CapDrop") or [],
+              "cleanup_confirmed": sys.argv[3] == "true" and sys.argv[4] == "0",
+          }
+          api_snapshot["policy"] = policy
+          print(json.dumps(api_snapshot, sort_keys=True))
+          PY
+      - name: Enforce Runner API, Docker isolation, and cleanup gates (non-rootless CI is not production authentication)
+        if: always()
+        run: uv run python scripts/check_engineering_gate.py docker --snapshot docker-snapshot.json --output docker-gate.json
+      - name: Upload Docker Runner evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secmind-docker-runner-evidence
+          path: |
+            runner-api.json
+            docker-probe-id.txt
+            docker-probe-inspect.json
+            docker-snapshot.json
+            docker-gate.json
+          if-no-files-found: warn
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Tear down
+        if: always()
+        run: docker compose down -v --remove-orphans
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

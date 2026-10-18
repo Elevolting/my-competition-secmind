@@ -1,0 +1,2 @@
+API_ENDPOINT=https://example.invalid/api
+API_TOKEN=${API_TOKEN}

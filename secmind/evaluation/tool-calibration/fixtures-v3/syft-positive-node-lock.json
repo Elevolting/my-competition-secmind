@@ -1,0 +1,1 @@
+{"name":"v3-sbom-node-app","version":"1.0.0","lockfileVersion":3,"requires":true,"packages":{"":{"name":"v3-sbom-node-app","version":"1.0.0","dependencies":{"axios":"1.7.9","qs":"6.13.0"}},"node_modules/axios":{"version":"1.7.9"},"node_modules/qs":{"version":"6.13.0"}}}

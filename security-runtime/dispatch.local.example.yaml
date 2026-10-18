@@ -1,0 +1,43 @@
+# Local, Docker-free example configuration for Security Runtime.
+server: "http://127.0.0.1:8000"
+
+common_env: {}
+
+# For a local claudecode worker, add these worker fields to connect the
+# workbench MCP catalog through the assigned blackboard intent:
+#   mcp_bridge_python: "../an/.venv/Scripts/python.exe"
+#   workbench_url: "http://127.0.0.1:8001"
+# On Linux, use ../an/.venv/bin/python. The Python environment must have
+# security_agent installed. Other worker types do not support this bridge.
+
+runtime:
+  interval: 3
+  max_workers: 4
+  max_running_projects: 2
+  max_project_workers: 2
+  healthcheck_timeout: 10
+  worker_healthcheck: "disabled"
+  execution: "local"
+  prompt_group: "default"
+
+local:
+  workspace_root: null
+  completed_action: "keep"
+
+tasks:
+  bootstrap:
+    timeout: 60
+    conclude_timeout: 30
+  reason:
+    timeout: 60
+    max_intents: 2
+  explore:
+    timeout: 60
+    conclude_timeout: 30
+
+workers:
+  - name: "mock-local"
+    type: "mock"
+    task_types: [bootstrap, reason, explore]
+    max_running: 2
+    priority: 0

@@ -1,0 +1,18 @@
+{
+  "skill_id": "python-security-audit",
+  "version": "1.0.0",
+  "description": "Audit Python dangerous APIs and security rules with Bandit and approved offline SAST.",
+  "trigger_terms": ["python", "bandit", "sast", "dangerous api", "代码审计", "危险 API"],
+  "supported_languages": ["python"],
+  "scenarios": ["code_audit"],
+  "required_capabilities": ["sast"],
+  "allowed_agent_profiles": ["sast-investigator"],
+  "risk_ceiling": 1,
+  "max_turns": 3,
+  "input_contract": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+  "output_contract": {"type": "object", "required": ["findings"], "properties": {"findings": {"type": "array"}}},
+  "eval_case_ids": ["python-bandit-rules", "python-safe-negative"],
+  "package_digest": "8c43910013b1b1715d6e5bbdb292b3453514244670f79dce1c3e1086ec997a78",
+  "signer": "secmind-platform-v1",
+  "signature": "-x5BKvr8iNfkNohnH-jMssEWpTb1qAOP0QclrGDTDi3efmnEtJMyLMUQwZbbekP684o2bb4MRAhdFL2hsf3pBQ"
+}

@@ -1,0 +1,718 @@
+{
+  "schema_version": "1.0",
+  "generated_date": "2026-08-07",
+  "language": "zh-CN",
+  "status": "local_fusion_complete_release_gate_failed",
+  "purpose": "记录四份队友交付在正式 v0.8 基线上的来源、哈希、处置边界、本地提交与真实验证结果",
+  "baseline": {
+    "commit_sha": "2f9071975f5aafa1900ad66c3f965246f4a88f79",
+    "version": "v0.8",
+    "source_repository_path": "repository://baseline-v0.8",
+    "isolated_clone_path": ".",
+    "target_branch": "codex/team-fusion-v0.8",
+    "independent_clone": true,
+    "uses_worktree": false,
+    "uses_shared_hardlinks": false,
+    "push_allowed_this_round": false,
+    "public_contract_baseline": "Schema 1.7",
+    "public_contract_upgraded": false
+  },
+  "analysis_inputs": [
+    {
+      "path": "source://merge-analysis/05_总览报告/SecMind队友交付合并分析总报告.md",
+      "size": 11459,
+      "sha256": "688e172ec14b13f8fe4c4728dc6bbb5c91f3576c7ed703330c2094f5e6775cf5"
+    },
+    {
+      "path": "source://merge-analysis/05_总览报告/SecMind队友交付二次查漏与融合价值复核.md",
+      "size": 13265,
+      "sha256": "f198c5839daf93b2f874066773ee7c5bd933c98b7ef84ea80760b3ac54b9e1d7"
+    },
+    {
+      "path": "source://merge-analysis/02_模块与文件清单/全文件处置追溯.csv",
+      "size": 110452,
+      "sha256": "4d0fbfce661f6e647d4f81738abfbbb6d4ebb6097c424d00856c65cfadc440e7"
+    },
+    {
+      "path": "source://merge-analysis/02_模块与文件清单/全功能处置与价值评级.csv",
+      "size": 7569,
+      "sha256": "9e9f5400c04ec5f13d843c3aa98f359edbbb93dc0c376c5326c287e5c9bc5666"
+    }
+  ],
+  "digest_policy": {
+    "archive_algorithm": "SHA-256 over the original ZIP bytes",
+    "review_tree_algorithm": "SHA-256 over UTF-8 concatenation of relative_path + NUL + lowercase(file_sha256) + LF, with paths sorted by Unicode ordinal order",
+    "review_tree_exclusions": [
+      ".git",
+      ".pytest_cache",
+      ".mypy_cache",
+      ".ruff_cache",
+      ".venv",
+      "__pycache__",
+      ".worktrees",
+      ".trae",
+      "artifacts",
+      "tmp",
+      ".env",
+      ".coverage",
+      ".DS_Store",
+      "*.pyc",
+      "*.pyo",
+      "*.db",
+      "*.sqlite",
+      "*.sqlite3"
+    ],
+    "secret_content_included": false
+  },
+  "sources": [
+    {
+      "source_id": "HC",
+      "delivery_kind": "完整 Git 仓库；模型路由部分包含未提交工作树改动",
+      "inferred_base": "v0.7.1 衍生线，Git 链 86bea9f -> 58901d5 -> 0c5e2ce",
+      "archive": {
+        "path": "source://team-deliveries/agent-route.zip",
+        "size": 5640841,
+        "sha256": "5e5d1b0731bace7c71ec79638f321693f4fef33cf0331f54cca1e1f5d6c9405b"
+      },
+      "extracted_root": "source://team-deliveries/agent-route_hc/agent/secmind",
+      "review_tree": {
+        "file_count": 431,
+        "byte_count": 5287051,
+        "sha256": "3b010dcfae8ecfdded54ae4a64bda9e78902eded9852d57a04f2e4d6640a8b32"
+      },
+      "key_files": [
+        {
+          "relative_path": "src/secmind/model_router.py",
+          "size": 2403,
+          "sha256": "7c5cbe093420df6b3f48b0c9600fb68cc78a8fb62fab55f58e757707f743eda2"
+        },
+        {
+          "relative_path": "src/secmind/memory.py",
+          "size": 8683,
+          "sha256": "656259022305d6eb96eb983ec2922d01c26058e427fbfb3876d51e6e0961e9c6"
+        },
+        {
+          "relative_path": "src/secmind/llm.py",
+          "size": 33645,
+          "sha256": "b36fd7c857208e9d43b6552d06c907e469799d2af4cc8a7dc73d1c77b8fbf0bc"
+        },
+        {
+          "relative_path": "src/secmind/prompt_assets/v0.7/catalog.yaml",
+          "size": 35190,
+          "sha256": "fec4cbc98247a2b089bf6715c6177f317c85fd07583afdc24cd252d89b1fd268"
+        }
+      ],
+      "disposition": {
+        "adopted": [],
+        "rewritten": [
+          "确定性 ModelTaskKind/ModelLane/ModelRouteDecision 边界，保持当前模型选择和 durable receipt",
+          "evidence_id 扩宽意图，在当前 migration head 后重写"
+        ],
+        "default_disabled": [
+          "Qdrant/Hybrid 的只读 text-facing 搜索候选，失败时回退 PostgreSQL offline"
+        ],
+        "registered_not_copied": [
+          "24 个 Python/JavaScript/Go/AI/CTF/Nudge 非 Java Prompt"
+        ],
+        "rejected": [
+          "旧 orchestrator/llm/compose/migration 整文件",
+          "ContextItem 跳过式去重",
+          "破坏性知识 seed 与凭据片段日志",
+          "静态 Pentest 直接标为 evaluated/release_enabled"
+        ]
+      }
+    },
+    {
+      "source_id": "WHB",
+      "delivery_kind": "无 Git 完整快照，另含外层合并指南",
+      "inferred_base": "v0.7.1-Qdrant 衍生线",
+      "archive": {
+        "path": "source://team-deliveries/secmind_agent_handoff_20260806_2140.zip",
+        "size": 1911980,
+        "sha256": "3b63a770658b535afd08221cdb8fc59d3ab83c827496b7c18a2795e2690a85f4"
+      },
+      "delivery_root": "source://team-deliveries/secmind_agent_handoff_whb_20260806_2140",
+      "extracted_root": "source://team-deliveries/secmind_agent_handoff_whb_20260806_2140/secmind_agent_handoff_20260806",
+      "review_tree": {
+        "file_count": 438,
+        "byte_count": 5498590,
+        "sha256": "100a6fd1fdabb81635425bbbc875c1621c80c6103f808d029932afd6de6e3fc2",
+        "note": "树摘要范围是 extracted_root；外层 README 单独列为关键文件"
+      },
+      "key_files": [
+        {
+          "relative_to": "delivery_root",
+          "relative_path": "README_MERGE_GUIDE_20260807.md",
+          "size": 14684,
+          "sha256": "ec64b868ad073aa883439c0cb92c7ee633329aab90bd8ac7d958a90f9fc92e2f"
+        },
+        {
+          "relative_to": "extracted_root",
+          "relative_path": "src/secmind/source_triage.py",
+          "size": 9150,
+          "sha256": "b127f51629e046a478bfcc0ad600111f0163690943978b05e73c2ce42b234533"
+        },
+        {
+          "relative_to": "extracted_root",
+          "relative_path": "src/secmind/llm.py",
+          "size": 35280,
+          "sha256": "6a39a97f80d10815c2ef953fc2c1093971119ec914eb5534ae09e0aef11a05a1"
+        },
+        {
+          "relative_to": "extracted_root",
+          "relative_path": "scripts/secmind_test3_adapter.py",
+          "size": 44766,
+          "sha256": "9811bc21561b403b1e7f5567d4fbe0f235dd6ff2bba57979a041c92326b83780"
+        }
+      ],
+      "disposition": {
+        "adopted": [],
+        "rewritten": [
+          "Repository Index v2 上的确定性 Source Triage",
+          "Provider-aware 且有硬上限的 JSON 恢复",
+          "只接受 SealedAdmissionSnapshot 与 InputManifest 的 Test3 投影"
+        ],
+        "default_disabled": [],
+        "registered_not_copied": [
+          "taxonomy boundary、Critic 证据核查与角色 Prompt 候选"
+        ],
+        "rejected": [
+          "SQLite 工具回捞",
+          "正则 Finding fallback",
+          "PARTIAL 提升 SUCCESS",
+          "三模型串行主链覆盖 Canonical Primary",
+          "旧 ToolGain 替代 Admission"
+        ]
+      }
+    },
+    {
+      "source_id": "CJM",
+      "delivery_kind": "30 文件增量覆盖包",
+      "inferred_base": "v0.7.1-Qdrant 增量",
+      "archive": {
+        "path": "source://team-deliveries/secmind_cjm_8.6.zip",
+        "size": 12732958,
+        "sha256": "8b8a2b07211d6bbc4fafcd7227a6476ecd5f44161b6b6270f6465346a448678c"
+      },
+      "extracted_root": "source://team-deliveries/secmind_cjm_8.6/secmind_cjm_8.6/secmind_improved_v0.7.1",
+      "review_tree": {
+        "file_count": 30,
+        "byte_count": 34221315,
+        "sha256": "8f431db245385fa2e6c50f0815daa3b2797c6b6a00f87898d1674b82ca594051"
+      },
+      "key_files": [
+        {
+          "relative_path": "src/secmind/log_analysis.py",
+          "size": 55600,
+          "sha256": "07b157fdd3143fe36064607770f1bffee4f396cd09983ab4ca32d6c51dca098c"
+        },
+        {
+          "relative_path": "src/secmind/orchestration/scenario_execution.py",
+          "size": 23235,
+          "sha256": "11d2c25e88aa9699055c686121eb05622688738529a9c230c94bdbf067bc1b75"
+        },
+        {
+          "relative_path": "docker/tools/semgrep/Dockerfile",
+          "size": 510,
+          "sha256": "18faba553069799ef1ee34868e7b636e1a74a656cbb495220d99e5807b3e4a6d"
+        },
+        {
+          "relative_path": "docker/tools/semgrep/run-semgrep",
+          "size": 3761,
+          "sha256": "68f858aa70c258ab10df99bc06d22c7511aa0980cee094fc5f5a946ce24f939d"
+        },
+        {
+          "relative_path": "docker/tools/semgrep/rules/python-cwes.yml",
+          "size": 3074,
+          "sha256": "7180a3cfcd6167c9267083feafea18516c8bda1b16fb0ed0479fdb10b38db5a6"
+        },
+        {
+          "relative_path": "knowledge_corpus/mitre_enterprise.jsonl",
+          "size": 3403875,
+          "sha256": "3987712d3cca6dfeaaa58335af98202e78100802c3a991ed0899df7fad3f54fa"
+        }
+      ],
+      "disposition": {
+        "adopted": [],
+        "rewritten": [
+          "run-scope 有界 CAS memoization，并完整保留 typed failure",
+          "ZIP 安全边界、PCAP 字段映射和输出 cap 思路"
+        ],
+        "default_disabled": [
+          "Semgrep 固定入口与 Runner 候选",
+          "通过治理后重建向量的 Hybrid Knowledge 候选",
+          "EVTX/PCAP/PCAPNG/ZIP parser 候选"
+        ],
+        "registered_not_copied": [
+          "binary/network/email profile 思路"
+        ],
+        "rejected": [
+          "旧 Qdrant 向量导出",
+          "损坏或仅自报 verified 的语料",
+          "宽泛 Semgrep 规则直接发布",
+          "UNTRUSTED_INPUT 公共场景",
+          "80.3 分作为发布证据"
+        ]
+      }
+    },
+    {
+      "source_id": "LS",
+      "delivery_kind": "无 Git 完整快照，自命名 v0.8 但公共 Schema 仍为 1.6",
+      "inferred_base": "v0.7.1 衍生线",
+      "archive": {
+        "path": "source://team-deliveries/secmind_ls_0806.zip",
+        "size": 5532502,
+        "sha256": "4e0f19ef2fbcd1fccbb4ab9f6eadb80f5a21e93c2af52a287b6f89f3bbc7d16a"
+      },
+      "extracted_root": "source://team-deliveries/secmind_ls_0806/secmind",
+      "review_tree": {
+        "file_count": 492,
+        "byte_count": 6519818,
+        "sha256": "e4b135d00868b9432965af0fd20652c61a8ea0fbee231926651c33a8d1880556"
+      },
+      "key_files": [
+        {
+          "relative_path": "src/secmind/log_analysis.py",
+          "size": 48924,
+          "sha256": "20cbd27bd58e45fd7a255c80525a41e57762b1bc4c5d96955eea4e9aaac31a38"
+        },
+        {
+          "relative_path": "src/secmind/multidomain_contracts.py",
+          "size": 3480,
+          "sha256": "40c02134b0ea5f71b9f9030ad7974a4b867ed171c55f0b53da8e5dd9de32f3d2"
+        },
+        {
+          "relative_path": "src/secmind/pentest_kernel/contracts.py",
+          "size": 4221,
+          "sha256": "e7653d491c8500f5c32020314a1b23fdcf92a8bf44e7e3d9cb45e45ecb901750"
+        },
+        {
+          "relative_path": "src/secmind/ir_kernel/contracts.py",
+          "size": 5334,
+          "sha256": "6e655f0fbcb531bad26ec01fa38c60fb25a7b466b0ec91f9152168f8a8ea82f9"
+        },
+        {
+          "relative_path": "src/secmind/rule_mapping.py",
+          "size": 10143,
+          "sha256": "8ec07b9a05544eaeddaae2557cfc93e44925027adfcba087d52acf15f0ec93b4"
+        },
+        {
+          "relative_path": "tests/conftest.py",
+          "size": 1125,
+          "sha256": "a010902ebb1eb26cb366a67d392a47ad21a3e72ccf91bfe95c6941952c87d019"
+        },
+        {
+          "relative_path": "src/secmind/prompt_assets/v0.7/catalog.yaml",
+          "size": 38376,
+          "sha256": "85506bdf3603a75e5f698bed4ae469de8680c7194a8560b3026ccf9933a1b33e"
+        }
+      ],
+      "disposition": {
+        "adopted": [],
+        "rewritten": [
+          "EVTX/PCAPNG magic、安全 XML、资源上限与 typed diagnostic 思路",
+          "Bandit 原生 ID/规范 ID/weakness 元数据分层",
+          "测试显式 offline、空 API key 与网络 tripwire"
+        ],
+        "default_disabled": [
+          "二进制 parser",
+          "多域执行接口"
+        ],
+        "registered_not_copied": [
+          "9 个 Log/Pentest/IR Planner-Primary-Critic Prompt",
+          "SealedDomainContract canonical digest 语义",
+          "Pentest ROE/FindingProof/审批义务",
+          "IR EvidenceChainLink 父摘要链与终报一致性"
+        ],
+        "rejected": [
+          "Schema 1.6 与旧 orchestrator/tools/config/llm",
+          "14 张平行表",
+          "29 个无执行器工具直接注册",
+          "全局取消参数污点",
+          "LS ToolGainGate",
+          "B401-B415 默认发布",
+          "partial 计 release completion"
+        ]
+      }
+    }
+  ],
+  "decision_summary": {
+    "adopted_verbatim": [],
+    "adopted_design_intent": [
+      "HC 确定性模型路由边界与 evidence_id 修复意图",
+      "WHB Source Triage、受限 JSON 恢复与密封 Test3 投影思想",
+      "CJM CAS memoization、PCAP 字段映射、ZIP 上限和 Semgrep Runner 骨架思想",
+      "LS magic 检测、安全 XML、多域契约、ROE、IR 父链、规则身份和测试隔离思想"
+    ],
+    "rewrite_policy": "所有进入当前 v0.8 的生产实现均针对 Schema 1.7、Admission、durable receipt、Repository Index、Broker/Runner 与现有 migration head 重新实现，不直接复制队友核心文件。",
+    "default_disabled_policy": "高耦合候选完成受控接线但在格式真实性、精度、知识治理或执行闭环门禁通过前保持关闭。",
+    "rejection_policy": "任何削弱 provenance、Admission、污点、审批、模型成本闸或公共 Schema 的实现均不合入。"
+  },
+  "fusion_items": [
+    {
+      "id": "FUS-001",
+      "name": "evidence_id 扩宽后继迁移",
+      "origins": ["HC", "LS"],
+      "implementation": "migrations/versions/0015_team_fusion_evidence_ids.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-002",
+      "name": "不可变 Repository Index v2 Source Triage",
+      "origins": ["WHB"],
+      "implementation": "src/secmind/source_triage.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-003",
+      "name": "受限 Provider-aware JSON 恢复",
+      "origins": ["WHB"],
+      "implementation": "src/secmind/llm.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-004",
+      "name": "确定性 ModelRouter 审计边界",
+      "origins": ["HC"],
+      "implementation": "src/secmind/model_router.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-005",
+      "name": "规则原生/规范/weakness 身份元数据",
+      "origins": ["LS"],
+      "implementation": "src/secmind/tools.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-006",
+      "name": "测试真实模型网络 tripwire",
+      "origins": ["LS"],
+      "implementation": "tests/conftest.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-007",
+      "name": "run-scope typed CAS memoization",
+      "origins": ["CJM"],
+      "implementation": "src/secmind/orchestration/scenario_execution.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-008",
+      "name": "所有外部扫描器 path/line/SHA/input manifest 校验",
+      "origins": ["CJM", "LS"],
+      "implementation": "src/secmind/tools.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-009",
+      "name": "EVTX/PCAP/PCAPNG/ZIP parser",
+      "origins": ["LS", "CJM"],
+      "implementation": "src/secmind/log_parsers",
+      "state": "default_disabled",
+      "feature_flag": "binary_log_parsers_enabled"
+    },
+    {
+      "id": "FUS-010",
+      "name": "Semgrep 容器与规则候选",
+      "origins": ["CJM"],
+      "implementation": "docker/tools/semgrep",
+      "state": "default_disabled",
+      "feature_flag": "semgrep_candidate_rules_enabled"
+    },
+    {
+      "id": "FUS-011",
+      "name": "只读 Hybrid Knowledge adapter",
+      "origins": ["HC", "CJM"],
+      "implementation": "src/secmind/hybrid_knowledge.py",
+      "state": "default_disabled",
+      "feature_flag": "hybrid_knowledge_enabled"
+    },
+    {
+      "id": "FUS-012",
+      "name": "密封 Test3 评测投影",
+      "origins": ["WHB"],
+      "implementation": "src/secmind/evaluation_projection.py",
+      "state": "default_enabled"
+    },
+    {
+      "id": "FUS-013",
+      "name": "LS 多域契约映射登记",
+      "origins": ["LS"],
+      "implementation": "documentation_only",
+      "state": "registered_not_copied"
+    }
+  ],
+  "prompt_candidate_registry": {
+    "hc_non_java": {
+      "source_root": "source://team-deliveries/agent-route_hc/agent/secmind/src/secmind/prompt_assets/v0.7/strategies",
+      "count": 24,
+      "bundle_sha256": "05e3f4793272b95a89fc2a210595e4e7d7feeda6514eacf0c8ed439964ef714c",
+      "state": "registered_not_copied",
+      "files": [
+        "nudge-budget-continuation.md",
+        "nudge-continue-analysis.md",
+        "nudge-injection-aware.md",
+        "nudge-structural-output.md",
+        "nudge-tool-first.md",
+        "primary-ai-data-exfiltration.md",
+        "primary-ai-prompt-injection.md",
+        "primary-ctf-multi-step-crypto.md",
+        "primary-ctf-multi-step-forensics.md",
+        "primary-ctf-multi-step-web.md",
+        "primary-go-command-injection.md",
+        "primary-go-path-traversal.md",
+        "primary-go-sql-injection.md",
+        "primary-javascript-command-injection.md",
+        "primary-javascript-path-traversal.md",
+        "primary-javascript-prototype-pollution.md",
+        "primary-javascript-ssrf.md",
+        "primary-javascript-xss.md",
+        "primary-python-authorization-bypass.md",
+        "primary-python-command-injection.md",
+        "primary-python-information-exposure.md",
+        "primary-python-path-traversal.md",
+        "primary-python-sql-injection.md",
+        "primary-python-unsafe-deserialization.md"
+      ],
+      "reason_not_copied": "需要逐模板治理、修复 PromptPlan 契约不一致并做盲测；不得批量提升旧模板状态"
+    },
+    "ls_multidomain": {
+      "source_root": "source://team-deliveries/secmind_ls_0806/secmind/src/secmind/prompt_assets/v0.7/strategies",
+      "count": 9,
+      "bundle_sha256": "bd9ef0fc97ed43c69b0c4dcf93d741e5b2a5030c21e1638003d220c8884df4c6",
+      "state": "registered_not_copied",
+      "files": [
+        "critic-incident-response.md",
+        "critic-log-analysis.md",
+        "critic-pentest-static.md",
+        "planner-incident-response.md",
+        "planner-log-analysis.md",
+        "planner-pentest-static.md",
+        "primary-incident-response.md",
+        "primary-log-analysis.md",
+        "primary-pentest-static.md"
+      ],
+      "reason_not_copied": "场景 metadata 和 pentest 词汇不一致，当前路由不可可靠命中"
+    }
+  },
+  "domain_contract_registry": [
+    {
+      "name": "LS 多域密封契约",
+      "source_relative_path": "src/secmind/multidomain_contracts.py",
+      "source_sha256": "40c02134b0ea5f71b9f9030ad7974a4b867ed171c55f0b53da8e5dd9de32f3d2",
+      "valuable_semantics": ["frozen", "extra-forbid", "canonical digest"],
+      "mapped_to": "现有 Schema 1.7 领域接口",
+      "copied": false,
+      "default_enabled": false
+    },
+    {
+      "name": "LS Pentest ROE",
+      "source_relative_path": "src/secmind/pentest_kernel/contracts.py",
+      "source_sha256": "e7653d491c8500f5c32020314a1b23fdcf92a8bf44e7e3d9cb45e45ecb901750",
+      "valuable_semantics": ["ROEContract", "FindingProof", "阶段审批义务", "目标范围"],
+      "mapped_to": "现有 Schema 1.7 领域接口",
+      "copied": false,
+      "default_enabled": false
+    },
+    {
+      "name": "LS IR 证据父链",
+      "source_relative_path": "src/secmind/ir_kernel/contracts.py",
+      "source_sha256": "6e655f0fbcb531bad26ec01fa38c60fb25a7b466b0ec91f9152168f8a8ea82f9",
+      "valuable_semantics": ["EvidenceChainLink", "父摘要链", "终报一致性"],
+      "mapped_to": "现有 Schema 1.7 领域接口",
+      "copied": false,
+      "default_enabled": false
+    }
+  ],
+  "explicit_rejections": [
+    "整包覆盖任何队友的 orchestrator.py、schemas.py、llm.py、config.py、tools.py、docker-compose.yml 或迁移目录",
+    "ContextItem 跳过式去重",
+    "LS 全局取消参数污点",
+    "LS ToolGainGate",
+    "B401-B415 默认发布",
+    "WHB 三模型串行主链",
+    "WHB SQLite/regex/状态提升 Admission 旁路",
+    "CJM UNTRUSTED_INPUT 公共场景",
+    "CJM 旧 Qdrant 向量与损坏语料",
+    "任何 live 默认配置、硬编码凭据或 GPT-5.6 测试"
+  ],
+  "commit_plan": [
+    {
+      "order": 1,
+      "subject": "establish isolated fusion baseline and widen evidence ids",
+      "status": "committed",
+      "commit_sha": "825739719793d960ce40105a9c77ba0fb4eacd79"
+    },
+    {
+      "order": 2,
+      "subject": "add deterministic source routing and bounded model handling",
+      "status": "committed",
+      "commit_sha": "6e924ae8284d69c62414de855f9975f70f7918df"
+    },
+    {
+      "order": 3,
+      "subject": "add bounded forensic and scanner candidates",
+      "status": "committed",
+      "commit_sha": "c3bd913762d8211401d4f6bff866d2ac420114ac"
+    },
+    {
+      "order": 4,
+      "subject": "add sealed evaluation and optional knowledge adapters",
+      "status": "committed",
+      "commit_sha": "49bbefa1db469d9f8f74af1070312322fedcbea8",
+      "tree_oid": "2982387515a6a9e395bd9cd3b90d1f133ad684e8"
+    },
+    {
+      "order": 5,
+      "subject": "document and validate team fusion",
+      "status": "included_in_final_commit",
+      "commit_sha": null
+    }
+  ],
+  "validation": {
+    "targeted_tests": {
+      "status": "passed",
+      "result": "最终 11 个融合套件 94 项通过；此前模型/持久化 130 项、密封评测 48 项、比较器 14 项、最终修复相关 19 项也通过",
+      "evidence_refs": ["tests://focused-fusion-suites"]
+    },
+    "full_pytest": {
+      "status": "partial_then_targeted_fix_verified",
+      "result": "1179 passed, 4 skipped, 1 failed；唯一失败为缺失 CAS 场景终态，修复后 19 项相关测试通过；未重复执行全量",
+      "evidence_refs": ["tests://full-suite-20260807", "tests://cas-recovery-targeted"]
+    },
+    "ruff": {
+      "status": "passed",
+      "result": "src、tests、scripts、docker/tools/semgrep 无错误",
+      "evidence_refs": ["validation://ruff"]
+    },
+    "mypy": {
+      "status": "passed",
+      "result": "131 个源码文件及融合评测脚本无错误",
+      "evidence_refs": ["validation://mypy"]
+    },
+    "alembic_single_head": {
+      "status": "passed",
+      "result": "0016_fusion_model_audit",
+      "evidence_refs": ["migrations://head"]
+    },
+    "alembic_empty_database_upgrade": {
+      "status": "passed_sqlite_only",
+      "result": "迁移专项共 6 项通过；当前机器未提供 PostgreSQL",
+      "evidence_refs": ["tests://migration-focused"]
+    },
+    "alembic_existing_data_upgrade": {
+      "status": "passed_sqlite_only",
+      "result": "已有数据升级与回退专项通过；未宣称 PostgreSQL 实测",
+      "evidence_refs": ["tests://migration-focused"]
+    },
+    "long_evidence_id_round_trip": {
+      "status": "passed_sqlite_only",
+      "result": "100 字符 Evidence ID 迁移和往返通过",
+      "evidence_refs": ["tests://migration-focused"]
+    },
+    "source_triage_recall_at_k": {
+      "status": "not_measurable_on_selected_cohort",
+      "baseline": null,
+      "fusion": null,
+      "regression_allowed": false,
+      "reason": "12 个固定任务均只有一个输入文件，且公开清单不含 vulnerable-path 标签；Recall@K 无区分度，工具按失败关闭拒绝生成发布结果",
+      "evidence_refs": ["evaluation://source-triage-recall-rejected-missing-ground-truth"]
+    },
+    "bounded_json_recovery": {
+      "status": "passed",
+      "result": "前后缀、代码围栏、转义括号、多候选、超深、超长和 Schema 错误专项通过",
+      "evidence_refs": ["tests://model-gateway-fusion"]
+    },
+    "binary_parser_adversarial": {
+      "status": "partial",
+      "result": "合成 PCAP/PCAPNG、IPv4/IPv6、损坏/截断和 ZIP 对抗输入通过；缺少真实 EVTX fixture",
+      "failure_action": "keep_disabled",
+      "evidence_refs": ["tests://log-parsers-fusion"]
+    },
+    "semgrep_rule_precision": {
+      "status": "not_run_no_docker",
+      "minimum_precision": 0.9,
+      "result": null,
+      "failure_action": "keep_disabled",
+      "evidence_refs": ["tests://semgrep-candidate-contract-only"]
+    },
+    "deepseek_v4_flash_paired_evaluation": {
+      "status": "quality_gain_observed_release_gate_failed",
+      "task_limit": 12,
+      "baseline_commit": "2f9071975f5aafa1900ad66c3f965246f4a88f79",
+      "fusion_commit": "49bbefa1db469d9f8f74af1070312322fedcbea8",
+      "model": "DeepSeek V4 Flash",
+      "same_prompt_budget_model_required": true,
+      "api_key_stored_in_repository": false,
+      "baseline_metrics": {
+        "overall_score": 0.808333,
+        "exact_cwe_f1": 0.666667,
+        "exact_cwe_tp": 7,
+        "exact_cwe_fp": 5,
+        "exact_cwe_fn": 2,
+        "strict_success_rate": 0.25,
+        "live_provider_success_rate": 1.0,
+        "total_tokens": 134991
+      },
+      "fusion_metrics": {
+        "overall_score": 0.916667,
+        "exact_cwe_f1": 0.782609,
+        "exact_cwe_tp": 9,
+        "exact_cwe_fp": 5,
+        "exact_cwe_fn": 0,
+        "strict_success_rate": 0.083333,
+        "live_provider_success_rate": 0.916667,
+        "total_tokens": 112044
+      },
+      "non_regression_passed": false,
+      "failed_checks": [
+        "operational_success_rate_non_regression",
+        "baseline_operational_success_rate",
+        "fusion_operational_success_rate",
+        "fusion_live_provider_success_rate"
+      ],
+      "evidence_refs": [
+        "docs/DeepSeek-V4-Flash配对评测说明.md",
+        "docs/DeepSeek-V4-Flash配对评测摘要.json"
+      ]
+    },
+    "evidence_completeness": {
+      "status": "passed",
+      "required": 1.0,
+      "result": {"baseline": "12/12", "fusion": "14/14"},
+      "evidence_refs": ["evaluation://paired/scores.json"]
+    },
+    "ledger_verification": {
+      "status": "passed",
+      "required": 1.0,
+      "result": {"baseline": "12/12", "fusion": "12/12"},
+      "evidence_refs": ["evaluation://paired/sealed-predictions"]
+    },
+    "original_repository_unchanged": {
+      "status": "passed_precommit_and_recheck_required_after_commit",
+      "required_head": "2f9071975f5aafa1900ad66c3f965246f4a88f79",
+      "required_clean": true,
+      "observed_head": "2f9071975f5aafa1900ad66c3f965246f4a88f79",
+      "observed_clean": true,
+      "evidence_refs": ["git://original-repository"]
+    }
+  },
+  "known_limitations": [
+    "二进制 parser、Semgrep、Hybrid Knowledge 和多域接口在专项门禁完成前保持关闭",
+    "HC 非 Java Prompt 与 LS 多域 Prompt 仅登记，未复制、未批准、未改变现有模板治理状态",
+    "未导入 CJM 旧向量；无离线预计算向量时 Hybrid Knowledge 必须退回 PostgreSQL",
+    "队友 Semgrep 规则多数是危险 API presence，不能在缺少逐规则正反例时发布",
+    "来源使用 source:// 逻辑引用，跨机器复核应使用 ZIP SHA-256 和可审查树摘要",
+    "DeepSeek 只执行一轮；质量增益不能证明稳定性或单模块因果关系",
+    "严格发布门禁失败，融合分支是本地候选而不是获准发布版本",
+    "当前机器没有 Docker/PostgreSQL，真实 Semgrep、rootless Runner、PostgreSQL 恢复和真实 EVTX fixture 尚未验收"
+  ],
+  "security_notes": [
+    "清单不包含 API key、.env 内容、数据库内容或模型响应正文",
+    "DeepSeek key 只能由进程环境注入，禁止复制、打印或提交",
+    "正常测试必须 offline/mock，不使用 GPT-5.6",
+    "检索、Prompt、源代码注释和队友语料均视为不可信数据，不能改变 Guardrail、Admission、scope 或工具权限"
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-937686b53fcd89a436e301b73df4f2907393c14241fc73b2b211febfe6cdf25d",
+      "evidence-18d6f448a0cc75e27fc20c8235a4ba18bcb8d4660b1e08ade978011f959ac576",
+      "evidence-414cf2a19b50ce82d591693872db8f92e1e55696e8762121aaf52fad6b233f79",
+      "evidence-c4fb882bfdaf44cf52e52710d51ec7f6d6ccc2475466439a299caf5397491994",
+      "evidence-623e4a48111edb792c4fa38d3318ab00585e9b8f98c5f7d9c9cd43e264030b11"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "静态分析确认存在完整的 DLL 注入链，映射到 MITRE ATT&CK T1055.001。攻击者可通过注入恶意 DLL 在目标进程中执行任意代码，规避安全控制并窃取敏感数据。建议立即启用进程注入防护并实施 DLL 加载验证。",
+    "findings": [
+      {
+        "business_impact": "攻击者可在目标进程中以受害者权限执行任意代码，可能导致数据泄露、持久化驻留、横向移动及安全防御绕过，严重危害业务连续性和数据机密性。",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-937686b53fcd89a436e301b73df4f2907393c14241fc73b2b211febfe6cdf25d",
+          "evidence-18d6f448a0cc75e27fc20c8235a4ba18bcb8d4660b1e08ade978011f959ac576",
+          "evidence-414cf2a19b50ce82d591693872db8f92e1e55696e8762121aaf52fad6b233f79",
+          "evidence-c4fb882bfdaf44cf52e52710d51ec7f6d6ccc2475466439a299caf5397491994",
+          "evidence-623e4a48111edb792c4fa38d3318ab00585e9b8f98c5f7d9c9cd43e264030b11"
+        ],
+        "severity": "Critical",
+        "technical_explanation": "静态证据显示样本采用标准 DLL 注入技术（T1055.001）。通过远程线程调用 LoadLibrary 加载恶意 DLL，实现代码注入。该行为封装了完整的注入链，包括获取目标进程句柄、分配远程内存写入 DLL 路径以及创建远程线程触发加载。此类技术广泛用于恶意软件逃避检测和权限维持。",
+        "title": "完整 DLL 注入链可执行任意代码"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "立即对样本进行动态沙箱分析以确认实际注入行为并提取 IOC",
+        "decision_role": "Security Operations Lead",
+        "expected_outcome": "确认注入目标进程和 DLL 载荷，获取哈希、路径及 C2 信息，支持遏制行动",
+        "priority": "P1",
+        "rationale": "静态分析已确认注入链，需要动态验证执行细节并生成可操作威胁情报"
+      },
+      {
+        "action": "在主机上部署进程注入检测规则（如监控 LoadLibrary 远程调用）",
+        "decision_role": "Detection Engineering Lead",
+        "expected_outcome": "增加针对远程线程创建和 DLL 加载的检测覆盖，提升攻击识别能力",
+        "priority": "P1",
+        "rationale": "现有证据表明存在注入风险，需要主动检测同类活动以防护正常业务"
+      }
+    ],
+    "limitations": [
+      "无法确认实际运行时注入的目标进程和 DLL 载荷",
+      "未观察到实际代码执行条件"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "开展动态分析确认注入目标及载荷",
+      "提取恶意 DLL 样本进行深度分析",
+      "将此行为加入 SIEM 检测规则",
+      "评估受影响资产范围并启动应急响应"
+    ],
+    "reverse_analysis": "静态逆向分析发现样本包含完整的 DLL 注入链，涉及进程创建、内存分配、远程线程创建及 DLL 路径写入等关键步骤。注入技术符合 MITRE ATT&CK T1055.001（Process Injection: Dynamic-link Library Injection）模式。具体注入流程包括：1) 打开目标进程句柄；2) 在目标进程内分配内存并写入 DLL 路径；3) 创建远程线程指向 LoadLibrary 以加载恶意 DLL。由于缺乏运行时观测，未确认实际触发条件。",
+    "risk_assessment": {
+      "exploitability": "Medium - 需满足特定权限条件，但技术成熟且易于自动化",
+      "impact_scope": "目标进程及所在系统，可能扩展至整个网络",
+      "overall_risk": "High",
+      "urgency": "High - 存在活跃利用可能，应尽快处理"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "dll_injection"
+      ],
+      "error": null,
+      "facts": {
+        "mitre": [
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001",
+          "dll_injection"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "注入目标进程的具体身份",
+      "恶意 DLL 的加载路径和内容",
+      "是否在其他样本中复用同一注入链"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "source-dll-injection-complete",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "735cfbdeaef61e52a463050682d6cd4fc13af3872c3a8c7d53ac1a38f1b3a6ad",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

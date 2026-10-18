@@ -1,0 +1,2 @@
+This document explains how a password manager works.
+No credential is embedded in this documentation.

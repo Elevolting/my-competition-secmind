@@ -1,0 +1,13 @@
+{
+  "arm": "optimized",
+  "case_id": "malformed-pe",
+  "receipt_sha256": "3bf87931c4875d26429867086c341515397ebf716f4acbcfdbc4b86c760d469b",
+  "repeat_id": 2,
+  "report_html_sha256": "b3ed8255f7403b2dd2edb732e63f060e31d753c28ba82098b8ef56f267e8d56c",
+  "report_json_sha256": "b2cf394265bb338fca4ea1d80f4791446a59f2ebdfe78910c8b1b84a79d8a787",
+  "report_md_sha256": "6132ee9ae248e0b475146358a14b577d0f1d46ebd6e7af9b1d4fb3879a8eafda",
+  "request_sha256": "bf893b6d5958559ad7495ccaecd69d2c6a7c99794eb2e68ca70f13a22b65da7d",
+  "response_sha256": "828ac10f50c5cb6579f6d54e270e0b9496eba4e1245814f090dfb8cb481f9f9e",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

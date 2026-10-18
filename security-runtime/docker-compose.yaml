@@ -1,0 +1,65 @@
+services:
+  # Full Kali toolchain for authorized local security testing.  It is opt-in
+  # because the image is intentionally large and contains offensive tooling.
+  kali:
+    profiles: ["kali"]
+    build:
+      context: ./container
+      dockerfile: Dockerfile
+    image: secmind-kali:local
+    container_name: security-runtime-kali
+    working_dir: /home/kali/workspace
+    volumes:
+      - ./datas/kali:/home/kali/workspace/data
+    # Keep the tool host available for dispatcher-created worker containers;
+    # no host ports are published and no unauthenticated service is exposed.
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
+
+  security-runtime-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: security-runtime-app
+    container_name: security-runtime-server
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      SECURITY_RUNTIME_ALLOWED_HOSTS: security-runtime-server
+    volumes:
+      - ./datas/security-runtime/:/root/.local/share/security-runtime/
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/projects', timeout=5)"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 3s
+    restart: unless-stopped
+    command: ["uv", "run", "security-runtime", "serve", "--host", "0.0.0.0", "--no-access-log"]
+  security-runtime-dispatcher:
+    # Optional legacy Claude Dispatcher. The default Pi Dispatcher runs on the host.
+    profiles: ["claude-dispatcher"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: security-runtime-app
+    container_name: security-runtime-dispatcher
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Docker + Claude Code dispatcher configuration.
+      - ./dispatch.claude.yaml:/security-runtime/dispatch.yaml
+    environment:
+      # Values are read from the host .env and injected into the dispatcher;
+      # the dispatcher then passes them to each Claude Worker container.
+      ANTHROPIC_MODEL: "${ANTHROPIC_MODEL:-}"
+      ANTHROPIC_BASE_URL: "${ANTHROPIC_BASE_URL:-}"
+      ANTHROPIC_AUTH_TOKEN: "${ANTHROPIC_AUTH_TOKEN:-}"
+    depends_on:
+      security-runtime-server:
+        condition: service_healthy
+    restart: unless-stopped
+    command: ["uv", "run", "security-runtime", "dispatch", "--config", "dispatch.yaml"]

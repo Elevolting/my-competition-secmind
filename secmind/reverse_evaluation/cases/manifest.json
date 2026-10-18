@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1",
+  "safety": {
+    "fixture_policy": "repository-authored-safe-and-synthetic-only",
+    "host_pe_execution_allowed": false,
+    "real_network_allowed": false
+  },
+  "cases": [
+    {"id": "pe-structure", "kind": "pe_static", "target": "reverse_evaluation/fixtures/safe-demo-v1/build/reverse_demo.exe", "prompt": "识别 PE 格式、架构、入口点和节区数量。"},
+    {"id": "pe-imports", "kind": "pe_static", "target": "reverse_evaluation/fixtures/safe-demo-v1/build/reverse_demo.exe", "prompt": "列出关键导入，并区分静态存在与已观测调用。"},
+    {"id": "xor-recovery", "kind": "pe_static", "target": "reverse_evaluation/fixtures/safe-demo-v1/build/reverse_demo.exe", "prompt": "恢复 XOR 隐藏的训练 token、测试域名和 key。"},
+    {"id": "dynamic-wrong-token", "kind": "dynamic_profile", "target": "reverse_evaluation/fixtures/safe-demo-v1/build/reverse_demo.exe", "profile": "wrong_token", "prompt": "仿真错误口令路径并说明退出和写文件行为。"},
+    {"id": "dynamic-correct-token", "kind": "dynamic_profile", "target": "reverse_evaluation/fixtures/safe-demo-v1/build/reverse_demo.exe", "profile": "correct_token", "prompt": "仿真正确口令路径并说明退出和写文件行为。"},
+    {"id": "source-process-hollowing", "kind": "source_static", "target": "reverse_evaluation/fixtures/source-cases/process_hollowing.c", "prompt": "识别完整进程镂空链。"},
+    {"id": "source-dll-injection-complete", "kind": "source_static", "target": "reverse_evaluation/fixtures/source-cases/dll_injection_complete.c", "prompt": "识别完整 DLL 注入链。"},
+    {"id": "source-dll-injection-incomplete", "kind": "source_static", "target": "reverse_evaluation/fixtures/source-cases/dll_injection_incomplete.c", "prompt": "判断不完整 DLL 注入线索能否形成结论。"},
+    {"id": "source-apc-rc4-antidebug", "kind": "source_static", "target": "reverse_evaluation/fixtures/source-cases/apc_rc4_antidebug.c", "prompt": "识别 APC、RC4、原生 API 和反调试行为。"},
+    {"id": "source-no-signal", "kind": "source_static", "target": "reverse_evaluation/fixtures/source-cases/no_signal.c", "prompt": "对无逆向信号源码给出克制结论。"},
+    {"id": "malformed-pe", "kind": "malformed_pe", "target": "reverse_evaluation/fixtures/synthetic/malformed.exe", "prompt": "安全处理畸形 PE。"},
+    {"id": "dynamic-failure-fallback", "kind": "dynamic_failure", "target": "reverse_evaluation/fixtures/safe-demo-v1/build/reverse_demo.exe", "profile": "forced_failure", "prompt": "动态仿真失败时保留静态结果并明确降级。"}
+  ]
+}

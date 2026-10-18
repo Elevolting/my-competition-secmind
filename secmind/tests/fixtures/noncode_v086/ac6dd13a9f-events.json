@@ -1,0 +1,44 @@
+[
+  {
+    "timestamp": "2020-05-24T01:13:47.756140+00:00",
+    "event_type": "windows_event:1",
+    "Image": "C:\\Users\\IEUser\\Tools\\PrivEsc\\RogueWinRM.exe",
+    "CommandLine": "RogueWinRM.exe -p c:\\Windows\\System32\\cmd.exe",
+    "ProcessGuid": "{747f3d96-ca4b-5ec9-0000-0010b8cb3700}",
+    "ProcessId": "3960",
+    "User": "NT AUTHORITY\\LOCAL SERVICE",
+    "provider": "Microsoft-Windows-Sysmon"
+  },
+  {
+    "timestamp": "2020-05-24T01:13:50.327171+00:00",
+    "event_type": "windows_event:1",
+    "Image": "C:\\Windows\\System32\\cmd.exe",
+    "CommandLine": "c:\\Windows\\System32\\cmd.exe",
+    "ParentImage": "C:\\Users\\IEUser\\Tools\\PrivEsc\\RogueWinRM.exe",
+    "ParentProcessGuid": "{747f3d96-ca4b-5ec9-0000-0010b8cb3700}",
+    "ProcessGuid": "{747f3d96-ca4e-5ec9-0000-00109fe23700}",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "provider": "Microsoft-Windows-Sysmon"
+  },
+  {
+    "timestamp": "2020-05-24T01:13:51.206385+00:00",
+    "event_type": "windows_event:3",
+    "Image": "C:\\Users\\IEUser\\Tools\\PrivEsc\\RogueWinRM.exe",
+    "ProcessGuid": "{747f3d96-ca4b-5ec9-0000-0010b8cb3700}",
+    "DestinationIp": "127.0.0.1",
+    "DestinationPort": "5985",
+    "SourceIp": "127.0.0.1",
+    "User": "NT AUTHORITY\\LOCAL SERVICE",
+    "provider": "Microsoft-Windows-Sysmon"
+  },
+  {
+    "timestamp": "2020-05-24T01:13:54.120171+00:00",
+    "event_type": "windows_event:1",
+    "Image": "C:\\Windows\\System32\\whoami.exe",
+    "CommandLine": "whoami",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+    "ParentProcessGuid": "{747f3d96-ca4e-5ec9-0000-00109fe23700}",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "provider": "Microsoft-Windows-Sysmon"
+  }
+]

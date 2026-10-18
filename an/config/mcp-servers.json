@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "runtime_enabled": false,
+  "invocation_enabled": false,
+  "servers": [
+    {"server_id": "local-semgrep", "name": "Local Semgrep", "transport": "streamable_http", "url": "http://127.0.0.1:9015/mcp", "metadata": {"category": "code-security"}},
+    {"server_id": "local-cyberchef", "name": "Local CyberChef", "transport": "streamable_http", "url": "http://127.0.0.1:9014/mcp", "metadata": {"category": "data-transformation"}},
+    {"server_id": "local-wiremcp", "name": "Local WireMCP", "transport": "streamable_http", "url": "http://127.0.0.1:9016/mcp", "metadata": {"category": "network-forensics"}},
+    {"server_id": "local-http-fetch", "name": "Local HTTP Fetch", "transport": "streamable_http", "url": "http://127.0.0.1:9011/mcp", "metadata": {"category": "http"}},
+    {"server_id": "local-chrome-devtools", "name": "Local Chrome DevTools", "transport": "streamable_http", "url": "http://127.0.0.1:9012/mcp", "metadata": {"category": "browser"}},
+    {"server_id": "local-web-security", "name": "Local Web Security Tools", "transport": "streamable_http", "url": "http://127.0.0.1:9013/mcp", "metadata": {"category": "security"}},
+    {"server_id": "local-security-extended", "name": "Local Security Extended", "transport": "streamable_http", "url": "http://127.0.0.1:9017/mcp", "metadata": {"category": "security-analysis"}}
+  ]
+}

@@ -1,0 +1,48 @@
+# DeepSeek v4 Flash through Pi's OpenAI-compatible chat/completions provider.
+#
+# Before starting Docker Compose, set these variables in the host environment:
+#   DEEPSEEK_BASE_URL=http://host.docker.internal:8001/v1
+#   DEEPSEEK_API_KEY=replace-with-the-internal-service-key
+#
+# The base URL must be reachable from both security-runtime-dispatcher and project containers.
+
+server: "http://security-runtime-server:8000"
+
+runtime:
+  interval: 3
+  max_workers: 1
+  max_running_projects: 1
+  max_project_workers: 1
+  healthcheck_timeout: 30
+  worker_healthcheck: "startup_only"
+  prompt_group: "default"
+
+tasks:
+  bootstrap:
+    timeout: 600
+    conclude_timeout: 120
+  reason:
+    timeout: 300
+    max_intents: 2
+  explore:
+    timeout: 600
+    conclude_timeout: 120
+
+container:
+  image: "ghcr.io/oritera/security-runtime-worker:latest"
+  network_mode: "bridge"
+  completed_action: "stop"
+
+workers:
+  - name: "deepseek-v4-flash-1"
+    type: "pi"
+    task_types: [bootstrap, reason, explore]
+    max_running: 1
+    priority: 0
+    env:
+      PI_MODEL: "deepseek-v4-flash"
+      PI_BASE_URL: "${DEEPSEEK_BASE_URL}"
+      PI_API_KEY: "${DEEPSEEK_API_KEY}"
+      PI_PROVIDER_API: "openai-completions"
+      # Replace this value if the internal deployment advertises a different limit.
+      PI_MODEL_CONTEXT_WINDOW: "131072"

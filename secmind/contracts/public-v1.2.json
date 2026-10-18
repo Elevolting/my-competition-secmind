@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.2",
+  "paths": [
+    "/api/v1/uploads",
+    "/api/v1/tasks",
+    "/api/v1/runs",
+    "/api/v1/runs/{run_id}",
+    "/api/v1/runs/{run_id}/report",
+    "/api/v1/runs/{run_id}/ledger",
+    "/api/v1/runs/{run_id}/ledger/export",
+    "/api/v1/runs/{run_id}/approvals/{request_id}",
+    "/api/v1/runs/{run_id}/cancel",
+    "/api/v1/runs/{run_id}/recover",
+    "/api/v1/runs/{run_id}/artifacts/{artifact_id}",
+    "/api/v1/runs/{run_id}/events",
+    "/api/v1/tools",
+    "/health/live",
+    "/health/ready"
+  ],
+  "tool_context_fields": [
+    "allowed_paths",
+    "attempt",
+    "idempotency_key",
+    "invocation_id",
+    "lease_fence",
+    "lease_owner_id",
+    "run_id",
+    "step_id",
+    "workspace"
+  ],
+  "tool_result_fields": [
+    "artifacts",
+    "data",
+    "duration_ms",
+    "error_code",
+    "error_message",
+    "evidence",
+    "invocation_id",
+    "status",
+    "summary"
+  ]
+}

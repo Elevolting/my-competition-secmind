@@ -1,0 +1,88 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-13237dbcad65e2fc748a1ab737c255aceb0bf2489ab31fd39088e348de9c7e4e",
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "The sample was emulated with a wrong token, demonstrating the rejection path: no file is created and the process exits with code 2. This confirms the token check fails gracefully.",
+    "findings": [
+      {
+        "business_impact": "The application correctly blocks unauthorized access, preventing unintended file writes.",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-13237dbcad65e2fc748a1ab737c255aceb0bf2489ab31fd39088e348de9c7e4e"
+        ],
+        "severity": "Low",
+        "technical_explanation": "The strcmp comparison returned non-zero for the wrong token, triggering the error path. The program printed 'token rejected; no file was created' and exited with code 2, confirming no file I/O occurred.",
+        "title": "Wrong token leads to rejection without file creation"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "Validate the authentication logic remains robust against brute-force",
+        "decision_role": "Security Manager",
+        "expected_outcome": "Consider rate limiting or lockout to deter credential guessing.",
+        "priority": "P2",
+        "rationale": "The wrong-token path is secure, but repeated failures could indicate brute-force attempts."
+      }
+    ],
+    "limitations": [
+      "Emulation only, no dynamic execution on host.",
+      "XOR decoding heuristic may include false positives."
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "Test with a correct token to confirm file creation behavior."
+    ],
+    "reverse_analysis": "The emulation shows the program compares the provided token (NOT-THE-TOKEN) against the expected value (SECMIND-REVERSE-OK) using strcmp, which returns non-zero, leading to a rejection message and process exit with code 2. No files were opened or created during this path.",
+    "risk_assessment": {
+      "exploitability": "Not exploitable; wrong token is rejected securely.",
+      "impact_scope": "Single execution, no data loss or exposure",
+      "overall_risk": "Low",
+      "urgency": "Routine"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "argument_check",
+        "string_comparison"
+      ],
+      "error": null,
+      "facts": {
+        "created_files": [],
+        "exit_code": 2
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 1,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": []
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "static_presence",
+    "sources": [
+      "emulated"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "dynamic-wrong-token",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 1,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

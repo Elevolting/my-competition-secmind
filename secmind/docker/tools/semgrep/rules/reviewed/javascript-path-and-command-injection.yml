@@ -1,0 +1,46 @@
+rules:
+  - id: secmind.javascript.express-path-traversal
+    languages: [javascript, typescript]
+    mode: taint
+    message: User-controlled request data reaches a filesystem path sink.
+    severity: ERROR
+    metadata:
+      cwe: CWE-22
+      confidence: HIGH
+      license: CC-BY-SA-4.0
+      remediation: Resolve paths below an approved root and reject traversal segments.
+    pattern-sources:
+      - patterns:
+          - pattern-either:
+              - pattern: $REQ.params.$FIELD
+              - pattern: $REQ.query.$FIELD
+              - pattern: $REQ.body.$FIELD
+    pattern-sinks:
+      - pattern-either:
+          - pattern: fs.readFile($PATH, ...)
+          - pattern: fs.readFileSync($PATH, ...)
+          - pattern: fs.createReadStream($PATH, ...)
+          - pattern: res.sendFile($PATH, ...)
+          - pattern: path.join(..., $PATH, ...)
+
+  - id: secmind.javascript.express-command-injection
+    languages: [javascript, typescript]
+    mode: taint
+    message: User-controlled request data reaches a child-process command sink.
+    severity: ERROR
+    metadata:
+      cwe: CWE-78
+      confidence: HIGH
+      license: CC-BY-SA-4.0
+      remediation: Use a fixed executable and validated argument vector without shell interpolation.
+    pattern-sources:
+      - patterns:
+          - pattern-either:
+              - pattern: $REQ.params.$FIELD
+              - pattern: $REQ.query.$FIELD
+              - pattern: $REQ.body.$FIELD
+    pattern-sinks:
+      - pattern-either:
+          - pattern: child_process.exec($CMD, ...)
+          - pattern: child_process.spawn($CMD, ...)
+          - pattern: exec($CMD, ...)

@@ -1,0 +1,93 @@
+.side-question-panel {
+  min-width: 0;
+  padding: 17px;
+  border-bottom: 1px solid rgba(135, 177, 195, .1);
+}
+
+.side-question-heading,
+.side-question-title,
+.side-question-meta,
+.side-question-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.side-question-heading,
+.side-question-meta { justify-content: space-between; }
+
+.side-question-title { min-width: 0; color: #67d9fa; }
+.side-question-title h3 { margin: 0; color: #dce9ed; font-size: 13px; font-weight: 650; line-height: 1.4; }
+.side-question-count { color: #86a4af; font: 11px Consolas, monospace; }
+.side-question-description { margin: 7px 0 15px; color: #8ca0a9; font-size: 11px; line-height: 1.55; }
+
+.side-question-composer label { display: block; margin-bottom: 7px; color: #a9c0c8; font-size: 11px; font-weight: 600; }
+.side-question-composer .ant-input {
+  width: 100%;
+  min-height: 78px;
+  padding: 9px 11px;
+  color: #dce9ed;
+  background: rgba(8, 14, 18, .62);
+  border-color: #2a3c45;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+}
+.side-question-composer .ant-input::placeholder { color: #788c95; }
+.side-question-composer .ant-input:focus { border-color: #62c4df; box-shadow: 0 0 0 2px rgba(98, 196, 223, .12); }
+.side-question-submit { display: flex; justify-content: flex-end; margin-top: 9px; }
+.side-question-submit .ant-btn { min-width: 82px; height: 32px; border-radius: 6px; font-size: 11px; }
+.side-question-error { margin-top: 10px; color: #f09b9b; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+
+.side-question-history-title { margin-top: 17px; padding-bottom: 7px; color: #718a94; font-size: 10px; font-weight: 700; }
+.side-question-list { max-height: 420px; overflow-y: auto; border-top: 1px solid rgba(135, 177, 195, .13); }
+.side-question-list .ant-list-item { padding: 12px 0; border-block-end-color: rgba(135, 177, 195, .11); }
+.side-question-list .ant-empty { margin: 16px 0 4px; }
+.side-question-list .ant-empty-description { color: #718a94; font-size: 11px; }
+
+.side-question-item { min-width: 0; width: 100%; }
+.side-question-meta { align-items: flex-start; }
+.side-question-meta .ant-typography { min-width: 0; color: #dce9ed; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.side-question-meta .ant-tag { flex: 0 0 auto; margin: 0; font-size: 10px; }
+.side-question-time { display: block; margin-top: 5px; color: #718a94; font-size: 10px; }
+.side-question-answer {
+  max-height: 320px;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  overflow: auto;
+  color: #c1d0d6;
+  background: rgba(8, 14, 18, .56);
+  border-left: 2px solid #395a67;
+  border-radius: 0 5px 5px 0;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.side-question-answer.is-streaming { border-left-color: #62c4df; }
+.side-question-actions { justify-content: flex-start; flex-wrap: wrap; margin-top: 9px; }
+.side-question-actions .ant-btn { font-size: 11px; }
+.side-question-actions > .anticon { color: #67d9fa; }
+
+body.light-theme .side-question-panel { border-bottom-color: #e3ebf1; }
+body.light-theme .side-question-title h3,
+body.light-theme .side-question-meta .ant-typography { color: #25394a; }
+body.light-theme .side-question-title { color: #1677b8; }
+body.light-theme .side-question-description,
+body.light-theme .side-question-count,
+body.light-theme .side-question-time,
+body.light-theme .side-question-history-title,
+body.light-theme .side-question-list .ant-empty-description { color: #657a8a; }
+body.light-theme .side-question-composer label { color: #425b6d; }
+body.light-theme .side-question-composer .ant-input::placeholder { color: #6e8190; }
+body.light-theme .side-question-list { border-top-color: #dce6ee; }
+body.light-theme .side-question-list .ant-list-item { border-block-end-color: #e3ebf1; }
+body.light-theme .side-question-answer { color: #354d5f; background: #f3f8fb; border-left-color: #a8c7d8; }
+body.light-theme .side-question-answer.is-streaming { border-left-color: #1677b8; }
+body.light-theme .side-question-error { color: #b63b42; }
+
+@media (max-width: 600px) {
+  .side-question-panel { padding: 15px 13px; }
+}

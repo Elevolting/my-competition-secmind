@@ -1,0 +1,72 @@
+schema_version: "1.0"
+provenance_id: "omo-v06-design-research"
+subject: "OMO / oh-my-openagent design research snapshot"
+usage_class: "design_inspiration_only"
+
+upstream_repository: null
+upstream_repository_status: "unverified"
+upstream_tag: null
+upstream_commit_sha: null
+archive_sha256: null
+local_snapshot:
+  snapshot_id: "external-local-research-snapshot-not-distributed"
+  git_metadata_available: false
+  package_version_observed: "4.18.0"
+  provenance_limitation: >-
+    The local snapshot has no readable Git metadata and contains version references
+    that cannot establish an authoritative upstream tag or commit. It is research
+    material only and is not an acceptable source for copied code.
+
+reviewed_license:
+  identifier_observed: "SUL-1.0"
+  source_file: "LICENSE.md"
+  review_status: "design-boundary-reviewed-not-redistribution-approved"
+
+reviewed_areas:
+  - "role separation for intent analysis, planning, criticism, and coordination"
+  - "bounded delegation and continuation behavior"
+  - "task, goal, stop-condition, and evidence work-contract discipline"
+  - "independent reproduction and adversarial falsification behavior"
+  - "criterion-based completion audit and QA evidence discipline"
+
+borrowed_concepts:
+  - "intent gap analysis"
+  - "plan author and independent critic separation"
+  - "bounded specialist delegation"
+  - "typed work-contract goals and stop conditions"
+  - "bounded continuation with no-progress detection"
+  - "adversarial review and independent evidence"
+  - "reviewer-readable QA evidence packs"
+
+copied_files: []
+source_code_inclusion:
+  declaration: "No OMO source code was copied, ported, or adapted into SecMind."
+  copied_or_adapted_source: false
+  verification_status: "maintainer-declared; release source and SBOM audit required"
+runtime_dependency: false
+build_dependency: false
+distribution_component: false
+node_or_bun_dependency: false
+
+implementation_policy:
+  approach: "independent Python implementation from concepts and behavioral specifications"
+  clean_room_claimed: false
+  prohibited_imports:
+    - "OMO runtime"
+    - "team-core"
+    - "delegate-core"
+    - "OMO prompts and skills"
+    - "rules-engine"
+    - "background task implementation"
+  required_controls:
+    - "Pydantic typed contracts"
+    - "PostgreSQL durable state"
+    - "lease, fence, and compare-and-swap"
+    - "PDP and Atomic Tool Broker"
+    - "evidence-bound verification"
+    - "budget and retry ceilings"
+    - "offline/mock model testing with tier ceiling 5.4"
+
+adaptation_owner: "SecMind A group"
+license_review_status: "no OMO source approved for inclusion"
+competition_disclosure_status: "design inspiration disclosed; copied_files empty"

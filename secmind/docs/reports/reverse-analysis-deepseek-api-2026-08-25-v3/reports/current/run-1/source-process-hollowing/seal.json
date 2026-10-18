@@ -1,0 +1,13 @@
+{
+  "arm": "current",
+  "case_id": "source-process-hollowing",
+  "receipt_sha256": "336ab4f751b43a85b03a7b7c5180a2652358f25c3261bd40fb638b81438de38f",
+  "repeat_id": 1,
+  "report_html_sha256": "1ceb7c01aa4b397fa7c3e0ea667c61e41f20f70380519cfd61537258be2a228b",
+  "report_json_sha256": "94bb42cfb8484ba11d833360ff9f59d8fc6896c624160cfad61cc1cb84204342",
+  "report_md_sha256": "96819aa17eaac8f0b9fbed8b14b39256649b5e32ebcce608567049fe98f84c4f",
+  "request_sha256": "40e0639a9f7be6f945d5bf49f45faea3a66387f0a2088322f2874847a8677187",
+  "response_sha256": "11013fd449267daf1088cdc7abbdd43e7e76ffb583f03fba13df1cde8a4a8d01",
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

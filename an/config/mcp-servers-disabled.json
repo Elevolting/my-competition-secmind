@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "runtime_enabled": false,
+  "invocation_enabled": false,
+  "reason": "迁移阶段仅保留清单；待后续完成权限、审批和隔离验证后再启用。",
+  "servers": []
+}

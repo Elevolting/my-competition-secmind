@@ -1,0 +1,1452 @@
+{
+  "aggregate_receipt": {
+    "cache_hit_input_tokens": 2048,
+    "cache_miss_input_tokens": 8122,
+    "cost_units": 0.123728,
+    "input_tokens": 10170,
+    "output_tokens": 20762,
+    "provider_requests": 10,
+    "total_tokens": 30932
+  },
+  "arm": "current",
+  "cases": [
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "section_count": 10
+      },
+      "id": "pe-structure",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 5559,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "856e6708-63e4-44dc-a5fd-4ca815f30a1f",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "856e6708-63e4-44dc-a5fd-4ca815f30a1f",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 1634,
+              "cost_units": 0.008572,
+              "input_tokens": 1634,
+              "output_tokens": 509,
+              "provider_requests": 1
+            },
+            "provider_request_id": "3d510db5-ad8b-4203-b419-b7246fc338f2",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 174440,
+            "request_digest": "41a21d812c99af2414e02ccca6c66d8d28839822cdb90710cc68709cbc9a83b1",
+            "response_digest": "02cfac8687ec83c64d2dc961966491de022a40a66acfc3caeb674cb7f5b732d5",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 1634,
+        "cost_units": 0.008572,
+        "input_tokens": 1634,
+        "latency_ms": 5559,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "856e6708-63e4-44dc-a5fd-4ca815f30a1f",
+        "output_tokens": 509,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "bbb15ba89c3eb0b22eec7e7b127e8278a096489e243d26d74f6a457ddb08f8fe",
+        "response_sha256": "02cfac8687ec83c64d2dc961966491de022a40a66acfc3caeb674cb7f5b732d5",
+        "retry_count": 0,
+        "total_tokens": 2143,
+        "used_fallback": false
+      },
+      "status": "completed",
+      "unknowns": [
+        "entry_point"
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "case_id": "pe-imports",
+        "format": "PE",
+        "import_categories": {
+          "exception_handling": [
+            "SetUnhandledExceptionFilter",
+            "__C_specific_handler"
+          ],
+          "file_io": [
+            "fclose",
+            "fopen",
+            "fprintf",
+            "fputc",
+            "fwrite"
+          ],
+          "memory": [
+            "VirtualProtect",
+            "VirtualQuery",
+            "calloc",
+            "free",
+            "malloc",
+            "memcpy",
+            "memset"
+          ],
+          "other": [
+            "GetLastError",
+            "GetStartupInfoA",
+            "IsDBCSLeadByteEx",
+            "MultiByteToWideChar",
+            "Sleep",
+            "TlsGetValue",
+            "WideCharToMultiByte",
+            "___lc_codepage_func",
+            "___mb_cur_max_func",
+            "localeconv",
+            "puts",
+            "vfprintf"
+          ],
+          "startup_runtime": [
+            "__getmainargs",
+            "__initenv",
+            "__iob_func",
+            "__lconv_init",
+            "__set_app_type",
+            "__setusermatherr",
+            "_acmdln",
+            "_amsg_exit",
+            "_cexit",
+            "_commode",
+            "_errno",
+            "_fmode",
+            "_initterm",
+            "_lock",
+            "_onexit",
+            "_unlock",
+            "abort",
+            "exit",
+            "signal"
+          ],
+          "string_handling": [
+            "strcmp",
+            "strerror",
+            "strlen",
+            "strncmp",
+            "wcslen"
+          ],
+          "synchronization": [
+            "DeleteCriticalSection",
+            "EnterCriticalSection",
+            "InitializeCriticalSection",
+            "LeaveCriticalSection"
+          ]
+        },
+        "import_semantics": "unspecified",
+        "observed_calls": [],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "static_imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "xor_keys": [
+          "0x6e",
+          "0x6e",
+          "0x9e",
+          "0x6e",
+          "0x34",
+          "0x50",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x5a",
+          "0x6c",
+          "0x6c",
+          "0x6e",
+          "0x0e",
+          "0x6c",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "444444441444-444I44444444444444444444444444444",
+          "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnn.xn.onnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+          "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "n.onnnnnnnnnnnnnnnnnnn",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "nnnnnnnnnnnn.nnn",
+          "n.onnnnnnnnnnnn",
+          "n.onnnnnnnnnnnv",
+          "sn.onnnnnnnnnnn",
+          "yn.onnnnnnnnnnn"
+        ]
+      },
+      "id": "pe-imports",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives."
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 14193,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "0ea11975-66ed-49d4-a17b-e78a1f42e72e",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "0ea11975-66ed-49d4-a17b-e78a1f42e72e",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 1636,
+              "cost_units": 0.015756,
+              "input_tokens": 1636,
+              "output_tokens": 2303,
+              "provider_requests": 1
+            },
+            "provider_request_id": "ec1000cc-4b7b-487d-8ca0-52ab00349429",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 165805,
+            "request_digest": "f9ad0f70f8d86fa188343050cf7d5476741f0cb3bb84fcccb6f02acc7fdd2ffb",
+            "response_digest": "264a65e98ce82b3af01200a4975f7c405a4e672a395f43a44b7ecf00eca7b675",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 0,
+        "cache_miss_input_tokens": 1636,
+        "cost_units": 0.015756,
+        "input_tokens": 1636,
+        "latency_ms": 14194,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "0ea11975-66ed-49d4-a17b-e78a1f42e72e",
+        "output_tokens": 2303,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "cf53aa87c22140aaec8d7f75ec330ea2bc1662c6170490d6341f8cffcbc7b345",
+        "response_sha256": "264a65e98ce82b3af01200a4975f7c405a4e672a395f43a44b7ecf00eca7b675",
+        "retry_count": 0,
+        "total_tokens": 3939,
+        "used_fallback": false
+      },
+      "status": "completed",
+      "unknowns": [
+        "No dynamic execution was performed, so runtime call behavior is unobserved and remains unknown for all imports.",
+        "XOR decoding is heuristic; decoded strings may contain false positives."
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "LIVE_MODEL_CALL_FAILED",
+        "type": "ModelGatewayError"
+      },
+      "evidence_refs": [],
+      "facts": {},
+      "id": "xor-recovery",
+      "limitations": [
+        "DeepSeek structured call did not complete"
+      ],
+      "model_receipt": null,
+      "status": "unavailable",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "LIVE_MODEL_CALL_FAILED",
+        "type": "ModelGatewayError"
+      },
+      "evidence_refs": [],
+      "facts": {},
+      "id": "dynamic-wrong-token",
+      "limitations": [
+        "DeepSeek structured call did not complete"
+      ],
+      "model_receipt": null,
+      "status": "unavailable",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE",
+        "message": "No dynamic execution was performed."
+      },
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "static_inference": {
+          "correct_token_path": "Not dynamically observed. Static imports (strcmp, strncmp, XOR patterns) suggest a token comparison routine, but the exact token path cannot be confirmed without emulation.",
+          "exit_behavior": "Not dynamically observed. Static imports include exit, _exit, and abort, indicating potential exit paths, but runtime exit behavior is unverified.",
+          "write_file_behavior": "Not dynamically observed. Static imports include fopen, fwrite, fclose, fprintf, suggesting file output capability, but no actual write operation was observed dynamically."
+        },
+        "xor_keys": [
+          "0x6e",
+          "0x6e",
+          "0x9e",
+          "0x6e",
+          "0x34",
+          "0x50",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x5a",
+          "0x6c",
+          "0x6c",
+          "0x6e",
+          "0x0e",
+          "0x6c",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "444444441444-444I44444444444444444444444444444",
+          "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+          "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "n.onnnnnnnnnnnnnnnnnnn",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "nnnnnnnnnnnn.nnn",
+          "n.onnnnnnnnnnnn",
+          "n.onnnnnnnnnnnv",
+          "sn.onnnnnnnnnnn",
+          "yn.onnnnnnnnnnn"
+        ]
+      },
+      "id": "dynamic-correct-token",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives.",
+        "Dynamic emulation not implemented."
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 15491,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "96fa4800-5c23-4a0e-adba-046b520cc8d0",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "96fa4800-5c23-4a0e-adba-046b520cc8d0",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 1398,
+              "cost_units": 0.015648,
+              "input_tokens": 1654,
+              "output_tokens": 2258,
+              "provider_requests": 1
+            },
+            "provider_request_id": "96bce2ec-7ccd-4385-9db7-5e32c1a24f05",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 164507,
+            "request_digest": "218ab8bada49eb0c838e443969902021b2b6b31e40456467360b443f56efdf0b",
+            "response_digest": "f695a48cd4ff68082eb4d6a88ef8064b9c1fe4e5a791a49475bb287af8a6dc0b",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 1398,
+        "cost_units": 0.015648,
+        "input_tokens": 1654,
+        "latency_ms": 15492,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "96fa4800-5c23-4a0e-adba-046b520cc8d0",
+        "output_tokens": 2258,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "035135cf0e1fd638d176928f72e4cccef09dd2a5f47ae8d5c93884f102d2633b",
+        "response_sha256": "f695a48cd4ff68082eb4d6a88ef8064b9c1fe4e5a791a49475bb287af8a6dc0b",
+        "retry_count": 0,
+        "total_tokens": 3912,
+        "used_fallback": false
+      },
+      "status": "unavailable",
+      "unknowns": [
+        "Correct token path",
+        "Runtime exit behavior",
+        "File write operations"
+      ]
+    },
+    {
+      "behaviors": [
+        "process_hollowing"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "0967a844-fdf5-5043-aafa-125fdac12019",
+        "359270e5-2e26-5ebf-b7c2-105dfd6cf05b",
+        "40b646c0-7fcc-5f6f-9161-c956260f6c4b",
+        "5e6a3180-6240-5630-89a8-a7ae857cab09",
+        "637b2ff0-85d9-531e-a9ee-558c20b93996",
+        "8919a814-679d-5552-9e3d-a802ff760764",
+        "e9c8df96-62b1-5cea-8a06-86e3e61492c5"
+      ],
+      "facts": {
+        "simulation": [],
+        "static": [
+          "T1055.012 - Process Injection: Process Hollowing",
+          "behavior: process_hollowing"
+        ]
+      },
+      "id": "source-process-hollowing",
+      "limitations": [
+        "仅依据所给证据，未包含完整进程镂空链的运行时细节"
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 8620,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "5b2ee46e-f4f1-4895-92c9-09e49a6f8c0d",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "5b2ee46e-f4f1-4895-92c9-09e49a6f8c0d",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 377,
+              "cost_units": 0.00614,
+              "input_tokens": 633,
+              "output_tokens": 902,
+              "provider_requests": 1
+            },
+            "provider_request_id": "2384997f-3c0f-4721-869a-9b5ece5668de",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 171378,
+            "request_digest": "64165911578db0a1d6ea947f1d27654b146430fd7080f23f12864413a4ef308f",
+            "response_digest": "0e4e0daaf9136e4aebe4fffd939209d9b3614acec05afc55869f2bbb997e1a05",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 377,
+        "cost_units": 0.00614,
+        "input_tokens": 633,
+        "latency_ms": 8620,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "5b2ee46e-f4f1-4895-92c9-09e49a6f8c0d",
+        "output_tokens": 902,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "3ae27413c820c3ff81e18baf2bfca7bc66f4cda79d84b45356f7b069253dbbfb",
+        "response_sha256": "0e4e0daaf9136e4aebe4fffd939209d9b3614acec05afc55869f2bbb997e1a05",
+        "retry_count": 0,
+        "total_tokens": 1535,
+        "used_fallback": false
+      },
+      "status": "completed",
+      "unknowns": [
+        "父进程、目标进程、注入载荷等完整链路细节未知"
+      ]
+    },
+    {
+      "behaviors": [
+        "dll_injection"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "230fff25-58da-5595-8ef7-b42b3e05de25",
+        "4663c07e-e2ac-53c2-9206-9764200ddc88",
+        "7d9130ba-7ca2-5cf6-919d-120dc1204976",
+        "e08eec6a-c689-5ba8-bebc-db8c2225837b",
+        "e0e77ebc-11c8-5b70-950b-0a27fff04c01"
+      ],
+      "facts": {
+        "emulation_observed": false,
+        "mitre": [
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001",
+          "dll_injection"
+        ],
+        "static": [
+          "dll_injection",
+          "Process Injection: Dynamic-link Library Injection",
+          "T1055.001"
+        ]
+      },
+      "id": "source-dll-injection-complete",
+      "limitations": [
+        "提供的证据仅为摘要，未包含具体注入链细节（如目标进程、DLL 路径、API 调用序列）"
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 7249,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "148e75d8-9d25-4971-aaef-a9b99d675e75",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "148e75d8-9d25-4971-aaef-a9b99d675e75",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 334,
+              "cost_units": 0.005144,
+              "input_tokens": 590,
+              "output_tokens": 696,
+              "provider_requests": 1
+            },
+            "provider_request_id": "f4ae1d19-ba43-41c5-92f0-59d4bd664541",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 172749,
+            "request_digest": "d8b1d5fc1dd7be73cad6908ada230fb9904a0495151b288b25cc06ae7ac260f2",
+            "response_digest": "4094b6b0a0cf61176c93483d0c34351c27abea0d280680feb314c85030f8d253",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 334,
+        "cost_units": 0.005144,
+        "input_tokens": 590,
+        "latency_ms": 7249,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "148e75d8-9d25-4971-aaef-a9b99d675e75",
+        "output_tokens": 696,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "5f21ce7c31f49f8f6d11ed383e2fa569711b85f79eaa8cb48f977895be07e962",
+        "response_sha256": "4094b6b0a0cf61176c93483d0c34351c27abea0d280680feb314c85030f8d253",
+        "retry_count": 0,
+        "total_tokens": 1286,
+        "used_fallback": false
+      },
+      "status": "completed",
+      "unknowns": [
+        "具体注入链步骤（打开目标进程、分配内存、写入 DLL 路径、触发远程线程等）未在提供证据中体现"
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "LIVE_EVIDENCE_REF_INVALID"
+      },
+      "evidence_refs": [],
+      "facts": {
+        "assessment": "仅存在不完整DLL注入线索，未建立完整高置信度逆向行为链，因此不能形成明确结论。",
+        "mitre": []
+      },
+      "id": "source-dll-injection-incomplete",
+      "limitations": [
+        "证据不完整",
+        "没有可用的行为观察或工具调用结果",
+        "model returned evidence references outside the sealed packet"
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 4829,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "bb319504-7f15-47de-8665-7c762cd31536",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "bb319504-7f15-47de-8665-7c762cd31536",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 201,
+              "cost_units": 0.003604,
+              "input_tokens": 457,
+              "output_tokens": 444,
+              "provider_requests": 1
+            },
+            "provider_request_id": "13cc719a-4a8c-4a81-8f19-64c7d6dd494c",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 175169,
+            "request_digest": "398db57d6fa777763b7c15be511b4736dd28346a4fe5c12b32f5e9e9d14ba943",
+            "response_digest": "62a06a6f830e87ba250f9e1a4fc06010a2c407c43936efdd67bb11bd9ea38a74",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 201,
+        "cost_units": 0.003604,
+        "input_tokens": 457,
+        "latency_ms": 4829,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "bb319504-7f15-47de-8665-7c762cd31536",
+        "output_tokens": 444,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "7193726922c171c3b87b0ceb7ef061dde707445d4c50349788ac22992f803382",
+        "response_sha256": "62a06a6f830e87ba250f9e1a4fc06010a2c407c43936efdd67bb11bd9ea38a74",
+        "retry_count": 0,
+        "total_tokens": 901,
+        "used_fallback": false
+      },
+      "status": "partial",
+      "unknowns": [
+        "DLL注入的完整行为链未知",
+        "缺少静态存在与仿真观测之间的关联证据",
+        "无法确认注入是否成功或实际落地执行"
+      ]
+    },
+    {
+      "behaviors": [
+        "apc_injection",
+        "dynamic_native_api_resolution",
+        "encrypted_payload_decryption",
+        "ntqueryinformationprocess_debug"
+      ],
+      "error": null,
+      "evidence_refs": [
+        "12bc8463-3291-5d6a-bb4d-927bb6d3b26f",
+        "1b62de96-c0b1-5f76-aa83-cf41b03fe06f",
+        "1ba7e735-8f7d-5d36-9ca0-9e2a8869189c",
+        "27946fd1-c6e1-5f10-9d45-611dab93a951",
+        "2fcc9630-27e5-5dc4-ae6d-0007f6f9a7c0",
+        "4c2ed949-710e-5b51-97f2-6832dbbf0eb2",
+        "58881659-51e6-57e1-89ac-f3b4497fb008",
+        "75cf4b71-8b79-5999-a39b-5ca708a5ba99",
+        "7833b315-36ff-5a38-8904-c52b13da5917",
+        "85d43dcd-b942-5378-bcd0-d7106c3e55ec",
+        "8b5746d4-080f-57f4-bcfd-5cc20ff1f477",
+        "966512c4-79e5-544a-9ac1-9725c280fc17",
+        "9897d6ef-9d84-56b3-8845-77a6a3aeb739",
+        "bc80127b-6cda-5818-b2e6-5e2673d33d84",
+        "c44063d7-589e-53a3-954e-1c3872a34d10",
+        "e3c0acb5-9c64-5315-b54b-3e079f62b052",
+        "ebad707f-17df-5114-83b2-f47d1832266c",
+        "ff75daa5-cf7c-5599-8dcd-405b94cc9271"
+      ],
+      "facts": {
+        "dynamic_observations": [],
+        "mitre": [
+          "Debugger Evasion",
+          "Native API",
+          "Obfuscated Files or Information",
+          "Process Injection: Asynchronous Procedure Call",
+          "T1027",
+          "T1055.004",
+          "T1106",
+          "T1622",
+          "apc_injection",
+          "dynamic_native_api_resolution",
+          "encrypted_payload_decryption",
+          "ntqueryinformationprocess_debug"
+        ],
+        "static_presence": [
+          "apc_injection",
+          "dynamic_native_api_resolution",
+          "encrypted_payload_decryption",
+          "ntqueryinformationprocess_debug"
+        ]
+      },
+      "id": "source-apc-rc4-antidebug",
+      "limitations": [
+        "仅依据静态证据，仿真观测未提供"
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 21095,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "11aa9a87-1a16-495e-9c0f-d23232b1f2d5",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "11aa9a87-1a16-495e-9c0f-d23232b1f2d5",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 766,
+              "cost_units": 0.01424,
+              "input_tokens": 1022,
+              "output_tokens": 2538,
+              "provider_requests": 1
+            },
+            "provider_request_id": "76c9659e-2440-44ab-8a0c-c608d2ceb670",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 158903,
+            "request_digest": "42d527fa7f24fc00d862fd17abb623a5e3997af6dd9fc1f17ee1479ba4cd0f1c",
+            "response_digest": "7561be8dbb8d43022e0ada4c0c5ffb52d585ec3b6fd0b21c795f401ff184bd6b",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 766,
+        "cost_units": 0.01424,
+        "input_tokens": 1022,
+        "latency_ms": 21095,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "11aa9a87-1a16-495e-9c0f-d23232b1f2d5",
+        "output_tokens": 2538,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "ffa8bde9aff20ae10dea176782dd82b79523b83d061ade117fd1aa4ff610df5f",
+        "response_sha256": "7561be8dbb8d43022e0ada4c0c5ffb52d585ec3b6fd0b21c795f401ff184bd6b",
+        "retry_count": 0,
+        "total_tokens": 3560,
+        "used_fallback": false
+      },
+      "status": "completed",
+      "unknowns": [
+        "RC4算法是否确认为加密方案不明确",
+        "动态执行时是否触发反调试行为未观测"
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": null,
+      "evidence_refs": [],
+      "facts": {
+        "mitre": []
+      },
+      "id": "source-no-signal",
+      "limitations": [
+        "No static or dynamic observational data; conclusion is restricted to absence of reverse behavior signal."
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 76738,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "4f6a58d7-4907-4a0f-876a-64a13c428b06",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "4f6a58d7-4907-4a0f-876a-64a13c428b06",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 193,
+              "cost_units": 0.031456,
+              "input_tokens": 449,
+              "output_tokens": 7415,
+              "provider_requests": 1
+            },
+            "provider_request_id": "895ff7f5-0a21-47df-a894-b5f303d6559d",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 103260,
+            "request_digest": "2453c7e5883d1eacf1fea0afe1a8ed154d31f8499975f7aae1afe5d045473620",
+            "response_digest": "187878534c6bd38727c8a13e26c89cbc5bc1fb0d132a1b0d9b6d9eb75b8ab3e5",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 193,
+        "cost_units": 0.031456,
+        "input_tokens": 449,
+        "latency_ms": 76738,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "4f6a58d7-4907-4a0f-876a-64a13c428b06",
+        "output_tokens": 7415,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "8f9f63344805fdd33c0816930130f7e7211368f1da64f6a33d47e535ed6b2708",
+        "response_sha256": "187878534c6bd38727c8a13e26c89cbc5bc1fb0d132a1b0d9b6d9eb75b8ab3e5",
+        "retry_count": 0,
+        "total_tokens": 7864,
+        "used_fallback": false
+      },
+      "status": "completed",
+      "unknowns": [
+        "No complete high-confidence reverse behavior chain was established."
+      ]
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "MALFORMED_PE",
+        "message": "RuntimeError"
+      },
+      "evidence_refs": [],
+      "facts": {},
+      "id": "malformed-pe",
+      "limitations": [],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 10535,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "488bc23a-8e5c-408e-a239-c1835521fd6c",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "488bc23a-8e5c-408e-a239-c1835521fd6c",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 187,
+              "cost_units": 0.005524,
+              "input_tokens": 443,
+              "output_tokens": 938,
+              "provider_requests": 1
+            },
+            "provider_request_id": "99f174ff-e483-4a26-a989-21beede3665a",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 169463,
+            "request_digest": "8dc30785dacb5f7ea8203e4ad9bcc58ef745db7a64516180c029bb21fdb194cb",
+            "response_digest": "a59001aebdbf426e2ae7278d4a56d95c0e62a63d82e2b1026ccb0f69e37f085f",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 187,
+        "cost_units": 0.005524,
+        "input_tokens": 443,
+        "latency_ms": 10535,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "488bc23a-8e5c-408e-a239-c1835521fd6c",
+        "output_tokens": 938,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "d308a600d1dd2800ac3e8aae5fcdc0917b1baad74baacbf91f3c56c35dc43dd1",
+        "response_sha256": "a59001aebdbf426e2ae7278d4a56d95c0e62a63d82e2b1026ccb0f69e37f085f",
+        "retry_count": 0,
+        "total_tokens": 1381,
+        "used_fallback": false
+      },
+      "status": "partial",
+      "unknowns": []
+    },
+    {
+      "behaviors": [],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "evidence_refs": [
+        "static:efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38"
+      ],
+      "facts": {
+        "dynamic_observation": {
+          "available": false,
+          "error_code": "DYNAMIC_UNAVAILABLE"
+        },
+        "static_evidence": {
+          "architecture": "x86-64",
+          "format": "PE",
+          "import_semantics": "unspecified",
+          "imports": [
+            "DeleteCriticalSection",
+            "EnterCriticalSection",
+            "GetLastError",
+            "GetStartupInfoA",
+            "InitializeCriticalSection",
+            "IsDBCSLeadByteEx",
+            "LeaveCriticalSection",
+            "MultiByteToWideChar",
+            "SetUnhandledExceptionFilter",
+            "Sleep",
+            "TlsGetValue",
+            "VirtualProtect",
+            "VirtualQuery",
+            "WideCharToMultiByte",
+            "__C_specific_handler",
+            "___lc_codepage_func",
+            "___mb_cur_max_func",
+            "__getmainargs",
+            "__initenv",
+            "__iob_func",
+            "__lconv_init",
+            "__set_app_type",
+            "__setusermatherr",
+            "_acmdln",
+            "_amsg_exit",
+            "_cexit",
+            "_commode",
+            "_errno",
+            "_fmode",
+            "_initterm",
+            "_lock",
+            "_onexit",
+            "_unlock",
+            "abort",
+            "calloc",
+            "exit",
+            "fclose",
+            "fopen",
+            "fprintf",
+            "fputc",
+            "free",
+            "fwrite",
+            "localeconv",
+            "malloc",
+            "memcpy",
+            "memset",
+            "puts",
+            "signal",
+            "strcmp",
+            "strerror",
+            "strlen",
+            "strncmp",
+            "vfprintf",
+            "wcslen"
+          ],
+          "section_count": 10,
+          "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+          "static_hints": [
+            "possible_file_io",
+            "possible_string_comparison",
+            "xor_decode_candidate"
+          ],
+          "xor_keys": [
+            "0x6e",
+            "0x6e",
+            "0x9e",
+            "0x6e",
+            "0x34",
+            "0x50",
+            "0x6e",
+            "0x6e",
+            "0x6e",
+            "0x5a",
+            "0x6c",
+            "0x6c",
+            "0x6e",
+            "0x0e",
+            "0x6c",
+            "0x6e",
+            "0x6e",
+            "0x6e",
+            "0x6e",
+            "0x6e"
+          ],
+          "xor_values": [
+            "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+            "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "444444441444-444I44444444444444444444444444444",
+            "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+            "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+            "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+            "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+            "llmlllmlllmlllmhmlh.llmjolj",
+            "xllmhmlh.llmlllmlllmhmlh",
+            "n.onnnnnnnnnnnnnnnnnnn",
+            "azkmz.hogbkj.ygzf.majk",
+            "mlllmhmlh.llmhmlh",
+            "nnnnnnnnnnnn.nnn",
+            "n.onnnnnnnnnnnn",
+            "n.onnnnnnnnnnnv",
+            "sn.onnnnnnnnnnn",
+            "yn.onnnnnnnnnnn"
+          ]
+        }
+      },
+      "id": "dynamic-failure-fallback",
+      "limitations": [
+        "No dynamic execution was performed.",
+        "No full disassembly engine is bundled in this helper.",
+        "XOR decoding is heuristic and may include false positives.",
+        "dynamic emulation unavailable"
+      ],
+      "model_receipt": {
+        "attempts": [
+          {
+            "budget_dimension": null,
+            "conservative_reserved_usage": {
+              "cache_hit_input_tokens": 0,
+              "cache_miss_input_tokens": 0,
+              "cost_units": 0.0,
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "provider_requests": 0
+            },
+            "deadline_ms": 180000,
+            "duration_ms": 19834,
+            "error_type": null,
+            "lineage_stage": "primary",
+            "logical_call_id": "80ae51ad-93aa-4717-8372-36c29599afb0",
+            "model_id": "deepseek-v4-flash",
+            "ordinal": 1,
+            "parent_logical_call_id": "80ae51ad-93aa-4717-8372-36c29599afb0",
+            "prompt_artifact_id": null,
+            "prompt_lineage_reason": "legacy_unbound_prompt",
+            "prompt_optimizer_attempt_id": null,
+            "prompt_selection_digest": "4257b6cddda02e2a1f64c1e479d6cf8d0e33ac73c8b9ec3a6ee9f97902e4ecff",
+            "prompt_version": "reverse-live-v1",
+            "provider_reported_usage": {
+              "cache_hit_input_tokens": 256,
+              "cache_miss_input_tokens": 1396,
+              "cost_units": 0.017644,
+              "input_tokens": 1652,
+              "output_tokens": 2759,
+              "provider_requests": 1
+            },
+            "provider_request_id": "8255f9e8-44bd-41fe-bf84-4bdd23ce1bf9",
+            "recovery_independence": "not_applicable",
+            "recovery_kind": "primary",
+            "remaining_budget_ms": 160164,
+            "request_digest": "93287ef9521b2f7d81c44351060164030a7fccaa82082d31022d54282e866975",
+            "response_digest": "fce69b452748815705fe83a95d28fe2ee7493de61f7d119b0f0a6c5a87c096a4",
+            "retry_after_ms": null,
+            "retry_after_source": null,
+            "retryable": false,
+            "route": "general:reasoning",
+            "route_profile": "primary-strong",
+            "stage": "provider_response",
+            "status_code": 200,
+            "unknown_usage": false
+          }
+        ],
+        "cache_hit_input_tokens": 256,
+        "cache_miss_input_tokens": 1396,
+        "cost_units": 0.017644,
+        "input_tokens": 1652,
+        "latency_ms": 19834,
+        "model_id": "deepseek-v4-flash",
+        "model_receipt_id": "80ae51ad-93aa-4717-8372-36c29599afb0",
+        "output_tokens": 2759,
+        "provider": "deepseek",
+        "provider_requests": 1,
+        "request_sha256": "d9f00ccf6d3393b93da6b12cfcbcae42c8d61c0f1201f701eb90c763ef23653e",
+        "response_sha256": "fce69b452748815705fe83a95d28fe2ee7493de61f7d119b0f0a6c5a87c096a4",
+        "retry_count": 0,
+        "total_tokens": 4411,
+        "used_fallback": false
+      },
+      "status": "partial",
+      "unknowns": []
+    }
+  ],
+  "evidence_sha256": "045c204a755be389669490800a570299b2c7a8c36e86f748796aa3cd7cb0a5d9",
+  "exploratory": true,
+  "gold_read": false,
+  "pricing": {
+    "estimated_cny": 0.1057144,
+    "priced_at": "2026-08-24T13:18:39.869000+08:00",
+    "pricing_band": "off_peak",
+    "snapshot": {
+      "currency": "CNY",
+      "model": "deepseek-v4-flash",
+      "off_peak": {
+        "cache_hit_input": 0.05,
+        "cache_miss_input": 1.5,
+        "output": 4.5
+      },
+      "peak": {
+        "cache_hit_input": 0.1,
+        "cache_miss_input": 3.0,
+        "output": 9.0
+      },
+      "peak_beijing_hours": [
+        "09:00-12:00",
+        "14:00-18:00"
+      ],
+      "retrieved_at": "2026-08-24",
+      "source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "unit_tokens": 1000000
+    }
+  },
+  "run_identity": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "reasoning_effort": "high",
+    "structured_output": "json_object",
+    "thinking_enabled": true
+  },
+  "safety": {
+    "host_pe_executions": 0,
+    "real_network_requests": 0,
+    "secret_leaks": 0,
+    "target_writes": 0
+  },
+  "safety_receipts": {
+    "host_pe_executions": {
+      "count": 0,
+      "evidence": [
+        "launch-contract:python-worker-and-api-emulator",
+        "launch-argv-sha256:dc1c6ae3032eb7abf558d396d8642da39f5c75500ce95f1e542ca69afa6f5bb2"
+      ],
+      "status": "verified"
+    },
+    "real_network_requests": {
+      "count": 0,
+      "evidence": [
+        "sandbox-profile-sha256:fc692c91a2026a81887f58564baf9e9eb61d7b2ada08e939ce1430288b0436ce",
+        "launch-argv-sha256:dc1c6ae3032eb7abf558d396d8642da39f5c75500ce95f1e542ca69afa6f5bb2"
+      ],
+      "sandbox_executable": "/usr/bin/sandbox-exec",
+      "status": "verified"
+    },
+    "secret_leaks": {
+      "count": 0,
+      "evidence": [
+        "serialized-output-secret-marker-scan-v1",
+        "4648171f4c6bf50dcd11184897024e8b5946803522b37e098f87973b09457d06"
+      ],
+      "status": "verified"
+    },
+    "target_writes": {
+      "count": 0,
+      "evidence": [
+        "target-hash-before:50374f8f22c77560d217126cfac19cf4eece267831379a4b0b60e3b4f174046b",
+        "target-hash-after:50374f8f22c77560d217126cfac19cf4eece267831379a4b0b60e3b4f174046b"
+      ],
+      "status": "verified"
+    }
+  },
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.7",
+  "openapi_sha256": "578794cd302baa18d2d09ca0acd0d9ca9ccb46c11dfa0c0c3cd4f6f1aa86c949",
+  "public_models_sha256": "c63d1333b76f58a246a162ceac1b54468820a69fa5a0e591f9d07048f67d95e0",
+  "tool_manifest_sha256": "d68d08b552ce260fcc5eb18ea9dc6c34fbc50c2de1174ebfba36f769071c87f1",
+  "ledger_event_sha256": "d3a54a262614dd5f3671d84b96d1f87e351006fcb70da7f27ba3fd9bdd2803e6",
+  "prompt_manifest_sha256": "660b2ad839444c4d1404fda3754c820f2b8cb1caa065ac7db3e97685012e876a",
+  "adaptive_prompt_catalog_sha256": "851d6dd8ce4dadfb39d89d2c84ac3550835f989bf326f7c85cb8bd01565fb7a5",
+  "migration_heads": [
+    "0022_widen_prompt_versions"
+  ]
+}

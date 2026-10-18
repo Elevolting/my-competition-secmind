@@ -1,0 +1,3 @@
+SECMIND_SYNTHETIC_FIXTURE_XOR_V1
+case_id=gitleaks-positive-slack
+data=iP829kpsydQPVB0eAvzi9qQ8kmsErtj7j0bOgIz4y9noh0KDNgukq3UjfkIY8P7x7zySawSu2PuPRs7Q3Laejr2CRYY1BqusfChjKQ==

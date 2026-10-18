@@ -1,0 +1,19 @@
+rules:
+  - id: secmind.java.request-runtime-command-injection
+    languages: [java]
+    mode: taint
+    message: User-controlled request data reaches a Java process execution sink.
+    severity: ERROR
+    metadata:
+      cwe: CWE-78
+      confidence: HIGH
+      license: CC-BY-SA-4.0
+      remediation: Use a fixed command and validated argument list instead of composing a shell command.
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.getParameter(...)
+          - pattern: $REQ.getHeader(...)
+    pattern-sinks:
+      - pattern-either:
+          - pattern: Runtime.getRuntime().exec($CMD, ...)
+          - pattern: new ProcessBuilder($CMD, ...)

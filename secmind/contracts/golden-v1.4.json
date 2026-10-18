@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.4",
+  "openapi_sha256": "6334e6ad88f647af0bc516684e2676a155122616c68bfe96e66ccdb1f692870c",
+  "public_models_sha256": "9d85ec1464eb48f3769cd89a2ac8851fa3565a74e7783cfef25d0c1dfa265387",
+  "tool_manifest_sha256": "d68d08b552ce260fcc5eb18ea9dc6c34fbc50c2de1174ebfba36f769071c87f1",
+  "ledger_event_sha256": "85ecb24c010656336591b751c8f021a0c2f8da6366579da2615620eaefff37e0",
+  "migration_heads": [
+    "0006_v05_governed_scenarios"
+  ]
+}

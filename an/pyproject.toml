@@ -1,0 +1,68 @@
+[project]
+name = "security-agent"
+version = "0.1.0"
+description = "Auditable, recoverable network-security agent runtime"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "bandit>=1.7.10,<2",
+  "fastapi>=0.115,<1",
+  "httpx>=0.27,<1",
+  "jsonschema>=4.23,<5",
+  "langgraph>=0.4,<2",
+  "mcp>=1.12,<2",
+  "psutil>=6,<8",
+  "pydantic>=2.10,<3",
+  "pydantic-settings>=2.7,<3",
+  "python-multipart>=0.0.18,<1",
+  "sqlalchemy>=2.0,<3",
+  "tenacity>=9,<10",
+  "tzdata>=2024.1,<2027",  # Windows zoneinfo needs IANA tz database (ZoneInfo("Asia/Shanghai"))
+  "uvicorn[standard]>=0.34,<1",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.2,<4"]
+qdrant = ["qdrant-client>=1.13,<2"]
+dev = [
+  "coverage[toml]>=7.6,<8",
+  "mypy>=1.14,<2",
+  "pytest>=9.0.3,<10",
+  "pytest-asyncio>=1.3,<2",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+security-agent-api = "security_agent.api:run"
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/security_agent"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"examples/*.py" = ["S602"]
+"src/security_agent/api.py" = ["S104"]
+
+[tool.coverage.run]
+source = ["security_agent"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true

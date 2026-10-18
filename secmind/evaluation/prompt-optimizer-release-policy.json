@@ -1,0 +1,17 @@
+{
+  "schema_version": "secmind-prompt-optimizer-release-policy-v1",
+  "authoritative_arm": "adaptive",
+  "required_arms": [
+    "fixed",
+    "catalog",
+    "adaptive_shadow",
+    "adaptive"
+  ],
+  "minimum_randomized_blocks": 5,
+  "fixed_denominator": true,
+  "missing_cells_are_failures": true,
+  "paired_delta_ci_lower_bound": ">0",
+  "all_domains_non_regression": true,
+  "default_without_verified_receipt": "adaptive_shadow",
+  "production_authoritative_optimizer_enabled": false
+}

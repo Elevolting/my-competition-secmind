@@ -1,0 +1,42 @@
+{
+  "cases": [
+    {
+      "id": "pe-structure"
+    },
+    {
+      "id": "pe-imports"
+    },
+    {
+      "id": "xor-recovery"
+    },
+    {
+      "id": "dynamic-wrong-token"
+    },
+    {
+      "id": "dynamic-correct-token"
+    },
+    {
+      "id": "source-process-hollowing"
+    },
+    {
+      "id": "source-dll-injection-complete"
+    },
+    {
+      "id": "source-dll-injection-incomplete"
+    },
+    {
+      "id": "source-apc-rc4-antidebug"
+    },
+    {
+      "id": "source-no-signal"
+    },
+    {
+      "id": "malformed-pe"
+    },
+    {
+      "id": "dynamic-failure-fallback"
+    }
+  ],
+  "schema_version": "1.0",
+  "suite_id": "secmind-reverse-safe-12-v1"
+}

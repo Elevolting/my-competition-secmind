@@ -1,0 +1,11 @@
+{
+  "name": "mandiant-speakeasy",
+  "version": "2.0.0b6",
+  "repository": "https://github.com/mandiant/speakeasy",
+  "commit": "b364d53ce9364e1f8aa898b9ed53597be39b23cb",
+  "archive_url": "https://github.com/mandiant/speakeasy/archive/b364d53ce9364e1f8aa898b9ed53597be39b23cb.zip",
+  "archive_sha256": "8ea18dd8a3967a39c58595ce0de65db4541f85db220e23d8053818bea7dfd3e7",
+  "tool_environment": ".reverse-tools/speakeasy",
+  "network_policy": "deny",
+  "host_pe_execution": false
+}

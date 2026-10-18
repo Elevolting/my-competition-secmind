@@ -1,0 +1,1 @@
+# v3 application has no Python runtime dependencies

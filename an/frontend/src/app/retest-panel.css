@@ -1,0 +1,12 @@
+.retest-entry { display: inline-flex; margin: 6px 0 0 8px; vertical-align: middle; }
+.retest-panel { display: grid; gap: 16px; min-width: 0; }
+.retest-source, .retest-history, .retest-detail, .retest-create, .retest-result { display: grid; gap: 9px; min-width: 0; }
+.retest-source, .retest-detail { padding: 12px; border: 1px solid var(--ant-color-border-secondary); border-radius: 6px; }
+.retest-source span, .retest-detail p, .retest-detail .ant-typography, .retest-report-row span { overflow-wrap: anywhere; }
+.retest-create label, .retest-result label { display: grid; gap: 5px; }
+.retest-create .ant-input-number { width: 118px; }
+.retest-result .ant-select { width: 100%; }
+.retest-report-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--ant-color-border-secondary); }
+.retest-report-row > span:nth-child(2) { min-width: 180px; flex: 1; }
+.retest-report-row .ant-typography { max-width: 100%; }
+@media (max-width: 600px) { .retest-entry { margin-left: 0; } .retest-report-row { align-items: flex-start; flex-direction: column; } }

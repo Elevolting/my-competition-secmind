@@ -1,0 +1,130 @@
+[project]
+name = "secmind"
+version = "0.8.7"
+description = "Auditable, recoverable network-security agent runtime"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "alembic>=1.14,<2",
+  "bandit>=1.7.10,<2",
+  "cryptography>=50.0.0,<51",
+  "docker>=7.1,<8",
+  "editables>=0.5,<1",
+  "fastapi>=0.115,<1",
+  "httpx>=0.27,<1",
+  "h2>=4.4.1,<5",
+  "jsonschema>=4.23,<5",
+  "langchain-core>=0.3,<2",
+  "langgraph>=0.4,<2",
+  "langgraph-checkpoint-postgres>=3.1.1,<4",
+  "prometheus-client>=0.21,<1",
+  "psycopg[binary,pool]>=3.2,<4",
+  "pydantic>=2.10,<3",
+  "pydantic-core>=2.27,<3",
+  "pydantic-settings>=2.7,<3",
+  "python-multipart>=0.0.18,<1",
+  "PyYAML>=6.0.2,<7",
+  "sqlalchemy>=2.0,<3",
+  "tenacity>=9,<10",
+  "tzdata>=2024.1,<2027",  # Windows zoneinfo needs IANA tz database (ZoneInfo("Asia/Shanghai") in reverse_live_evaluation)
+  "uvicorn[standard]>=0.34,<1",
+]
+
+[project.optional-dependencies]
+qdrant = ["qdrant-client>=1.13,<2"]
+forensics = [
+  "defusedxml>=0.7.1,<1",
+  "dpkt>=1.9.8,<2",
+  "python-evtx>=0.8.1,<1",
+]
+full = [
+  "defusedxml>=0.7.1,<1",
+  "dpkt>=1.9.8,<2",
+  "python-evtx>=0.8.1,<1",
+  "qdrant-client>=1.13,<2",
+]
+dev = [
+  "defusedxml>=0.7.1,<1",
+  "dpkt>=1.9.8,<2",
+  "python-evtx>=0.8.1,<1",
+  "qdrant-client>=1.13,<2",
+  "coverage[toml]>=7.6,<8",
+  "mypy>=1.14,<2",
+  "pytest>=9.0.3,<10",
+  "pytest-asyncio>=1.3,<2",
+  "ruff>=0.9,<1",
+  "types-jsonschema>=4.23,<5",
+  "types-PyYAML>=6.0.12,<7",
+]
+
+[project.scripts]
+secmind-api = "secmind.api:run"
+secmind-projector = "secmind.projector:run"
+secmind-worker = "secmind.worker:run"
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/secmind"]
+
+# Hatch's default editable install writes the non-ASCII repository path as a
+# UTF-8 line in a .pth file. Windows Python decodes .pth files with the active
+# ANSI code page, so a repository under a Chinese path becomes unimportable.
+# Exact editable mode uses an ASCII import hook with UTF-8 Python source and is
+# therefore location-independent.
+dev-mode-exact = true
+
+[tool.hatch.build.targets.wheel.force-include]
+"third_party/mukul975-anthropic-cybersecurity-skills/LICENSE" = "secmind_distribution/licenses/mukul975-anthropic-cybersecurity-skills/LICENSE"
+"third_party/mukul975-anthropic-cybersecurity-skills/NOTICE.md" = "secmind_distribution/licenses/mukul975-anthropic-cybersecurity-skills/NOTICE.md"
+"docker/tools/semgrep/rules/reviewed" = "secmind_distribution/resources/semgrep/reviewed"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.codex-audit",
+  "/.runtime-check",
+  "/.test-tmp",
+  "/data",
+  "/dist",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+asyncio_mode = "auto"
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+norecursedirs = [".tmp-*", ".test-tmp", "__pycache__"]
+markers = [
+  "integration: requires external PostgreSQL or Qdrant services",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = [
+  "evaluation/tool-calibration/fixtures",
+  "evaluation/tool-calibration/fixtures-v3",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"examples/*.py" = ["S602"]
+"docker/tools/semgrep/tests/*.py" = ["S602", "S603", "S605", "S607"]
+"scripts/evaluate.py" = ["ASYNC240"]
+"src/secmind/api.py" = ["S104"]
+"src/secmind/prompting/lifecycle_library.py" = ["E501"]
+"src/secmind/reverse_report.py" = ["E501"]
+
+[tool.coverage.run]
+source = ["secmind"]
+branch = true
+omit = []
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

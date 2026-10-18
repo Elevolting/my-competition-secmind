@@ -1,0 +1,9 @@
+{
+  "gold_sha256": "dc92bb93f3ba68d3f8d6887b512a4f51011549b7276a624f60b72406eeea0a32",
+  "metrics_sha256": "3f902fdfdc307b4e29422589e01b4d16ddffaa64a543391b7a5f6577a5f8e2de",
+  "receipt_sha256": "ea31a9813904177d4c8c4798c8a63fe64639e06b14dbdc6dcd942a38dce7ebbd",
+  "rows_sha256": "a866f982046fdee09e3b81c20384555a3c160b678e840cf70bb18c9eb8c00b54",
+  "run_tree_sha256": "00cc3920bdb6d8b94f2765eec0f0065031d01db1cfc97f9559ce8ebcd6acc55a",
+  "schema_version": "1.0",
+  "source_inventory_sha256": "a16502ff694c94bce49dfa0a5e2c9fa6906605b3dff4185db2d8dc330c08e604"
+}

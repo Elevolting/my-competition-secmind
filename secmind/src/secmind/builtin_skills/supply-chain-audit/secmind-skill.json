@@ -1,0 +1,18 @@
+{
+  "skill_id": "supply-chain-audit",
+  "version": "1.0.0",
+  "description": "Generate a CycloneDX SBOM and match dependencies against a pinned offline OSV database.",
+  "trigger_terms": ["dependency", "sbom", "osv", "supply chain", "依赖", "供应链"],
+  "supported_languages": ["python", "javascript", "typescript", "java", "go"],
+  "scenarios": ["code_audit"],
+  "required_capabilities": ["sbom", "dependency_audit"],
+  "allowed_agent_profiles": ["dependency-investigator"],
+  "risk_ceiling": 1,
+  "max_turns": 3,
+  "input_contract": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+  "output_contract": {"type": "object", "required": ["sbom_artifact_id", "findings"], "properties": {"sbom_artifact_id": {"type": "string"}, "findings": {"type": "array"}}},
+  "eval_case_ids": ["supply-chain-vulnerable", "supply-chain-safe"],
+  "package_digest": "0ad75700050e6b620db46788830e3370770127781fae8e362402321fc035fe3c",
+  "signer": "secmind-platform-v1",
+  "signature": "K4YdUZ9RBSnd5EOPNQh8REgkzLeaLtgQ5yf0MFt-shElU9ik9x6Xf6MHQFagEbOITs_bfyknze7sybZd9ZZsBw"
+}

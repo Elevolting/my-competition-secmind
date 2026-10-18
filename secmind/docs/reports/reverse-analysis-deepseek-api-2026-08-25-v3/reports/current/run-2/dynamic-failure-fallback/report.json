@@ -1,0 +1,205 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "partial",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "partial",
+    "executive_summary": "Analysis completed using static methods only because dynamic emulation was unavailable. The PE file (x86-64, 10 sections) shows file I/O, string comparison, and XOR decode heuristics; no runtime behavior was observed. Findings are based on static hints and import analysis, with moderate confidence.",
+    "findings": [
+      {
+        "business_impact": "Potentially hidden configuration, credential, or command-and-control strings could affect confidentiality and integrity if exposed.",
+        "confidence": "moderate",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "medium",
+        "technical_explanation": "Static heuristics flagged XOR decode candidates. XOR keys such as 0x6e and 0x9e produced strings, including 'SECMIND-REVERSE-OK' and multiple 'x.on...'/similar patterns. The use of XOR on strings is common in obfuscation or packing. Imported functions (fopen, fwrite, strcmp) suggest the code may write and compare decoded data at runtime. Because dynamic execution was not possible, the exact role of these strings remains unconfirmed.",
+        "title": "Static XOR-encoded data suggests hidden string or file markers"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "Run the sample in a controlled sandbox or dynamic emulator to confirm the XOR-decoded strings and observe actual file and string behavior.",
+        "decision_role": "Security Analyst",
+        "expected_outcome": "Actual runtime behavior and decoded strings revealed, increasing or decreasing confidence and business impact estimate.",
+        "priority": "P2",
+        "rationale": "Static results are heuristic and dynamic behavior is unobserved; confirmation is needed to validate the risk and refine impact."
+      }
+    ],
+    "limitations": [
+      "No dynamic execution was performed.",
+      "No full disassembly engine is bundled in this helper.",
+      "XOR decoding is heuristic and may include false positives.",
+      "dynamic emulation unavailable"
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "Acquire a working dynamic analysis environment and execute the sample under controlled monitoring.",
+      "Verify the XOR decoding with a stronger disassembler or emulator and confirm the purpose of the decoded strings.",
+      "Check the decoded string 'SECMIND-REVERSE-OK' and related markers in the context of the sample's file and string operations."
+    ],
+    "reverse_analysis": "The PE file is an x86-64 executable with 10 sections. Static import analysis shows a standard C runtime plus Windows APIs (critical sections, virtual memory, locale) and file and string functions. Heuristic XOR decoding produced several candidate keys and strings, including possible markers such as 'SECMIND-REVERSE-OK' and likely file/string-handling code. No runtime behavior was observed because dynamic emulation was unavailable. The presence of file I/O and string comparison imports aligns with candidate decoded content, but the XOR results are heuristic and may include false positives.",
+    "risk_assessment": {
+      "exploitability": "unknown",
+      "impact_scope": "Potential local data exposure or unintended behavior if the XOR strings are used for sensitive operations; scope is limited to the analyzed sample without further confirmation.",
+      "overall_risk": "medium",
+      "urgency": "medium"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "xor_decode_candidate",
+        "possible_file_io",
+        "possible_string_comparison"
+      ],
+      "error": {
+        "code": "DYNAMIC_UNAVAILABLE"
+      },
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_semantics": "unspecified",
+        "imports": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "static_hints": [
+          "possible_file_io",
+          "possible_string_comparison",
+          "xor_decode_candidate"
+        ],
+        "xor_keys": [
+          "0x6e",
+          "0x6e",
+          "0x9e",
+          "0x6e",
+          "0x34",
+          "0x50",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x5a",
+          "0x6c",
+          "0x6c",
+          "0x6e",
+          "0x0e",
+          "0x6c",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e",
+          "0x6e"
+        ],
+        "xor_values": [
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "444444441444-444I44444444444444444444444444444",
+          "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+          "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+          "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+          "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "n.onnnnnnnnnnnnnnnnnnn",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "nnnnnnnnnnnn.nnn",
+          "n.onnnnnnnnnnnn",
+          "n.onnnnnnnnnnnv",
+          "sn.onnnnnnnnnnn",
+          "yn.onnnnnnnnnnn"
+        ]
+      },
+      "status": "partial"
+    },
+    "task_identity": {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "Actual runtime behavior of the sample.",
+      "Purpose and usage of decoded XOR strings beyond heuristics.",
+      "Whether the file and string operations are benign or malicious."
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "unspecified",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "current",
+    "case_id": "dynamic-failure-fallback",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}

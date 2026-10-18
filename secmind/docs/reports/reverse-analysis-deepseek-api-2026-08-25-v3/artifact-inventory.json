@@ -1,0 +1,2694 @@
+{
+  "artifact_count": 336,
+  "artifacts": [
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/receipt.json",
+      "repeat_id": 1,
+      "sha256": "e3aebe3ea1267c4eee3677b85df66f4a3c0562a1645253396bc785aae5d29c57",
+      "size_bytes": 3823
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/report.html",
+      "repeat_id": 1,
+      "sha256": "af1a0b18c03c5880d3f4dfbd3608c8bcb205de9cb9ff98502047b44f61a9928c",
+      "size_bytes": 11222
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/report.json",
+      "repeat_id": 1,
+      "sha256": "c714685bbbb24162a966d98e3bf68cb3f47f1e97f39f7e32034789b52fca03d8",
+      "size_bytes": 9190
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/report.md",
+      "repeat_id": 1,
+      "sha256": "049ce2650f3e6fd7efe0e1e5d5b416fef1836c27e80bee46683aa80da1d42513",
+      "size_bytes": 4379
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/request.json",
+      "repeat_id": 1,
+      "sha256": "4437e512c23462731d34e593e82d18e8b0fca691c922aebc40fbf2900962245c",
+      "size_bytes": 2999
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/response.json",
+      "repeat_id": 1,
+      "sha256": "1dd3c96bdec51cdf71b6fe7878d5743dd1d6bdf116eb3a8b2cceb017f84d8ca2",
+      "size_bytes": 8918
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-1/dynamic-correct-token/seal.json",
+      "repeat_id": 1,
+      "sha256": "e3bdfb38c915791d366e77eafa55153dc861e0dde5e54688fefbf7030cc3b871",
+      "size_bytes": 689
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/receipt.json",
+      "repeat_id": 1,
+      "sha256": "4dcc0e49587b713c7d54c165bd18385b1ff01cbcebe7600eb26b42c017f4a748",
+      "size_bytes": 3822
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/report.html",
+      "repeat_id": 1,
+      "sha256": "d2b628345207b118939b83c2daa38e43edb1f4ee1ecdc7c6fb0f78bb6c221c35",
+      "size_bytes": 9641
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/report.json",
+      "repeat_id": 1,
+      "sha256": "daf184e8787b5fdd44aec47d8cdb5fb5974b3c0847e8b5e508b796d013568089",
+      "size_bytes": 8144
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/report.md",
+      "repeat_id": 1,
+      "sha256": "cf57a2951c3d8aaa07aea87319ee9afc609ab5f6bec3e9fa753cceb20d0a2e5c",
+      "size_bytes": 3135
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/request.json",
+      "repeat_id": 1,
+      "sha256": "946426ddb61d2097e43179bfa009f8d0ae317eaed21b63302223dc5d6ede1a9b",
+      "size_bytes": 3005
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/response.json",
+      "repeat_id": 1,
+      "sha256": "364d21b0622c076508b4d325a4be0e216b6ec8865566f199c568114e62038c54",
+      "size_bytes": 7872
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-1/dynamic-failure-fallback/seal.json",
+      "repeat_id": 1,
+      "sha256": "cde77f19e45dabb96cb93c24507ad900cc339dfa367c40d8f71282831643676d",
+      "size_bytes": 692
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/receipt.json",
+      "repeat_id": 1,
+      "sha256": "77984c2fcacda2d78e0853cf9239d9db0bfe91e30ea545fbc479b277f4dc8080",
+      "size_bytes": 3827
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/report.html",
+      "repeat_id": 1,
+      "sha256": "29a04e15788d28e56f6d721000a5afdcb93e9648eaddd2a244b794465c54fd84",
+      "size_bytes": 9525
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/report.json",
+      "repeat_id": 1,
+      "sha256": "fa5b8953450a9a26f85b36200989ab6035850ff4adc54c65a7cb13df469d6c61",
+      "size_bytes": 35498
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/report.md",
+      "repeat_id": 1,
+      "sha256": "d17cf0d4bd0c97604ed52665c50a1299e3a6f55529541820760bb5d0dbbbbb4d",
+      "size_bytes": 2849
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/request.json",
+      "repeat_id": 1,
+      "sha256": "02ab968e47a8d1f413e2cb541cca851e5fe8e73a8cc285b84169bc375f14067f",
+      "size_bytes": 2993
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/response.json",
+      "repeat_id": 1,
+      "sha256": "a34c172c7316be079f7aee639898e0ada8e2e22ea81d8dc11c94a78abed291fb",
+      "size_bytes": 35226
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-1/dynamic-wrong-token/seal.json",
+      "repeat_id": 1,
+      "sha256": "5150f046f2b4bc101f523edeed16b35aa571120f4d5f6fe1b2bdb8f437c7c83b",
+      "size_bytes": 687
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/receipt.json",
+      "repeat_id": 1,
+      "sha256": "e89bb9517409f681c7bf3095ab83efccac8098e8e3f1e40be13e430c295a1c1d",
+      "size_bytes": 3798
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/report.html",
+      "repeat_id": 1,
+      "sha256": "fa897433f27e16aa769ae6e98e159d6342fceb7e2861e97f6768cd8e6be425bd",
+      "size_bytes": 8406
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/report.json",
+      "repeat_id": 1,
+      "sha256": "0307e334f5ea6e632d531a6ba13dc173283e236b6c43dc0ec3182eec4fa997b1",
+      "size_bytes": 3057
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/report.md",
+      "repeat_id": 1,
+      "sha256": "2fd485619a8da63fb03f17daa332e1572b23653715199917c4c2940d33969e48",
+      "size_bytes": 1992
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/request.json",
+      "repeat_id": 1,
+      "sha256": "f880af7108bf8ceb06ef675e5b3429f89e09788b8645a33d14b774252444f8bc",
+      "size_bytes": 2853
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/response.json",
+      "repeat_id": 1,
+      "sha256": "0889c98c5eb588f2454a1039e8078906e8005486290e609af572f379196ffccb",
+      "size_bytes": 2785
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-1/malformed-pe/seal.json",
+      "repeat_id": 1,
+      "sha256": "d224ef52e7f69a8338ea51f9b13e28c1d3f101f4523c90fd06655ac69a50195e",
+      "size_bytes": 680
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/receipt.json",
+      "repeat_id": 1,
+      "sha256": "210538eec0f56c6828296c19c3e710918f550a3894be772e46adc8221bf04eca",
+      "size_bytes": 3810
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/report.html",
+      "repeat_id": 1,
+      "sha256": "eedd4044ffa432488ca381a02ee6e8fb90f9c325e5b8c48e312d80727f520e73",
+      "size_bytes": 12872
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/report.json",
+      "repeat_id": 1,
+      "sha256": "592c47cf345c89fd46655c3d426b6afb04cb0b195516ac25dc01ac3a631e630c",
+      "size_bytes": 10969
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/report.md",
+      "repeat_id": 1,
+      "sha256": "b8baa1f5bfe047daa3d1669f9c7f364f2096b907762c912bf5f6dd257b952d9b",
+      "size_bytes": 5706
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/request.json",
+      "repeat_id": 1,
+      "sha256": "a16e96f38f93339d43f1e7e1d6f2cf287babeae70882e9629357cf00e13b8779",
+      "size_bytes": 2969
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/response.json",
+      "repeat_id": 1,
+      "sha256": "3e6d3a4a64c5aa8ad6a273f9c5a3bc2807b316ddcee0db85b914485e2891989e",
+      "size_bytes": 10697
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-1/pe-imports/seal.json",
+      "repeat_id": 1,
+      "sha256": "9376bf2c222ab09091a8eadccd05230280c24c31b6df68a161a796cf0d543dd9",
+      "size_bytes": 678
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/receipt.json",
+      "repeat_id": 1,
+      "sha256": "ce32002b004b338d53565961ba9dfd46c802f5bf9773d0cd15ac836b1dd44aa2",
+      "size_bytes": 3806
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/report.html",
+      "repeat_id": 1,
+      "sha256": "c5c96f22a0771739dd8edcad3cc22233c44cd978fe48e626156c7366a69eba49",
+      "size_bytes": 9270
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/report.json",
+      "repeat_id": 1,
+      "sha256": "36f5e4e8681011a597147b3c4743a56daa06ce3ca3b3cf4d99886494015a36e3",
+      "size_bytes": 5817
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/report.md",
+      "repeat_id": 1,
+      "sha256": "26e4211e9084795963022f290e8d91be9bf84e9495a0d00cfc9146781638df64",
+      "size_bytes": 2788
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/request.json",
+      "repeat_id": 1,
+      "sha256": "446b4cb3627724640ca9ea81ea8d784c4ccce0fe3f44ca2338b270ccef45ed95",
+      "size_bytes": 2967
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/response.json",
+      "repeat_id": 1,
+      "sha256": "979a9f75116959321049b86a14e146e35c6e3ee7e138408da4a1ee7e1abea302",
+      "size_bytes": 5545
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-1/pe-structure/seal.json",
+      "repeat_id": 1,
+      "sha256": "88826eae7777dd135c24b8fc70cac47ecddd128b76bdcd21aa690b4113f9eef8",
+      "size_bytes": 680
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/receipt.json",
+      "repeat_id": 1,
+      "sha256": "eddd908d316f48e5dc164247dc6602130b327147de8cc70c853c5ed9272a5aaf",
+      "size_bytes": 3834
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/report.html",
+      "repeat_id": 1,
+      "sha256": "84036361bf5eb0a3c69e7b0324f04cead6bc0286f0e432c1f5c12518a7f99a4a",
+      "size_bytes": 13858
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/report.json",
+      "repeat_id": 1,
+      "sha256": "a22e5aec8431625bacb8106d25b99de4efe113cee3043087a27754d432b7f9ac",
+      "size_bytes": 8481
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/report.md",
+      "repeat_id": 1,
+      "sha256": "9336f2798caac2e659ae3b64672a83819b6c31521f05746fb344fe59a78ea607",
+      "size_bytes": 6105
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/request.json",
+      "repeat_id": 1,
+      "sha256": "8d74bf51290efc98a45e0c376eba03243a4f027618fc71b7ec8331a751a70a4d",
+      "size_bytes": 4376
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/response.json",
+      "repeat_id": 1,
+      "sha256": "246d38861230ecd18ceb88688bb7dc86e9cc620a685031a843007ec949e69380",
+      "size_bytes": 8209
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-1/source-apc-rc4-antidebug/seal.json",
+      "repeat_id": 1,
+      "sha256": "e272b05f82452df3c7edc0a61609514c81058cbc46e92511942258e0041e547f",
+      "size_bytes": 692
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/receipt.json",
+      "repeat_id": 1,
+      "sha256": "9e9c0d0427a83bc2e7846679effb24f41ff3e3a28e3f59bb212f2d0b046cbffc",
+      "size_bytes": 3834
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/report.html",
+      "repeat_id": 1,
+      "sha256": "147907d37e940ce1d0038c3a1b3117d899f215cfab7f8f90643c0a396ddde7b9",
+      "size_bytes": 11237
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/report.json",
+      "repeat_id": 1,
+      "sha256": "2784ce13fef194cdede60be105428ce7b55ea26bd4fe1fc192850469ec9b3f25",
+      "size_bytes": 5778
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/report.md",
+      "repeat_id": 1,
+      "sha256": "ab9c3772ba58975a88639f2d5b2d7fed062100c99c8e509c2fdca253fdc496e1",
+      "size_bytes": 4309
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/request.json",
+      "repeat_id": 1,
+      "sha256": "31f630721a2762af86210f6d02517db64ee68624086c5cfefce7ccec0d26750e",
+      "size_bytes": 3316
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/response.json",
+      "repeat_id": 1,
+      "sha256": "4756349f41311fedce9098575563f0d2d475f5f7075d7d564b2ad4ba42648d86",
+      "size_bytes": 5506
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-1/source-dll-injection-complete/seal.json",
+      "repeat_id": 1,
+      "sha256": "e6a444f439be3131675e41a5fcb3292a5ba7adadb3657c3a95fdeb85ef976fe8",
+      "size_bytes": 697
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/receipt.json",
+      "repeat_id": 1,
+      "sha256": "57d43396fb4f9c4a9b2699b12f8a5c0ebb13509ca0671681735811eed48cea71",
+      "size_bytes": 3824
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/report.html",
+      "repeat_id": 1,
+      "sha256": "0f840ef5a26253422664b1de5b188d82bc4d2fb1da3b46234e42933d35742adb",
+      "size_bytes": 8364
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/report.json",
+      "repeat_id": 1,
+      "sha256": "f79468475f994dd578542fff6c7800674916cb49ff948918c2ab70a17d6584b0",
+      "size_bytes": 3011
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/report.md",
+      "repeat_id": 1,
+      "sha256": "a70f088ace203eb6d3ecfb77a89cf972ef23afb91158a5a6bbadb38b0fda1649",
+      "size_bytes": 1929
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/request.json",
+      "repeat_id": 1,
+      "sha256": "5b6d52852e29a8501fa4a4060c905a4c43647429b079ce03c48cd20676a164fd",
+      "size_bytes": 2939
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/response.json",
+      "repeat_id": 1,
+      "sha256": "5cec263028861e14a0ea8940c5cff666906ee2e045c7639532c5b38f289aaae2",
+      "size_bytes": 2739
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-1/source-dll-injection-incomplete/seal.json",
+      "repeat_id": 1,
+      "sha256": "12dcc4842b90654a323e34f8adbd9da82b163bdc04e55e331edffb6cd6e22238",
+      "size_bytes": 699
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/receipt.json",
+      "repeat_id": 1,
+      "sha256": "bc0d058da670a1dc8752c6a3b0e54cf63de989cabcd768a08695f5dd5784855c",
+      "size_bytes": 3805
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/report.html",
+      "repeat_id": 1,
+      "sha256": "e47393ca424cc264d918c2a20d09c33e734c58051397161620309a1101a20313",
+      "size_bytes": 8987
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/report.json",
+      "repeat_id": 1,
+      "sha256": "74b5d4adfdcf46dd77044afec136dcc2efab218f7eab8b928db2144d3aff7ae9",
+      "size_bytes": 3588
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/report.md",
+      "repeat_id": 1,
+      "sha256": "093e5418eddf00f92cf7c7b712be9c8be97e049171c213e321cf8f826e70974d",
+      "size_bytes": 2526
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/request.json",
+      "repeat_id": 1,
+      "sha256": "12a87bb2c6a3bb9c9e00959cd7aeeac93f77a02df6105bd8e1c83e94745455cd",
+      "size_bytes": 2886
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/response.json",
+      "repeat_id": 1,
+      "sha256": "679c39b809582494c1f51f3fa8f41a8df8b9fcf8930ae128e0a934bca9033d75",
+      "size_bytes": 3316
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-1/source-no-signal/seal.json",
+      "repeat_id": 1,
+      "sha256": "81d60ab229599b3927310fb356d36baae4d0dc1e4f069e7c3ee84a4b260261ca",
+      "size_bytes": 684
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/receipt.json",
+      "repeat_id": 1,
+      "sha256": "336ab4f751b43a85b03a7b7c5180a2652358f25c3261bd40fb638b81438de38f",
+      "size_bytes": 3828
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/report.html",
+      "repeat_id": 1,
+      "sha256": "1ceb7c01aa4b397fa7c3e0ea667c61e41f20f70380519cfd61537258be2a228b",
+      "size_bytes": 12089
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/report.json",
+      "repeat_id": 1,
+      "sha256": "94bb42cfb8484ba11d833360ff9f59d8fc6896c624160cfad61cc1cb84204342",
+      "size_bytes": 6487
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/report.md",
+      "repeat_id": 1,
+      "sha256": "96819aa17eaac8f0b9fbed8b14b39256649b5e32ebcce608567049fe98f84c4f",
+      "size_bytes": 4885
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/request.json",
+      "repeat_id": 1,
+      "sha256": "40e0639a9f7be6f945d5bf49f45faea3a66387f0a2088322f2874847a8677187",
+      "size_bytes": 3464
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/response.json",
+      "repeat_id": 1,
+      "sha256": "11013fd449267daf1088cdc7abbdd43e7e76ffb583f03fba13df1cde8a4a8d01",
+      "size_bytes": 6215
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-1/source-process-hollowing/seal.json",
+      "repeat_id": 1,
+      "sha256": "27d1796b5b729099d72e8b4e3ca67524599cc06d003f88c5a735bcdf6060f2f9",
+      "size_bytes": 692
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/receipt.json",
+      "repeat_id": 1,
+      "sha256": "654cd43ea2171cbfa9ca507d8fc45c0c4067e143b3e238198612e25c54092d57",
+      "size_bytes": 5015
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/report.html",
+      "repeat_id": 1,
+      "sha256": "b21031df9961ddefec61ede0027df7b49dc51c00680b5b047bcf19c84a833937",
+      "size_bytes": 10835
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/report.json",
+      "repeat_id": 1,
+      "sha256": "864103fbefa4b60ad02f0e63987515712a421c2b09ea304d41485e8508e3157f",
+      "size_bytes": 5837
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/report.md",
+      "repeat_id": 1,
+      "sha256": "797d4e859326c3f9bf19da965c8fe6ad32aad1b4b672dcda66e87271785b927c",
+      "size_bytes": 4068
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/request.json",
+      "repeat_id": 1,
+      "sha256": "27fbf0d54a87bf4e10a0efd9c74dfc619a910c924230c1c63ac79bb16fecf16c",
+      "size_bytes": 2969
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/response.json",
+      "repeat_id": 1,
+      "sha256": "064db87886aa60ddc8ce0f6f14607721e90e30e755c9d00d16961ceea5f1cca5",
+      "size_bytes": 5565
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-1/xor-recovery/seal.json",
+      "repeat_id": 1,
+      "sha256": "0f2920ad7fd97e0d88ad7f3021c0e3a7bb92ac8d4776475e5ca85048c24f46b5",
+      "size_bytes": 680
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/receipt.json",
+      "repeat_id": 2,
+      "sha256": "56e3c52dafb421739888636fdf8b70cb162ba547c5d303f699edad01100f85aa",
+      "size_bytes": 3823
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/report.html",
+      "repeat_id": 2,
+      "sha256": "77215322ad35ac2c23b85d8d05fb27205d5738a96b9e33148e13df4bc1a609bd",
+      "size_bytes": 10268
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/report.json",
+      "repeat_id": 2,
+      "sha256": "1860fb776608c0f0ce1e99bd4173a8edeeab845d88f78aa3803c14fe593b10ba",
+      "size_bytes": 8443
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/report.md",
+      "repeat_id": 2,
+      "sha256": "ad7750624a3abf30df6ee683e206199fac968356faf21ce204b02ba248542f35",
+      "size_bytes": 3570
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/request.json",
+      "repeat_id": 2,
+      "sha256": "ef4434c1b53fbfffd1ac0717603df06efcaee3868b83af1d2784c1b18fe06af9",
+      "size_bytes": 2999
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/response.json",
+      "repeat_id": 2,
+      "sha256": "455bc250479e9ece5a2fbfa836c52afde351a19cfbe5829ad7e3e457fa36963e",
+      "size_bytes": 8171
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/current/run-2/dynamic-correct-token/seal.json",
+      "repeat_id": 2,
+      "sha256": "589b6b80482dca8b8dead758261ab3e94d7d018d349480104f6edcc74906a9f0",
+      "size_bytes": 689
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/receipt.json",
+      "repeat_id": 2,
+      "sha256": "8577fa5fe37c6cfef0fe10c5e95f71c802093f1cf9e204ea79d3e504872e8f31",
+      "size_bytes": 3822
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/report.html",
+      "repeat_id": 2,
+      "sha256": "000152bb7db0e08bfbc0ed4a75a26a4493e14f939081c33ff7d84ffd88bf1acf",
+      "size_bytes": 10479
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/report.json",
+      "repeat_id": 2,
+      "sha256": "f5eb67b91400a7aa23aaf362e9eda2b554c65877259f0051b5f1762411682893",
+      "size_bytes": 13542
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/report.md",
+      "repeat_id": 2,
+      "sha256": "ed545c69bde0bfc21833a7835c20f2f48cb4152885c888b762a1be539215db0b",
+      "size_bytes": 3936
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/request.json",
+      "repeat_id": 2,
+      "sha256": "b6735ff91553487883a02d752654532bd4c148313c29dd679b04b78cec2780a1",
+      "size_bytes": 3005
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/response.json",
+      "repeat_id": 2,
+      "sha256": "7cd07796f35a1e750353252c1ec4786ca0d838dbf03ede090306c9d892f1147e",
+      "size_bytes": 13270
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/current/run-2/dynamic-failure-fallback/seal.json",
+      "repeat_id": 2,
+      "sha256": "f9c0d95bc5a2d93cb46bb8b43b682c92fdf47b58c8dcebffbe32c10c986dc019",
+      "size_bytes": 692
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/receipt.json",
+      "repeat_id": 2,
+      "sha256": "c06987a5c02a831d6fcb39aea9eb7dca3ad97f70c798685b77a2256fd69c48f4",
+      "size_bytes": 3814
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/report.html",
+      "repeat_id": 2,
+      "sha256": "2929b75201fe58db21348a17312d860723fedb6b5fe41f07f464d540636a9f0b",
+      "size_bytes": 9657
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/report.json",
+      "repeat_id": 2,
+      "sha256": "a21a6455b2a311e3c698863a3a0a5f57973adba5b9fd4081be2f6a6fa188a4ed",
+      "size_bytes": 4602
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/report.md",
+      "repeat_id": 2,
+      "sha256": "d83bd163b117a6c3dbd0caa545a6ded70f5db70188ad9e466972a290a410a1e9",
+      "size_bytes": 3166
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/request.json",
+      "repeat_id": 2,
+      "sha256": "01af933f47e76f04903ea2a5d744300fac94777504e3b5b777d1457b5eb9f4d3",
+      "size_bytes": 2993
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/response.json",
+      "repeat_id": 2,
+      "sha256": "b0f7cf3d79c4b07572e9b595d5119758ebb4e45750dc862a9b2a6e341f46cfff",
+      "size_bytes": 4330
+    },
+    {
+      "arm": "current",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/current/run-2/dynamic-wrong-token/seal.json",
+      "repeat_id": 2,
+      "sha256": "86fa076fc6b4a87dbf5f33c5a42ec5c58fd0d9896699eca11750b50e0ff1a049",
+      "size_bytes": 687
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/receipt.json",
+      "repeat_id": 2,
+      "sha256": "07cf6297da64d8a55ffd4c49acbc972bb8d6fdeee023999aba7595b16ba7d2d1",
+      "size_bytes": 3798
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/report.html",
+      "repeat_id": 2,
+      "sha256": "0b4a225538a9ce75360c5cb45432d7b5b7761700aeb645de22dad167b8400980",
+      "size_bytes": 9529
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/report.json",
+      "repeat_id": 2,
+      "sha256": "60aab0470b3ecf2cd5101b524c158c4bcf877349b96b130879af7d8f6cd7085c",
+      "size_bytes": 4186
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/report.md",
+      "repeat_id": 2,
+      "sha256": "3aa6eb5b620eef463b37f76ec7733ed4dafa481c4c2722df8294a3cb1eb543b0",
+      "size_bytes": 3093
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/request.json",
+      "repeat_id": 2,
+      "sha256": "f9d15a1805be6ca4bf7d97c51dfc169ad36a1cb8d4cefd7545b03eba090e956c",
+      "size_bytes": 2853
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/response.json",
+      "repeat_id": 2,
+      "sha256": "9fb1ebca726ce70cd3579df2be60f5c769636fc50ea585a6503dbab7c0f04e3c",
+      "size_bytes": 3914
+    },
+    {
+      "arm": "current",
+      "case_id": "malformed-pe",
+      "path": "reports/current/run-2/malformed-pe/seal.json",
+      "repeat_id": 2,
+      "sha256": "9e1026e93deb579586f0cac55b0ac67b31969c3f1239de50e12cc0978a0de33a",
+      "size_bytes": 680
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/receipt.json",
+      "repeat_id": 2,
+      "sha256": "0f4778597dd9defe1c20db2545ce5638e07f336dfe4314a34d7730ea8fb7e871",
+      "size_bytes": 3803
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/report.html",
+      "repeat_id": 2,
+      "sha256": "0f196024829c3c5fe9994393212a0936cfb7b876d2379b7f670a3129e21c64bb",
+      "size_bytes": 10399
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/report.json",
+      "repeat_id": 2,
+      "sha256": "7e7580b05837a1a712aa83d6c0980d73eac59cf29273a325aee23f5ac413cb81",
+      "size_bytes": 5245
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/report.md",
+      "repeat_id": 2,
+      "sha256": "70d4dd9ac6ffb8dfd4548d136b4db1dcfc5dbe4c9e8053e6194b1d59ac368337",
+      "size_bytes": 3604
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/request.json",
+      "repeat_id": 2,
+      "sha256": "24824748a1a15e145c5a795edd2354bb216bbb0f4f6a0f9b7176db5eddeef952",
+      "size_bytes": 2969
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/response.json",
+      "repeat_id": 2,
+      "sha256": "c33ac2a8ed8f4ed36782088732ccda4ec39477c1f70c7849a2367c3bb1172fea",
+      "size_bytes": 4973
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-imports",
+      "path": "reports/current/run-2/pe-imports/seal.json",
+      "repeat_id": 2,
+      "sha256": "ed100a40c111e8a767b1f06c5630fff205d9221a5e8cf7c71b23e38cf7ae7621",
+      "size_bytes": 678
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/receipt.json",
+      "repeat_id": 2,
+      "sha256": "b8d3587c35b1994c9b97a83b06db58ca84aab2aae7321cd7fe7d203f3943057d",
+      "size_bytes": 3812
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/report.html",
+      "repeat_id": 2,
+      "sha256": "15d26d79aaa44e4c52ed653b1b412e265f4a91012b561085457255f926c27281",
+      "size_bytes": 10504
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/report.json",
+      "repeat_id": 2,
+      "sha256": "a527ab65272052372bf459fe0e25d9b124479bb2e9f9a5d804de3114a0956e9b",
+      "size_bytes": 8623
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/report.md",
+      "repeat_id": 2,
+      "sha256": "eba1576029a547375aa937dcfc7fb81de22ec603167c9c6bdb6000a05e27ec8b",
+      "size_bytes": 3803
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/request.json",
+      "repeat_id": 2,
+      "sha256": "08308421b1cec92e11044d6cacf27094d02b1267379c6b0be295cefc17f6dfb3",
+      "size_bytes": 2967
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/response.json",
+      "repeat_id": 2,
+      "sha256": "80a82f644521e80bad263e539e02db97811f0c02ae853f65a2d20d42c671c733",
+      "size_bytes": 8351
+    },
+    {
+      "arm": "current",
+      "case_id": "pe-structure",
+      "path": "reports/current/run-2/pe-structure/seal.json",
+      "repeat_id": 2,
+      "sha256": "04e01a6f8b91d9d8238589d3222997e179035f43f26ae36c4a22035980e2c6cb",
+      "size_bytes": 680
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/receipt.json",
+      "repeat_id": 2,
+      "sha256": "2d4b33d2adb5afe25346a99f8b4c6d3beac53b9cf6963f5fbe17e3dbd0fad774",
+      "size_bytes": 3834
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/report.html",
+      "repeat_id": 2,
+      "sha256": "dc176702539e4ff556241a483fe201547494e79dead6d01ab5451efa4a3883b7",
+      "size_bytes": 15307
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/report.json",
+      "repeat_id": 2,
+      "sha256": "6ead39ea24a0c8460f9f8f8c4d61d48f8d41425b7c9dc77a17510cfbcb5a70b5",
+      "size_bytes": 9747
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/report.md",
+      "repeat_id": 2,
+      "sha256": "3bcbc524bd1bfce96cf5d4ecd45b63ff4686cb8fb3ea345e731b349774ecbe7c",
+      "size_bytes": 7372
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/request.json",
+      "repeat_id": 2,
+      "sha256": "377d6234afe5873e8539655bffe45389fab4d23bc196d6d3b0931beb9bd3bb5f",
+      "size_bytes": 4376
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/response.json",
+      "repeat_id": 2,
+      "sha256": "885be8b83ddce19c73479d2d0e7f8a6b96ca87986d27d2f5713aa6597a6aec06",
+      "size_bytes": 9475
+    },
+    {
+      "arm": "current",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/current/run-2/source-apc-rc4-antidebug/seal.json",
+      "repeat_id": 2,
+      "sha256": "16c7a74c9fbfbddb1e640493ac22649abd7c1cf3125b6a0ede80c7d90a9eb22e",
+      "size_bytes": 692
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/receipt.json",
+      "repeat_id": 2,
+      "sha256": "316d3cda3c29f0b73666380f72a1347ee987e4510dbcc59387102b1563128a40",
+      "size_bytes": 5062
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/report.html",
+      "repeat_id": 2,
+      "sha256": "55847d983a35676880af79af01a483e7d72d361b772b956fe508fc15f7b6202f",
+      "size_bytes": 10528
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/report.json",
+      "repeat_id": 2,
+      "sha256": "e529d8ebf1c7846c437365d86614a0bb58cdde5723076d845446e2765d61295d",
+      "size_bytes": 5076
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/report.md",
+      "repeat_id": 2,
+      "sha256": "d0e4ad525c55d192a59ad4a0d768d874fc7c89c8e5ded44af5d72b4d00b23b81",
+      "size_bytes": 3614
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/request.json",
+      "repeat_id": 2,
+      "sha256": "21690e9b70fc3576da6f9143d710b316b508f3c1741cc60d7a1e3128156955db",
+      "size_bytes": 3316
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/response.json",
+      "repeat_id": 2,
+      "sha256": "4e8f581624012eead7d52065bc9a4775d21983c960a9cf61a21b8bdda9368840",
+      "size_bytes": 4804
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/current/run-2/source-dll-injection-complete/seal.json",
+      "repeat_id": 2,
+      "sha256": "d035837cf97d62d5c2c09b76170d5b8276883825a0ff72234566dd16a2e34d3a",
+      "size_bytes": 697
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/receipt.json",
+      "repeat_id": 2,
+      "sha256": "86fbf31d7931bd8f02d03a84a9f7d60ad64c0640a7c75f2d3d8e237a16917b4b",
+      "size_bytes": 3820
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/report.html",
+      "repeat_id": 2,
+      "sha256": "dd1994c0dc2133e9e5fba04efe0d9e80d63a832dadb09ed9c99a8855198acdeb",
+      "size_bytes": 9738
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/report.json",
+      "repeat_id": 2,
+      "sha256": "aa39b17c7f26c99b3210f960bfaff24388af6ed97c6112378e963cd6e3839be5",
+      "size_bytes": 4390
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/report.md",
+      "repeat_id": 2,
+      "sha256": "e32dc7beeb335c00ee9ca049c63967a89630921c59808ed234bfeb11d469d4e5",
+      "size_bytes": 3294
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/request.json",
+      "repeat_id": 2,
+      "sha256": "b22e4292f967764e0229362e43d8520bc5a3919db15d083a6e9a8bf8485a0981",
+      "size_bytes": 2939
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/response.json",
+      "repeat_id": 2,
+      "sha256": "9525c0b527c7695a503db415ab323c27279108527fbcd47f88763e36a68edfac",
+      "size_bytes": 4118
+    },
+    {
+      "arm": "current",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/current/run-2/source-dll-injection-incomplete/seal.json",
+      "repeat_id": 2,
+      "sha256": "ce6739d4fe07ea598ad6fc17d43280693d1cd6a90406ad2ba7aee430541ce9bd",
+      "size_bytes": 699
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/receipt.json",
+      "repeat_id": 2,
+      "sha256": "15c7afbc6d3a749217835ea96f4d29f7244274ec8ed982525e654c9c9ff29f40",
+      "size_bytes": 3805
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/report.html",
+      "repeat_id": 2,
+      "sha256": "71ef547f456ba1e8cd1971a1fa4453b1346e8bdd99c97dcf2fe757454c9a6779",
+      "size_bytes": 8751
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/report.json",
+      "repeat_id": 2,
+      "sha256": "660a6ca123862e802b501476f46cf751df3f60d1ae0dd1d6501716a7d9441cf6",
+      "size_bytes": 3389
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/report.md",
+      "repeat_id": 2,
+      "sha256": "c0a8959f3846279f7d2d3a901eb3212d4992939ae9c2d42fc74ec5657002b0d7",
+      "size_bytes": 2411
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/request.json",
+      "repeat_id": 2,
+      "sha256": "f1e935077c15d23a698c825769d4b7bd550923c446fca15d55ab7dbbb9dd20e7",
+      "size_bytes": 2886
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/response.json",
+      "repeat_id": 2,
+      "sha256": "e31205e1aedaf1791d8e94968589ad2934e07f850317095c9f235e523615f8f7",
+      "size_bytes": 3117
+    },
+    {
+      "arm": "current",
+      "case_id": "source-no-signal",
+      "path": "reports/current/run-2/source-no-signal/seal.json",
+      "repeat_id": 2,
+      "sha256": "c955e8d49602dfa344ddb75d98c668cedc1e1509f74eebaad254efa9cb090231",
+      "size_bytes": 684
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/receipt.json",
+      "repeat_id": 2,
+      "sha256": "eceb67a69329d9d891f6fda5a6bc8b8875538953bfad9294ccb1411411cea750",
+      "size_bytes": 3822
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/report.html",
+      "repeat_id": 2,
+      "sha256": "910bb2300d7e7e983928d19ce715c037ca56a047b2be5fa22d7d66471dea09cf",
+      "size_bytes": 10382
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/report.json",
+      "repeat_id": 2,
+      "sha256": "864652d8aecf3f9b5440248306ebee135126627be1163828a9ce10b0d82b76b7",
+      "size_bytes": 4811
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/report.md",
+      "repeat_id": 2,
+      "sha256": "62a7846e53a32d92aa0f7511e6cb9e0039c514760f406d4ad984930fa6534db2",
+      "size_bytes": 3335
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/request.json",
+      "repeat_id": 2,
+      "sha256": "93c20644df731d99a73259509265f5854f8da71e624ce2f36ba91d80e80815b3",
+      "size_bytes": 3464
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/response.json",
+      "repeat_id": 2,
+      "sha256": "6313f843e3838416f8d6a005fddd674833f9dc62c36145a3e7ba1730cc1aea7c",
+      "size_bytes": 4539
+    },
+    {
+      "arm": "current",
+      "case_id": "source-process-hollowing",
+      "path": "reports/current/run-2/source-process-hollowing/seal.json",
+      "repeat_id": 2,
+      "sha256": "9a48cf1285910da94c5a7c6543f7754b72d678157c7e328c1ab9e11f538ec19b",
+      "size_bytes": 692
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/receipt.json",
+      "repeat_id": 2,
+      "sha256": "aae18b854e881a5b00897714afe15edd799304731a4e661ffd8cb126d13378b0",
+      "size_bytes": 3812
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/report.html",
+      "repeat_id": 2,
+      "sha256": "99e37ebe0cd6e312eb6f45ba9ca4242f05e4e859792962e81d5ce828d82c7b90",
+      "size_bytes": 10998
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/report.json",
+      "repeat_id": 2,
+      "sha256": "a94abf22571c9c55e43e943fe672a375a085d4bde1369d830fee98bbfc5d7e74",
+      "size_bytes": 6041
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/report.md",
+      "repeat_id": 2,
+      "sha256": "387580be5832026fea92272c4622a545001f2bf6dcdb664fbbb278df390682a0",
+      "size_bytes": 4339
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/request.json",
+      "repeat_id": 2,
+      "sha256": "2d6c4a35db1741d5e44206411ec6addcadc6932b8ebe594ea53bad93c56f4c02",
+      "size_bytes": 2969
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/response.json",
+      "repeat_id": 2,
+      "sha256": "47c1d8ae6eed6ef21f349a212d32fc47b15eb4c1de81bd2d91a26993a9a7791f",
+      "size_bytes": 5769
+    },
+    {
+      "arm": "current",
+      "case_id": "xor-recovery",
+      "path": "reports/current/run-2/xor-recovery/seal.json",
+      "repeat_id": 2,
+      "sha256": "2ffb53e385b5cabd73a55b3ef5b0ce5fe7e204be9836c1d1d314e49384cc7303",
+      "size_bytes": 680
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/receipt.json",
+      "repeat_id": 1,
+      "sha256": "9a8df9053f76fa617bff7710d1f9b2d91e7a45e67dad4cbfb35d69b4ed6a6a78",
+      "size_bytes": 3822
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/report.html",
+      "repeat_id": 1,
+      "sha256": "c1c1d4e7391d82bcb3315bdc99bbbdadef7fde412866f7428d6359971b99bf20",
+      "size_bytes": 10729
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/report.json",
+      "repeat_id": 1,
+      "sha256": "39d68ba4a56ef5141311be645ffb73b88e27589c38e6315bedf756c7731c25d9",
+      "size_bytes": 6608
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/report.md",
+      "repeat_id": 1,
+      "sha256": "9d3af7af6bc16bcde5d8187b5304ef3242feb56013ffbd561831a3a269de59f9",
+      "size_bytes": 3886
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/request.json",
+      "repeat_id": 1,
+      "sha256": "b1f459dea98e234fdc0858c72922fbe4407a5300aa336768679f1f301abb57c9",
+      "size_bytes": 3086
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/response.json",
+      "repeat_id": 1,
+      "sha256": "0bb00b4af36a6602ac0a9e2a73afcd61bdf98c0308ee54f5756ad1d7aca133a5",
+      "size_bytes": 6330
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-1/dynamic-correct-token/seal.json",
+      "repeat_id": 1,
+      "sha256": "31a2a71a2d8a9a47864c163c0636cba1718c62f9e031b8d3d7ead3757f111ff0",
+      "size_bytes": 691
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/receipt.json",
+      "repeat_id": 1,
+      "sha256": "50c2dcb92eb7d3489352f6ba6991c4ac945860b44eb9aa5827421396e0cb4a53",
+      "size_bytes": 3823
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/report.html",
+      "repeat_id": 1,
+      "sha256": "90be35e9d8807e0001ca35b0cdaba9c0d50ac43cd860e1aa28da443ea1ae4ad1",
+      "size_bytes": 10960
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/report.json",
+      "repeat_id": 1,
+      "sha256": "b9bc3eaf2792b1637d59ae45afa41c60c704b91ad9023642ca110a1baea2360d",
+      "size_bytes": 8148
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/report.md",
+      "repeat_id": 1,
+      "sha256": "402da75f23debc3e861b39a84d3d84082364ef0022a6442a7844c242d78bf9ae",
+      "size_bytes": 4092
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/request.json",
+      "repeat_id": 1,
+      "sha256": "906d9c5a351ee2d540db1829f00ad269d3de3461068c63050b550c3cfe96ac19",
+      "size_bytes": 3011
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/response.json",
+      "repeat_id": 1,
+      "sha256": "d44a20b025c92914a8c4ddac9d65a2228dc3b5572f8c71427308bddf5a1eb41e",
+      "size_bytes": 7872
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-1/dynamic-failure-fallback/seal.json",
+      "repeat_id": 1,
+      "sha256": "9f0cfca8e96a5b74ae5aee3eb29145aa2258e19b346a1b7e5ce668aa54f7cfbf",
+      "size_bytes": 694
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/receipt.json",
+      "repeat_id": 1,
+      "sha256": "17eb96a21eff329353510a19fdc7188a46730b5d0c94204bce8acc4c78433d5c",
+      "size_bytes": 7451
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/report.html",
+      "repeat_id": 1,
+      "sha256": "3af2850bb512d1ac35495c3656714b65cefa80d940f7d91abbc065240e056433",
+      "size_bytes": 9008
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/report.json",
+      "repeat_id": 1,
+      "sha256": "683301faaa0ff019f910a9600cf66981b58ebef2c935912dc2b4b8778b90ebf9",
+      "size_bytes": 3683
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/report.md",
+      "repeat_id": 1,
+      "sha256": "242aab0d52828f7cf1ea11c2bc1f95015bbf324cdba209442138f0ed5b11116e",
+      "size_bytes": 2493
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/request.json",
+      "repeat_id": 1,
+      "sha256": "71b8baf99cb7c2f783797373ebb67f97c7684ece291c278a5b6859ab967a045d",
+      "size_bytes": 3080
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/response.json",
+      "repeat_id": 1,
+      "sha256": "f5f513bcf0cf44fca57c3a4a34ed808bda75252c9071277db0d8d3726f59e309",
+      "size_bytes": 3405
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-1/dynamic-wrong-token/seal.json",
+      "repeat_id": 1,
+      "sha256": "db205ac15a6a4e8a52f17605f273fb0939ba9190fd77ced031fd210c69ef4ae9",
+      "size_bytes": 689
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/receipt.json",
+      "repeat_id": 1,
+      "sha256": "83aaed1e31a6077b0c2b0dc671af473246c4996f8c3a6d799f682cbf64bda05d",
+      "size_bytes": 3800
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/report.html",
+      "repeat_id": 1,
+      "sha256": "161bf6697a2f6183f6bc4bfa10c0ea50a6873e5515d0d170e1ae69c08a7b0894",
+      "size_bytes": 8765
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/report.json",
+      "repeat_id": 1,
+      "sha256": "97fce124e71eafc52cc16d4e948187399318c6c957faddf3b2d2f693082ae302",
+      "size_bytes": 3423
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/report.md",
+      "repeat_id": 1,
+      "sha256": "4e3bc40ef2972ff91ac80d12411d8a8b219c14929fb17eb2f7d23a480e34aed2",
+      "size_bytes": 2335
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/request.json",
+      "repeat_id": 1,
+      "sha256": "5df97eed9891e6dd9d170193cc10ec5dd83cc7348a134b91dfff2d09003a0c99",
+      "size_bytes": 2859
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/response.json",
+      "repeat_id": 1,
+      "sha256": "f0dc9e387b9af702403ced98584dbdf31b63d0e774a4baf3f1f60fa0684d5a65",
+      "size_bytes": 3151
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-1/malformed-pe/seal.json",
+      "repeat_id": 1,
+      "sha256": "6b6a4fc4a6e235fc91aa0a1f61923455a6b08e4041aad0a5e750a9b51ea15596",
+      "size_bytes": 682
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/receipt.json",
+      "repeat_id": 1,
+      "sha256": "0fde66d0244412265544b49c326c946270f5a32e17ad9c260e69e6cb19b96d8b",
+      "size_bytes": 5032
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/report.html",
+      "repeat_id": 1,
+      "sha256": "ab18a2b5cad3d55fff44cdaedffd8b0e25b59968db529b190deb1ef7d160ad67",
+      "size_bytes": 9269
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/report.json",
+      "repeat_id": 1,
+      "sha256": "7ffc92844434fb88c20c7746d8494e98a05f484810fe2faca067273ceab75e7e",
+      "size_bytes": 5149
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/report.md",
+      "repeat_id": 1,
+      "sha256": "9828b3ec3a959f2f1d27719dad324a7cfc10691c7622b1567bf665454415e50e",
+      "size_bytes": 2607
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/request.json",
+      "repeat_id": 1,
+      "sha256": "d67938d99bed6df19ad799ac36c76556f741e44233b6040ecb2e6fcf4ebec9dd",
+      "size_bytes": 2975
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/response.json",
+      "repeat_id": 1,
+      "sha256": "aa97742ce2569e97caac30bd8b84e5a826c08d9fce341f0d563898c4bd95d708",
+      "size_bytes": 4873
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-1/pe-imports/seal.json",
+      "repeat_id": 1,
+      "sha256": "fd1946500b3e64518b21801381af6d2f783cd3ec929b276eaf74e2804a0b26a9",
+      "size_bytes": 680
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/receipt.json",
+      "repeat_id": 1,
+      "sha256": "3f8ad8b36ebcb216b0ed8fa8f01fb76e7b57676b747e8f8c757aa8e743043ea5",
+      "size_bytes": 3809
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/report.html",
+      "repeat_id": 1,
+      "sha256": "ee72fc1b048c11689cc8a2c3a538e4f5efe3c02dfa3c377c3194c6eee3146434",
+      "size_bytes": 11634
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/report.json",
+      "repeat_id": 1,
+      "sha256": "df3e501eb23052aed0418f064c9d35fcfed0b6f357c39be89efb034dc4b2f6c0",
+      "size_bytes": 8839
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/report.md",
+      "repeat_id": 1,
+      "sha256": "227aa9365410c17794d007d666c98af0eb592e338f10bf98157c338bad859f41",
+      "size_bytes": 4643
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/request.json",
+      "repeat_id": 1,
+      "sha256": "00d0fa5423886bbdc9c509ae3cf31acb7f25997b1e9057d92428c0e82ba00c33",
+      "size_bytes": 2973
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/response.json",
+      "repeat_id": 1,
+      "sha256": "83437f627711da11ca5435201ebb1acf8c91fe86276aa5030d5d6e32cd04c7a2",
+      "size_bytes": 8563
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-1/pe-structure/seal.json",
+      "repeat_id": 1,
+      "sha256": "47cf72fa654df19017df80e83ccd019a742ccc7c5be7a0360242b1f000027ada",
+      "size_bytes": 682
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/receipt.json",
+      "repeat_id": 1,
+      "sha256": "118ef33f221b05acce0f6ab95c9b1ac3fad37df7007bba98a0b716cabc326e90",
+      "size_bytes": 3830
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/report.html",
+      "repeat_id": 1,
+      "sha256": "a78b2141bca7a356bf4a7219a056e1206909afc92a11e4a92093ff8559258842",
+      "size_bytes": 14690
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/report.json",
+      "repeat_id": 1,
+      "sha256": "08f6798f97074c8158e4dc083deb2df72cc324f9a09f075ee5fd989d66c52d4e",
+      "size_bytes": 8943
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/report.md",
+      "repeat_id": 1,
+      "sha256": "85124af0dbb84adfde59ac56833c3f7d6432a214704b5ccc532935a81646ce45",
+      "size_bytes": 6691
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/request.json",
+      "repeat_id": 1,
+      "sha256": "77482333ccbc2a929d88aa1814da23b59c8dcab00abd046028aa01f9c8c8d0c4",
+      "size_bytes": 4382
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/response.json",
+      "repeat_id": 1,
+      "sha256": "8708d4e6201741bfe53eb156e37ef51b9b7899e42d8265b44e2eac5bbb063f2d",
+      "size_bytes": 8671
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-1/source-apc-rc4-antidebug/seal.json",
+      "repeat_id": 1,
+      "sha256": "2a518b3f23c9a71560915338effafd524df7ed122a3902d571c63afe26892650",
+      "size_bytes": 694
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/receipt.json",
+      "repeat_id": 1,
+      "sha256": "b52f941f9ceb70a1057b6f893ece29482871f1be1ac2006a6c6b59cedd068027",
+      "size_bytes": 3829
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/report.html",
+      "repeat_id": 1,
+      "sha256": "e555e9bceb4682b16ee5621b392270d50e06ff24c42e70c33e82af1fab8d0ac1",
+      "size_bytes": 9581
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/report.json",
+      "repeat_id": 1,
+      "sha256": "965f86e62af129e67533fb31a70c22d7de7a4826e03809633da6c5a2a071f152",
+      "size_bytes": 4123
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/report.md",
+      "repeat_id": 1,
+      "sha256": "19d1cee30be1771afa77dbe8781d553793a103f975673f542d36fbc7ed363220",
+      "size_bytes": 2798
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/request.json",
+      "repeat_id": 1,
+      "sha256": "3dbd95ce744b2cff885f4cf75675004febb4b4efb9e13b80538cca8273b2f17d",
+      "size_bytes": 3322
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/response.json",
+      "repeat_id": 1,
+      "sha256": "cbd4b022c626c6d8ba4749412d92be20ee6d599d0ff650762493e939fbed8ba9",
+      "size_bytes": 3851
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-1/source-dll-injection-complete/seal.json",
+      "repeat_id": 1,
+      "sha256": "6d283a3d668b5190118d3badcb74f75f7f2470cb1dbab523a87183c9f568ef97",
+      "size_bytes": 699
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/receipt.json",
+      "repeat_id": 1,
+      "sha256": "68e54c10c212b0cbe7a7e59229ecca92fece96d090afbaf8e4b8879c1021999a",
+      "size_bytes": 3826
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/report.html",
+      "repeat_id": 1,
+      "sha256": "f6e650c96723f6bf39ebfb8282ca296a65aa2f5ad24c2d2836180a6e58c33999",
+      "size_bytes": 8420
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/report.json",
+      "repeat_id": 1,
+      "sha256": "eeb287c6d4b8c77a8bad4e9f7cfea6412be55f3a2b302b00c6b894bd7395cbcf",
+      "size_bytes": 3070
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/report.md",
+      "repeat_id": 1,
+      "sha256": "10d44b4dd78cb6cc9e4d562ede4e94e66d9da9e74b3cff19769ad5a92d04b1c6",
+      "size_bytes": 1979
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/request.json",
+      "repeat_id": 1,
+      "sha256": "41d5f187a3dde75412e2f2bb238c5d28ea306ef43f1dcd46417867c6aa09fdd9",
+      "size_bytes": 2945
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/response.json",
+      "repeat_id": 1,
+      "sha256": "fc4e323ba4ac132b3bd7b0a769f4dcee5f65dc399e8109ba64cead9b88a9e7be",
+      "size_bytes": 2798
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-1/source-dll-injection-incomplete/seal.json",
+      "repeat_id": 1,
+      "sha256": "495a3c61a285bc6715db3cf43a265781915e1fe369b0d53f157cc003304e1b5f",
+      "size_bytes": 701
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/receipt.json",
+      "repeat_id": 1,
+      "sha256": "19313f833306b1cf75cc906abac2073e37e9c82deaad654fc347cfeb9846f7de",
+      "size_bytes": 3811
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/report.html",
+      "repeat_id": 1,
+      "sha256": "a89a5e8ffa474d6c9f928244ba5b5821e356eb393ff97942bf5a4bb91b855ff8",
+      "size_bytes": 8569
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/report.json",
+      "repeat_id": 1,
+      "sha256": "615ef45f977f695eeb51abe7cc2c9783238ef59d2fdf85f113c72d837f4537aa",
+      "size_bytes": 3207
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/report.md",
+      "repeat_id": 1,
+      "sha256": "6d6377ae76d3a976d2cef300618464536bda26801db8b4d3c278110fea2cdf39",
+      "size_bytes": 2241
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/request.json",
+      "repeat_id": 1,
+      "sha256": "6a74a64ab34fe0da73a4009e5a4615ef70b7506fd4f078ab82da85d5b9231a78",
+      "size_bytes": 2892
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/response.json",
+      "repeat_id": 1,
+      "sha256": "774b4c743b8687295c3a23bfc11203d6d18da61a655deb92b1c2e7a7b88543a5",
+      "size_bytes": 2935
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-1/source-no-signal/seal.json",
+      "repeat_id": 1,
+      "sha256": "90faaf6eb94eb9271eedd0f8f4412ed420d0b29e17b889d9200d8e289de46c8f",
+      "size_bytes": 686
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/receipt.json",
+      "repeat_id": 1,
+      "sha256": "a5944c8cbcd798851ebee0528b792e6bdbbbe29bd6be166ffab0aff2e6b51705",
+      "size_bytes": 3820
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/report.html",
+      "repeat_id": 1,
+      "sha256": "5685e47cda911b5ac03e0ed3a167fa6a6cec67643b9063ffa9ae094cc642f3f7",
+      "size_bytes": 10623
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/report.json",
+      "repeat_id": 1,
+      "sha256": "ca912741d60d67d0c362aea395b40c575c7e262e9c7d56cf8db6ee21674f0b8c",
+      "size_bytes": 5089
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/report.md",
+      "repeat_id": 1,
+      "sha256": "21c6d1cd5dc7f5735b7c1e2d3122387a8982d139410ed3c2687dbd32cb62ed7a",
+      "size_bytes": 3709
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/request.json",
+      "repeat_id": 1,
+      "sha256": "140eeb4589ee8484e4b6adcf8e052ee6385e67342b0c704bfa5494e9ae357a3c",
+      "size_bytes": 3470
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/response.json",
+      "repeat_id": 1,
+      "sha256": "9616a0dc7a29aecd9dbdbeea391b1bfc3b8226430271f8d6937dd79267089ff9",
+      "size_bytes": 4817
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-1/source-process-hollowing/seal.json",
+      "repeat_id": 1,
+      "sha256": "0ef4f8d3241b5f9c6603ecdffed3e64e3ffa7ca17abe1a9969300107a73fea13",
+      "size_bytes": 694
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/receipt.json",
+      "repeat_id": 1,
+      "sha256": "e1ba2599078ff12b3c864119819be3b15f505c3e1c327825414fe78037ac399b",
+      "size_bytes": 3813
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/report.html",
+      "repeat_id": 1,
+      "sha256": "277f8eb4a5158e4cd9e406567062899ba1e08b9a79955265a17ccce24e69d316",
+      "size_bytes": 11099
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/report.json",
+      "repeat_id": 1,
+      "sha256": "d3c94c3fa117b58ea030b0be3e7e082ca632b03bf0d4e455413b26f3d9565026",
+      "size_bytes": 6629
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/report.md",
+      "repeat_id": 1,
+      "sha256": "b90bc76d7d18b9fc56405e1c4152beadcd2bb16cba29fe9a04ac1efe4ddf66e7",
+      "size_bytes": 3981
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/request.json",
+      "repeat_id": 1,
+      "sha256": "3561421f2bd887cfa7e502a687ab2228d5aef4321a83800e87b20c60d6d8a9cc",
+      "size_bytes": 2975
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/response.json",
+      "repeat_id": 1,
+      "sha256": "afc55afa8b591775b653160f7ded52e8476e3714d053ff7a9a6a7c45fba81a14",
+      "size_bytes": 6353
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-1/xor-recovery/seal.json",
+      "repeat_id": 1,
+      "sha256": "46ee634e677c490edbfa60ee3e1c9f74d01394f70759f46b6f68d6660444ec39",
+      "size_bytes": 682
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/receipt.json",
+      "repeat_id": 2,
+      "sha256": "90bfaa865f4adcb812908ff530366e7dc6af3da73758d501fa458eed65eccf8e",
+      "size_bytes": 6240
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/report.html",
+      "repeat_id": 2,
+      "sha256": "6d761006cba957e02ae8753f8cba0f753b10fb6efd83fcaf2316e55a11519602",
+      "size_bytes": 11285
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/report.json",
+      "repeat_id": 2,
+      "sha256": "63cbd1039cf1d1430896f52248b848820de74adf4a5307c44cad16d11c0d0d5f",
+      "size_bytes": 8505
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/report.md",
+      "repeat_id": 2,
+      "sha256": "a683427a0bd4a985362fd1cb93dd785573110b39705f0643818ddd99d1c22b17",
+      "size_bytes": 4324
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/request.json",
+      "repeat_id": 2,
+      "sha256": "99d39244077cfd4724d785fc0dbe919a200076145891c5bc69e386f278a0d844",
+      "size_bytes": 3086
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/response.json",
+      "repeat_id": 2,
+      "sha256": "1fe8c748efa13e44ae1c0e8142234e2bcf79bc783651fece1fa259979feb1749",
+      "size_bytes": 8227
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-correct-token",
+      "path": "reports/optimized/run-2/dynamic-correct-token/seal.json",
+      "repeat_id": 2,
+      "sha256": "a2985bc771242e2c7424bf94b1cb5f5c397105683cdeb1340180cc552134544e",
+      "size_bytes": 691
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/receipt.json",
+      "repeat_id": 2,
+      "sha256": "b9358c9fe73aa3ea3746b0845997b39b36273763908e8e9d382d84b3e63bd3f7",
+      "size_bytes": 3816
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/report.html",
+      "repeat_id": 2,
+      "sha256": "a280b8e0f54955fcd307ad0827a19eb0cd80185383c41c5ef209976782227cbb",
+      "size_bytes": 8863
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/report.json",
+      "repeat_id": 2,
+      "sha256": "d62a2218bc684054e4f32e532c58ed27c0915aaef983abd0d737eef87eddeb5c",
+      "size_bytes": 4838
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/report.md",
+      "repeat_id": 2,
+      "sha256": "e007a239a4bd8a6485d6b00d6187a796a2281eccc627d149dcbf73fe3be29398",
+      "size_bytes": 2377
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/request.json",
+      "repeat_id": 2,
+      "sha256": "c9b6e2c390bf0c1c18dbd95071d9bc118ed8fb2edb3c6d8029b174366793f2c3",
+      "size_bytes": 3011
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/response.json",
+      "repeat_id": 2,
+      "sha256": "fe511c5c912f76f7484fbf5990561d783d340bd3baf181930d1b398ba2b4d01a",
+      "size_bytes": 4562
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-failure-fallback",
+      "path": "reports/optimized/run-2/dynamic-failure-fallback/seal.json",
+      "repeat_id": 2,
+      "sha256": "0b9dcb2ea2b793f0f2a3a32666517243ee11b2fc1eb3fb30fcd7ac75cffc609b",
+      "size_bytes": 694
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/receipt.json",
+      "repeat_id": 2,
+      "sha256": "9f03dd9d992b5ef768d685e6763219aacb42ab8ea9b40c7a6ccab7071ab413c4",
+      "size_bytes": 3810
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/report.html",
+      "repeat_id": 2,
+      "sha256": "c655e24761b973bfd9799e302d98f245fdad2decd5387d5b3b93b24af3f37439",
+      "size_bytes": 8466
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/report.json",
+      "repeat_id": 2,
+      "sha256": "2ef7807af22bdcd614080519edfcdd3b2a7c5ff53cb25098004e40c8a82e4949",
+      "size_bytes": 3275
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/report.md",
+      "repeat_id": 2,
+      "sha256": "c0dcbde4894175b7f84a5959ebfac624d5a6358382d967c10441ad0d03d6a5dc",
+      "size_bytes": 1944
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/request.json",
+      "repeat_id": 2,
+      "sha256": "8d1c46a5b12533eee5192ab1db2a71d9607fc303a894a493cf362cb29775c7a0",
+      "size_bytes": 3080
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/response.json",
+      "repeat_id": 2,
+      "sha256": "832446e6470682ae48652c7358da80cce2f6ee979a1ccb461d4f3c18a8fabac5",
+      "size_bytes": 2997
+    },
+    {
+      "arm": "optimized",
+      "case_id": "dynamic-wrong-token",
+      "path": "reports/optimized/run-2/dynamic-wrong-token/seal.json",
+      "repeat_id": 2,
+      "sha256": "6dfe1d031f3ceebf9c4ec5c3fde390a440b681e2f36a2841d941c9f96258c319",
+      "size_bytes": 689
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/receipt.json",
+      "repeat_id": 2,
+      "sha256": "3bf87931c4875d26429867086c341515397ebf716f4acbcfdbc4b86c760d469b",
+      "size_bytes": 3800
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/report.html",
+      "repeat_id": 2,
+      "sha256": "b3ed8255f7403b2dd2edb732e63f060e31d753c28ba82098b8ef56f267e8d56c",
+      "size_bytes": 9524
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/report.json",
+      "repeat_id": 2,
+      "sha256": "b2cf394265bb338fca4ea1d80f4791446a59f2ebdfe78910c8b1b84a79d8a787",
+      "size_bytes": 4179
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/report.md",
+      "repeat_id": 2,
+      "sha256": "6132ee9ae248e0b475146358a14b577d0f1d46ebd6e7af9b1d4fb3879a8eafda",
+      "size_bytes": 3098
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/request.json",
+      "repeat_id": 2,
+      "sha256": "bf893b6d5958559ad7495ccaecd69d2c6a7c99794eb2e68ca70f13a22b65da7d",
+      "size_bytes": 2859
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/response.json",
+      "repeat_id": 2,
+      "sha256": "828ac10f50c5cb6579f6d54e270e0b9496eba4e1245814f090dfb8cb481f9f9e",
+      "size_bytes": 3907
+    },
+    {
+      "arm": "optimized",
+      "case_id": "malformed-pe",
+      "path": "reports/optimized/run-2/malformed-pe/seal.json",
+      "repeat_id": 2,
+      "sha256": "28ed4d666bfa3f6e679cf74507e6399a9760197b2de5d91d151cb1c284d1adc0",
+      "size_bytes": 682
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/receipt.json",
+      "repeat_id": 2,
+      "sha256": "5c1d1bfad701cb1edb235d4e9868a1c9e4eac8c61421818af55191fdb74bb77a",
+      "size_bytes": 3811
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/report.html",
+      "repeat_id": 2,
+      "sha256": "ee01eba514616be443fe858765689deaddb1b55b8d8eaf9baaa961ed856a63cf",
+      "size_bytes": 11610
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/report.json",
+      "repeat_id": 2,
+      "sha256": "3e0a25073d4ba9479ce54b5073e48910e0858cd9596d82be29f241c1478b2ab5",
+      "size_bytes": 8309
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/report.md",
+      "repeat_id": 2,
+      "sha256": "df140ac9d4898465a7d3e8bb57ccc19e5918343f7bacec833d6d218cb4473099",
+      "size_bytes": 4630
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/request.json",
+      "repeat_id": 2,
+      "sha256": "2f1a07c999809c26967e0cdf4bf804234d48907d8ca772ff802dd3c4ff252b51",
+      "size_bytes": 2975
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/response.json",
+      "repeat_id": 2,
+      "sha256": "5199ccb539b6b2ff6c8bdff0394c370d460de4c54258d93d056939b90e4cad14",
+      "size_bytes": 8033
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "path": "reports/optimized/run-2/pe-imports/seal.json",
+      "repeat_id": 2,
+      "sha256": "d13a00b0d4e8ff9d91f088da6e0b2b564d9faef959d14c0b0d9a39c2d53e4fb0",
+      "size_bytes": 680
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/receipt.json",
+      "repeat_id": 2,
+      "sha256": "137b3df484ed5be794e1f3f4aae9b46931b316f4a035604a9929c8e3734b0a65",
+      "size_bytes": 3811
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/report.html",
+      "repeat_id": 2,
+      "sha256": "e826dc7945bfc444b91b9034a4b2dc23606444e38dbe21549d05e0da11193634",
+      "size_bytes": 10315
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/report.json",
+      "repeat_id": 2,
+      "sha256": "37dd9a7314b14033147a0a6572cf4c75931166ec42a63aa591b32b48076f7079",
+      "size_bytes": 5228
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/report.md",
+      "repeat_id": 2,
+      "sha256": "9bad6aa285e3e04bc195a5a40dff4e7d3fc65253564cc63d3f7117499b317ea3",
+      "size_bytes": 3605
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/request.json",
+      "repeat_id": 2,
+      "sha256": "737f9a2893e5127d19e6a865e03f16a7ca770bad9933dd2888edb0979cb1b7c0",
+      "size_bytes": 2973
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/response.json",
+      "repeat_id": 2,
+      "sha256": "5e20c071b79b8289366ee0dbb38f0d5f71bd1e0fc48d25ba288c2cdf6b8fa725",
+      "size_bytes": 4952
+    },
+    {
+      "arm": "optimized",
+      "case_id": "pe-structure",
+      "path": "reports/optimized/run-2/pe-structure/seal.json",
+      "repeat_id": 2,
+      "sha256": "f0f5243c3fce06ab83ba61d16abb72b8ba420ab10b1f072d4f00578832ebe79c",
+      "size_bytes": 682
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/receipt.json",
+      "repeat_id": 2,
+      "sha256": "785b8bdf479d1900a1aca12b2cbcfffe08366444ce8f5a1edbdafb5fd42c774b",
+      "size_bytes": 3830
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/report.html",
+      "repeat_id": 2,
+      "sha256": "518901e7da256bd11a50b46cb4eeda218a6d4469895ca28520a5932658a91300",
+      "size_bytes": 13013
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/report.json",
+      "repeat_id": 2,
+      "sha256": "ee11d9ae10af32fbf1f279f755aa5daedc9a799c6a26953eb6d6094094040467",
+      "size_bytes": 7633
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/report.md",
+      "repeat_id": 2,
+      "sha256": "7f013e1bf0dd0f9e0ea28af7591948c015782767ef92bf11f39cc7b163ff2708",
+      "size_bytes": 5255
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/request.json",
+      "repeat_id": 2,
+      "sha256": "39b837b607dafdbdba437e5a8973b8340e68a6ffc734cf6242e5b3eb9a1e7dcf",
+      "size_bytes": 4382
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/response.json",
+      "repeat_id": 2,
+      "sha256": "bd10d32b36662804d5b2273408337e7c837366bbbdfa3c6ff01f0708e40f20ef",
+      "size_bytes": 7361
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-apc-rc4-antidebug",
+      "path": "reports/optimized/run-2/source-apc-rc4-antidebug/seal.json",
+      "repeat_id": 2,
+      "sha256": "b0900d15f4e009926a10544229719eb54671e383f03154f2d08e987159515262",
+      "size_bytes": 694
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/receipt.json",
+      "repeat_id": 2,
+      "sha256": "2978e380287a30b464ea390e56cc3ad42e054a23e65ed4435fc581f09f936281",
+      "size_bytes": 3834
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/report.html",
+      "repeat_id": 2,
+      "sha256": "212b1fc528271f414200004075f672b6d1b9f0e88f3456b9705c61be09d79f96",
+      "size_bytes": 11094
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/report.json",
+      "repeat_id": 2,
+      "sha256": "6be238b8fed55c6ae058a9d32ad1d2049d4260890cfa6ff22bf53bdf9e314e10",
+      "size_bytes": 5642
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/report.md",
+      "repeat_id": 2,
+      "sha256": "15b19a89d0025547e8f5d399b2e7d52493539cd0c36e4dc8fc9c02ac3b5edefe",
+      "size_bytes": 4192
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/request.json",
+      "repeat_id": 2,
+      "sha256": "08a85f48dbcd80eb6c290b61e98ec843edd97e68e219b64056e55e880e6f59e7",
+      "size_bytes": 3322
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/response.json",
+      "repeat_id": 2,
+      "sha256": "368d25f1638773894c747e58086a58e74d76c04a85dccabfee17e24655986ef2",
+      "size_bytes": 5370
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-complete",
+      "path": "reports/optimized/run-2/source-dll-injection-complete/seal.json",
+      "repeat_id": 2,
+      "sha256": "02c7842e35a91d7604de00ca51a32400a31ab0d85334936dee0248ec31895438",
+      "size_bytes": 699
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/receipt.json",
+      "repeat_id": 2,
+      "sha256": "e5c17691ace85a969a64279d94e0a6bd78e68e9ebc7cd3f825d1272bb8891b16",
+      "size_bytes": 3826
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/report.html",
+      "repeat_id": 2,
+      "sha256": "536a28dc98c9c6152d11d68706d6cdc06f11958d1dcaeba292550565386e57cf",
+      "size_bytes": 10063
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/report.json",
+      "repeat_id": 2,
+      "sha256": "eec4d7182afac2d50c63f14caad44c1fcf0f40f84b3d3d14aa2dbbbe055a85f4",
+      "size_bytes": 4683
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/report.md",
+      "repeat_id": 2,
+      "sha256": "6961a1e74a550b6c5eeb5e064a68d5e18a136de0665cd3dea54082cfb470643e",
+      "size_bytes": 3480
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/request.json",
+      "repeat_id": 2,
+      "sha256": "5dad9fcec3c0b7e3a90fa35231af7f9a9ab52df54bca0a025fa5f4e31626c48b",
+      "size_bytes": 2945
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/response.json",
+      "repeat_id": 2,
+      "sha256": "ec849e14dbe6988928e4ce00b7445c3809866f4d9214b511185799cbe51e029f",
+      "size_bytes": 4411
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-dll-injection-incomplete",
+      "path": "reports/optimized/run-2/source-dll-injection-incomplete/seal.json",
+      "repeat_id": 2,
+      "sha256": "0a3c3406f428b9a9ae5b0f75f9dd91edf783403ce9ded340e83da722a9aafd4e",
+      "size_bytes": 701
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/receipt.json",
+      "repeat_id": 2,
+      "sha256": "ee04e7da2fd6d3995acd795aa1e41fa4124599ccc4cb43a8563de012cd611368",
+      "size_bytes": 5008
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/report.html",
+      "repeat_id": 2,
+      "sha256": "f72acda804e8018f4eb285cd0f7a9568e6dab0f75dcf76ed2494ea6c644317b6",
+      "size_bytes": 8735
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/report.json",
+      "repeat_id": 2,
+      "sha256": "f6e907551d52e65f70c2e9d1403bca94ea4c6ab28f505789ebf5ab2bf8d14421",
+      "size_bytes": 3389
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/report.md",
+      "repeat_id": 2,
+      "sha256": "e99bf19e13a56b3dc4104f2dc5eafb37d0dd0a841b7b420c83d4ec6dc489f6c6",
+      "size_bytes": 2299
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/request.json",
+      "repeat_id": 2,
+      "sha256": "3afe4163d4e42803302ad1fa39c437d31ad779072b2d8105cd75146e89269efa",
+      "size_bytes": 2892
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/response.json",
+      "repeat_id": 2,
+      "sha256": "3cccbb850dc68bfe53cd0bae5375e369d63b6c86db2cdc37522c81c93c35af4d",
+      "size_bytes": 3117
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-no-signal",
+      "path": "reports/optimized/run-2/source-no-signal/seal.json",
+      "repeat_id": 2,
+      "sha256": "34a3aac20510b1e30c69053b95071b87c9518ad512b3ed68e05df90ea561aaa6",
+      "size_bytes": 686
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/receipt.json",
+      "repeat_id": 2,
+      "sha256": "01c2a041b9d0afd54b2935432e35d1921936cfa805ffee9dfe9562e89c9582d6",
+      "size_bytes": 3819
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/report.html",
+      "repeat_id": 2,
+      "sha256": "5af6a1f32e63912440b0dab392cd58645da57570633192c9bab4c51193909242",
+      "size_bytes": 9821
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/report.json",
+      "repeat_id": 2,
+      "sha256": "27a638e06bbc520b2536534709b98662ae5410795f6fd2cf81185d999ff293ba",
+      "size_bytes": 4343
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/report.md",
+      "repeat_id": 2,
+      "sha256": "732f127770cecbfbfbfe74d07ee202f2814e7350ceddbb59a02531d8ce78e46c",
+      "size_bytes": 3011
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/request.json",
+      "repeat_id": 2,
+      "sha256": "faf43cf8748cbee1c5bf6bd573469432c5af1af3e66ab6c0dfe25e5bf2136602",
+      "size_bytes": 3470
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/response.json",
+      "repeat_id": 2,
+      "sha256": "073f89489c66570de385aafa42dd45ab47aa93b6b49906951a5774424cba82e0",
+      "size_bytes": 4071
+    },
+    {
+      "arm": "optimized",
+      "case_id": "source-process-hollowing",
+      "path": "reports/optimized/run-2/source-process-hollowing/seal.json",
+      "repeat_id": 2,
+      "sha256": "66ab3f2cad1d6c31a318bc37f8b4d85b46a34fe4fa69108f494320cf5cd8ff47",
+      "size_bytes": 694
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/receipt.json",
+      "repeat_id": 2,
+      "sha256": "b909b3ffe8f2d64e84d19a895912c24260e861adee7e22d63f8920594bff8eff",
+      "size_bytes": 3811
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/report.html",
+      "repeat_id": 2,
+      "sha256": "3c8fb9463d20f08ea60a76a3cea0e7db960868c130fe715f1fb82fe5e15194ce",
+      "size_bytes": 9415
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/report.json",
+      "repeat_id": 2,
+      "sha256": "6b25e2d6d7173d00b050c30f82c707b766a8b1e7e78a15f426663b919a5bbed4",
+      "size_bytes": 5049
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/report.md",
+      "repeat_id": 2,
+      "sha256": "dacc504fb5ac7791ca17dc0b77002ea1c280cfaae31d6f1213d7f9fda0681020",
+      "size_bytes": 2872
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/request.json",
+      "repeat_id": 2,
+      "sha256": "83f3ad7fbfbefb6628c99b5550cb5406918ff5962e96ce0c2e63366fd1c8a772",
+      "size_bytes": 2975
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/response.json",
+      "repeat_id": 2,
+      "sha256": "d84ab08e6f76e39057cc782e340cc4d74a1c9842facbaf20ef397f72cc29eae8",
+      "size_bytes": 4773
+    },
+    {
+      "arm": "optimized",
+      "case_id": "xor-recovery",
+      "path": "reports/optimized/run-2/xor-recovery/seal.json",
+      "repeat_id": 2,
+      "sha256": "bff07758d1fdf6cf50bd44c8d3861dc8157bf9a6d7bc790903714d4258088555",
+      "size_bytes": 682
+    }
+  ],
+  "schema_version": "1.0"
+}

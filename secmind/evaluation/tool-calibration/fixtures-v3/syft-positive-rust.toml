@@ -1,0 +1,16 @@
+version = 3
+
+[[package]]
+name = "v3-sbom-app"
+version = "1.0.0"
+dependencies = ["serde", "thiserror"]
+
+[[package]]
+name = "serde"
+version = "1.0.215"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "thiserror"
+version = "1.0.69"
+source = "registry+https://github.com/rust-lang/crates.io-index"

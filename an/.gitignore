@@ -1,0 +1,65 @@
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+secrets/
+credentials/
+service-account*.json
+model-runtime.json
+
+# Runtime data, user uploads and generated reports
+data/
+uploads/
+artifacts/
+reports/
+logs/
+.codex-runtime/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+
+# Python environments, caches and build output
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Frontend dependencies, generated output and local overrides
+node_modules/
+frontend/node_modules/
+frontend/dist/
+*.local
+
+# Editor and operating-system files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local architecture comparisons and release audits
+/优化.md
+/匿名化清单.md
+/合板.md
+/合版_优化.md
+/对比.md
+

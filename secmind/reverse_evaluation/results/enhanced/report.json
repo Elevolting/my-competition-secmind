@@ -1,0 +1,831 @@
+{
+  "schema_version": "1.0",
+  "title": "Enhanced static reverse analysis",
+  "status": "completed",
+  "file": {
+    "name": "reverse_demo.exe",
+    "path": "F:\\大模型\\26挑战杯网安智能体\\secmind\\reverse_evaluation\\fixtures\\safe-demo-v1\\build\\reverse_demo.exe",
+    "size_bytes": 40448,
+    "sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "format": "PE",
+    "machine": "AMD64",
+    "architecture": "x86-64",
+    "subsystem": "WINDOWS_CUI",
+    "imagebase": "0x140000000",
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "size_of_image": 69632
+  },
+  "pe": {
+    "imagebase": "0x140000000",
+    "entrypoint_rva": "0x14e0",
+    "entrypoint_va": "0x1400014e0",
+    "entrypoint_offset": 2272,
+    "entrypoint_bytes_hex": "48 83 ec 28 48 8b 05 45 84 00 00 c7 00 00 00 00 00 e8 9a fc ff ff 90 90 48 83 c4 28 c3 0f 1f 00 48 83 ec 28 e8 ef 5e 00 00 48 83 f8 01 19 c0 48 83 c4 28 c3 90 90 90 90 90 90 90 90 90 90 90 90",
+    "dll_characteristics": [
+      "HIGH_ENTROPY_VA",
+      "DYNAMIC_BASE",
+      "NX_COMPAT"
+    ],
+    "file_alignment": 512,
+    "section_count": 10,
+    "import_library_count": 2,
+    "export_count": 0
+  },
+  "sections": [
+    {
+      "name": ".text",
+      "virtual_address": "0x1000",
+      "virtual_size": 27944,
+      "raw_size": 28160,
+      "offset": 1024,
+      "entropy": 6.2762,
+      "characteristics": [
+        "CNT_CODE",
+        "CNT_INITIALIZED_DATA",
+        "MEM_EXECUTE",
+        "MEM_READ"
+      ],
+      "sample_hex": "c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 83 ec 28 48 8b 05 35 89 00 00 31 c9 c7 00 01"
+    },
+    {
+      "name": ".data",
+      "virtual_address": "0x8000",
+      "virtual_size": 256,
+      "raw_size": 512,
+      "offset": 29184,
+      "entropy": 1.0068,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ",
+        "MEM_WRITE"
+      ],
+      "sample_hex": "0a 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 7d 00 40 01 00 00 00 00 00 00 00 00 00 00 00"
+    },
+    {
+      "name": ".rdata",
+      "virtual_address": "0x9000",
+      "virtual_size": 3776,
+      "raw_size": 4096,
+      "offset": 29696,
+      "entropy": 4.3953,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ"
+      ],
+      "sample_hex": "75 73 61 67 65 3a 20 25 73 20 3c 74 72 61 69 6e 69 6e 67 2d 74 6f 6b 65 6e 3e 0a 00 77 00 72 65"
+    },
+    {
+      "name": ".pdata",
+      "virtual_address": "0xa000",
+      "virtual_size": 1152,
+      "raw_size": 1536,
+      "offset": 33792,
+      "entropy": 3.391,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ"
+      ],
+      "sample_hex": "00 10 00 00 01 10 00 00 00 b0 00 00 10 10 00 00 3e 11 00 00 04 b0 00 00 40 11 00 00 89 11 00 00"
+    },
+    {
+      "name": ".xdata",
+      "virtual_address": "0xb000",
+      "virtual_size": 1076,
+      "raw_size": 1536,
+      "offset": 35328,
+      "entropy": 3.5096,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ"
+      ],
+      "sample_hex": "01 00 00 00 01 04 01 00 04 42 00 00 01 04 01 00 04 62 00 00 01 0f 08 00 0f 01 13 00 08 30 07 60"
+    },
+    {
+      "name": ".bss",
+      "virtual_address": "0xc000",
+      "virtual_size": 2976,
+      "raw_size": 0,
+      "offset": 0,
+      "entropy": 0.0,
+      "characteristics": [
+        "CNT_UNINITIALIZED_DATA",
+        "MEM_READ",
+        "MEM_WRITE"
+      ],
+      "sample_hex": ""
+    },
+    {
+      "name": ".idata",
+      "virtual_address": "0xd000",
+      "virtual_size": 1960,
+      "raw_size": 2048,
+      "offset": 36864,
+      "entropy": 3.8065,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ",
+        "MEM_WRITE"
+      ],
+      "sample_hex": "3c d0 00 00 00 00 00 00 00 00 00 00 ec d6 00 00 fc d1 00 00 b4 d0 00 00 00 00 00 00 00 00 00 00"
+    },
+    {
+      "name": ".CRT",
+      "virtual_address": "0xe000",
+      "virtual_size": 104,
+      "raw_size": 512,
+      "offset": 38912,
+      "entropy": 0.3326,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ",
+        "MEM_WRITE"
+      ],
+      "sample_hex": "00 00 00 00 00 00 00 00 40 11 00 40 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+    },
+    {
+      "name": ".tls",
+      "virtual_address": "0xf000",
+      "virtual_size": 16,
+      "raw_size": 512,
+      "offset": 39424,
+      "entropy": 0.0,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_READ",
+        "MEM_WRITE"
+      ],
+      "sample_hex": "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+    },
+    {
+      "name": ".reloc",
+      "virtual_address": "0x10000",
+      "virtual_size": 140,
+      "raw_size": 512,
+      "offset": 39936,
+      "entropy": 1.6545,
+      "characteristics": [
+        "CNT_INITIALIZED_DATA",
+        "MEM_DISCARDABLE",
+        "MEM_READ"
+      ],
+      "sample_hex": "00 70 00 00 0c 00 00 00 08 ad 00 00 00 80 00 00 1c 00 00 00 10 a0 90 a0 a0 a0 b0 a0 b8 a0 c0 a0"
+    }
+  ],
+  "imports": [
+    {
+      "library": "KERNEL32.dll",
+      "count": 14,
+      "entries": [
+        {
+          "iat_address": "0xd03c",
+          "is_ordinal": false,
+          "name": "DeleteCriticalSection",
+          "hint": 283
+        },
+        {
+          "iat_address": "0xd044",
+          "is_ordinal": false,
+          "name": "EnterCriticalSection",
+          "hint": 319
+        },
+        {
+          "iat_address": "0xd04c",
+          "is_ordinal": false,
+          "name": "GetLastError",
+          "hint": 630
+        },
+        {
+          "iat_address": "0xd054",
+          "is_ordinal": false,
+          "name": "GetStartupInfoA",
+          "hint": 743
+        },
+        {
+          "iat_address": "0xd05c",
+          "is_ordinal": false,
+          "name": "InitializeCriticalSection",
+          "hint": 892
+        },
+        {
+          "iat_address": "0xd064",
+          "is_ordinal": false,
+          "name": "IsDBCSLeadByteEx",
+          "hint": 919
+        },
+        {
+          "iat_address": "0xd06c",
+          "is_ordinal": false,
+          "name": "LeaveCriticalSection",
+          "hint": 984
+        },
+        {
+          "iat_address": "0xd074",
+          "is_ordinal": false,
+          "name": "MultiByteToWideChar",
+          "hint": 1036
+        },
+        {
+          "iat_address": "0xd07c",
+          "is_ordinal": false,
+          "name": "SetUnhandledExceptionFilter",
+          "hint": 1394
+        },
+        {
+          "iat_address": "0xd084",
+          "is_ordinal": false,
+          "name": "Sleep",
+          "hint": 1410
+        },
+        {
+          "iat_address": "0xd08c",
+          "is_ordinal": false,
+          "name": "TlsGetValue",
+          "hint": 1445
+        },
+        {
+          "iat_address": "0xd094",
+          "is_ordinal": false,
+          "name": "VirtualProtect",
+          "hint": 1492
+        },
+        {
+          "iat_address": "0xd09c",
+          "is_ordinal": false,
+          "name": "VirtualQuery",
+          "hint": 1494
+        },
+        {
+          "iat_address": "0xd0a4",
+          "is_ordinal": false,
+          "name": "WideCharToMultiByte",
+          "hint": 1547
+        }
+      ]
+    },
+    {
+      "library": "msvcrt.dll",
+      "count": 40,
+      "entries": [
+        {
+          "iat_address": "0xd0b4",
+          "is_ordinal": false,
+          "name": "__C_specific_handler",
+          "hint": 56
+        },
+        {
+          "iat_address": "0xd0bc",
+          "is_ordinal": false,
+          "name": "___lc_codepage_func",
+          "hint": 64
+        },
+        {
+          "iat_address": "0xd0c4",
+          "is_ordinal": false,
+          "name": "___mb_cur_max_func",
+          "hint": 67
+        },
+        {
+          "iat_address": "0xd0cc",
+          "is_ordinal": false,
+          "name": "__getmainargs",
+          "hint": 82
+        },
+        {
+          "iat_address": "0xd0d4",
+          "is_ordinal": false,
+          "name": "__initenv",
+          "hint": 83
+        },
+        {
+          "iat_address": "0xd0dc",
+          "is_ordinal": false,
+          "name": "__iob_func",
+          "hint": 84
+        },
+        {
+          "iat_address": "0xd0e4",
+          "is_ordinal": false,
+          "name": "__lconv_init",
+          "hint": 92
+        },
+        {
+          "iat_address": "0xd0ec",
+          "is_ordinal": false,
+          "name": "__set_app_type",
+          "hint": 98
+        },
+        {
+          "iat_address": "0xd0f4",
+          "is_ordinal": false,
+          "name": "__setusermatherr",
+          "hint": 100
+        },
+        {
+          "iat_address": "0xd0fc",
+          "is_ordinal": false,
+          "name": "_acmdln",
+          "hint": 116
+        },
+        {
+          "iat_address": "0xd104",
+          "is_ordinal": false,
+          "name": "_amsg_exit",
+          "hint": 124
+        },
+        {
+          "iat_address": "0xd10c",
+          "is_ordinal": false,
+          "name": "_cexit",
+          "hint": 142
+        },
+        {
+          "iat_address": "0xd114",
+          "is_ordinal": false,
+          "name": "_commode",
+          "hint": 158
+        },
+        {
+          "iat_address": "0xd11c",
+          "is_ordinal": false,
+          "name": "_errno",
+          "hint": 203
+        },
+        {
+          "iat_address": "0xd124",
+          "is_ordinal": false,
+          "name": "_fmode",
+          "hint": 255
+        },
+        {
+          "iat_address": "0xd12c",
+          "is_ordinal": false,
+          "name": "_initterm",
+          "hint": 331
+        },
+        {
+          "iat_address": "0xd134",
+          "is_ordinal": false,
+          "name": "_lock",
+          "hint": 443
+        },
+        {
+          "iat_address": "0xd13c",
+          "is_ordinal": false,
+          "name": "_onexit",
+          "hint": 615
+        },
+        {
+          "iat_address": "0xd144",
+          "is_ordinal": false,
+          "name": "_unlock",
+          "hint": 820
+        },
+        {
+          "iat_address": "0xd14c",
+          "is_ordinal": false,
+          "name": "abort",
+          "hint": 1055
+        },
+        {
+          "iat_address": "0xd154",
+          "is_ordinal": false,
+          "name": "calloc",
+          "hint": 1057
+        },
+        {
+          "iat_address": "0xd15c",
+          "is_ordinal": false,
+          "name": "exit",
+          "hint": 1070
+        },
+        {
+          "iat_address": "0xd164",
+          "is_ordinal": false,
+          "name": "fclose",
+          "hint": 1074
+        },
+        {
+          "iat_address": "0xd16c",
+          "is_ordinal": false,
+          "name": "fopen",
+          "hint": 1088
+        },
+        {
+          "iat_address": "0xd174",
+          "is_ordinal": false,
+          "name": "fprintf",
+          "hint": 1090
+        },
+        {
+          "iat_address": "0xd17c",
+          "is_ordinal": false,
+          "name": "fputc",
+          "hint": 1092
+        },
+        {
+          "iat_address": "0xd184",
+          "is_ordinal": false,
+          "name": "free",
+          "hint": 1097
+        },
+        {
+          "iat_address": "0xd18c",
+          "is_ordinal": false,
+          "name": "fwrite",
+          "hint": 1110
+        },
+        {
+          "iat_address": "0xd194",
+          "is_ordinal": false,
+          "name": "localeconv",
+          "hint": 1151
+        },
+        {
+          "iat_address": "0xd19c",
+          "is_ordinal": false,
+          "name": "malloc",
+          "hint": 1158
+        },
+        {
+          "iat_address": "0xd1a4",
+          "is_ordinal": false,
+          "name": "memcpy",
+          "hint": 1166
+        },
+        {
+          "iat_address": "0xd1ac",
+          "is_ordinal": false,
+          "name": "memset",
+          "hint": 1168
+        },
+        {
+          "iat_address": "0xd1b4",
+          "is_ordinal": false,
+          "name": "puts",
+          "hint": 1180
+        },
+        {
+          "iat_address": "0xd1bc",
+          "is_ordinal": false,
+          "name": "signal",
+          "hint": 1198
+        },
+        {
+          "iat_address": "0xd1c4",
+          "is_ordinal": false,
+          "name": "strcmp",
+          "hint": 1214
+        },
+        {
+          "iat_address": "0xd1cc",
+          "is_ordinal": false,
+          "name": "strerror",
+          "hint": 1219
+        },
+        {
+          "iat_address": "0xd1d4",
+          "is_ordinal": false,
+          "name": "strlen",
+          "hint": 1221
+        },
+        {
+          "iat_address": "0xd1dc",
+          "is_ordinal": false,
+          "name": "strncmp",
+          "hint": 1224
+        },
+        {
+          "iat_address": "0xd1e4",
+          "is_ordinal": false,
+          "name": "vfprintf",
+          "hint": 1260
+        },
+        {
+          "iat_address": "0xd1ec",
+          "is_ordinal": false,
+          "name": "wcslen",
+          "hint": 1285
+        }
+      ]
+    }
+  ],
+  "import_hints": [
+    {
+      "api": "GetLastError",
+      "hint": "error handling"
+    },
+    {
+      "api": "SetUnhandledExceptionFilter",
+      "hint": "exception handling"
+    },
+    {
+      "api": "Sleep",
+      "hint": "delay / pacing"
+    },
+    {
+      "api": "VirtualProtect",
+      "hint": "memory protection change"
+    },
+    {
+      "api": "VirtualQuery",
+      "hint": "memory query"
+    },
+    {
+      "api": "fclose",
+      "hint": "file close"
+    },
+    {
+      "api": "fopen",
+      "hint": "file open / file I/O"
+    },
+    {
+      "api": "fprintf",
+      "hint": "formatted file output"
+    },
+    {
+      "api": "fputc",
+      "hint": "character output"
+    },
+    {
+      "api": "fwrite",
+      "hint": "binary or file output"
+    },
+    {
+      "api": "memcpy",
+      "hint": "memory copy"
+    },
+    {
+      "api": "memset",
+      "hint": "memory initialization"
+    },
+    {
+      "api": "puts",
+      "hint": "console output"
+    },
+    {
+      "api": "strcmp",
+      "hint": "string comparison"
+    },
+    {
+      "api": "strlen",
+      "hint": "string length"
+    },
+    {
+      "api": "strncmp",
+      "hint": "bounded string comparison"
+    }
+  ],
+  "raw_strings": [
+    "!This program cannot be run in DOS mode.",
+    "`.data",
+    ".rdata",
+    "@.pdata",
+    "@.xdata",
+    ".idata",
+    ".reloc",
+    "AUATUWVSH",
+    "[^_]A\\A]",
+    "UAWAVAUATWVSH",
+    "[^_A\\A]A^A_]",
+    "AUATWVSH",
+    " [^_A\\A]H",
+    "ATWVSH",
+    "([^_A\\",
+    ":MZuWHcB<H",
+    "AUATSH",
+    "0[A\\A]",
+    "C$9C(~",
+    " u HcC$A",
+    "AVAUATUWVSH",
+    "@[^_]A\\A]A^",
+    "S$9S(~",
+    "UATWVSH",
+    "IcD$$A",
+    "D$$A9D$(~",
+    "[^_A\\]",
+    "=UUUUw",
+    " [A\\A]",
+    "X[^_]A\\A]",
+    "AWAVAUATUWVSH",
+    "[^_]A\\A]A^A_",
+    "8[^_]A\\A]A^A_",
+    "D$P)D$`",
+    "HcD$pH",
+    "l$`+l$L",
+    "ATUWVSHcY",
+    "[^_]A\\",
+    "AUATVSH",
+    "([^A\\A]",
+    "([^_]A\\A]A^A_",
+    "([^_]A\\A]",
+    " [^_]A\\A]A^",
+    "ATUWVSH",
+    " [^_]A\\",
+    "@[^_A\\A]",
+    "H[^_A\\",
+    "0[^_]A\\A]A^",
+    "`[^_A\\A]",
+    "usage: %s <training-token>",
+    "reverse_demo_result.txt",
+    "token rejected; no file was created",
+    "safe reverse training sample",
+    "reserved test domain: %s",
+    "network access: disabled",
+    "token accepted; local report created",
+    "could not write the local report",
+    ".(;3434=t?\";7*6?t34,;63>",
+    "Argument domain error (DOMAIN)",
+    "Argument singularity (SIGN)",
+    "Overflow range error (OVERFLOW)",
+    "Partial loss of significance (PLOSS)",
+    "Total loss of significance (TLOSS)",
+    "The result is too small to be represented (UNDERFLOW)",
+    "Unknown error",
+    "_matherr(): %s in %s(%g, %g)  (retval=%g)",
+    "Mingw-w64 runtime failure:",
+    "Address %p has no image-section",
+    "  VirtualQuery failed for %d bytes at address %p",
+    "  VirtualProtect failed with code 0x%x",
+    "  Unknown pseudo relocation protocol version %d.",
+    "  Unknown pseudo relocation bit size %d.",
+    "(null)",
+    "Infinity",
+    "GCC: (GNU) 11.2.0",
+    "DeleteCriticalSection",
+    "EnterCriticalSection",
+    "GetLastError",
+    "GetStartupInfoA",
+    "InitializeCriticalSection",
+    "IsDBCSLeadByteEx",
+    "LeaveCriticalSection",
+    "MultiByteToWideChar",
+    "SetUnhandledExceptionFilter",
+    "TlsGetValue",
+    "VirtualProtect",
+    "VirtualQuery",
+    "WideCharToMultiByte",
+    "__C_specific_handler",
+    "___lc_codepage_func",
+    "___mb_cur_max_func",
+    "__getmainargs",
+    "__initenv",
+    "__iob_func",
+    "__lconv_init",
+    "__set_app_type",
+    "__setusermatherr",
+    "_acmdln",
+    "_amsg_exit",
+    "_cexit",
+    "_commode",
+    "_errno",
+    "_fmode",
+    "_initterm",
+    "_onexit",
+    "_unlock",
+    "calloc",
+    "fclose",
+    "fprintf",
+    "fwrite",
+    "localeconv",
+    "malloc",
+    "memcpy",
+    "memset",
+    "signal",
+    "strcmp",
+    "strerror",
+    "strlen",
+    "strncmp",
+    "vfprintf",
+    "wcslen",
+    "KERNEL32.dll",
+    "msvcrt.dll"
+  ],
+  "xor_decode_candidates": [
+    {
+      "value": "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+      "section": ".CRT",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+      "section": ".data",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+      "section": ".rdata",
+      "xor_key": "0x9e",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "444444441444-444I44444444444444444444444444444",
+      "section": ".rdata",
+      "xor_key": "0x34",
+      "source": "xor"
+    },
+    {
+      "value": "PPPPPPPPUPPPIPPP-PPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+      "section": ".rdata",
+      "xor_key": "0x50",
+      "source": "xor"
+    },
+    {
+      "value": "xn.onnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnn.xn.onnnnnnnnnnnnnnnnnnn",
+      "section": ".CRT",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnnnnnnnnnnnnn.onnnnnnnnnnn",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "ZZZZZZZZSECMIND-REVERSE-OKZZZZZZZZZZZZZZ",
+      "section": ".rdata",
+      "xor_key": "0x5a",
+      "source": "xor"
+    },
+    {
+      "value": "llmlllmlllmlllmhmlh.llmjolj",
+      "section": ".xdata",
+      "xor_key": "0x6c",
+      "source": "xor"
+    },
+    {
+      "value": "xllmhmlh.llmlllmlllmhmlh",
+      "section": ".xdata",
+      "xor_key": "0x6c",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnnnnnnnnnnnnnnnnnn",
+      "section": ".CRT",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "azkmz.hogbkj.ygzf.majk",
+      "section": ".rdata",
+      "xor_key": "0x0e",
+      "source": "xor"
+    },
+    {
+      "value": "mlllmhmlh.llmhmlh",
+      "section": ".xdata",
+      "xor_key": "0x6c",
+      "source": "xor"
+    },
+    {
+      "value": "nnnnnnnnnnnn.nnn",
+      "section": ".data",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnnnnnnnnnnn",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "n.onnnnnnnnnnnv",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "sn.onnnnnnnnnnn",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    },
+    {
+      "value": "yn.onnnnnnnnnnn",
+      "section": ".rdata",
+      "xor_key": "0x6e",
+      "source": "xor"
+    }
+  ],
+  "limitations": [
+    "No dynamic execution was performed.",
+    "No full disassembly engine is bundled in this helper.",
+    "XOR decoding is heuristic and may include false positives."
+  ]
+}

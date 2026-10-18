@@ -1,0 +1,201 @@
+{
+  "artifact_type": "reverse_api_case_business_report",
+  "execution_status": "completed",
+  "model_receipt_ref": "receipt.json",
+  "report": {
+    "evidence_refs": [
+      "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+    ],
+    "execution_status": "completed",
+    "executive_summary": "The PE file is an x86-64 binary with 10 sections. Static analysis reveals a set of imports mostly for C runtime and file I/O operations. There is no observed dynamic evidence; therefore, all imports are considered static presence only. XOR decoding hints suggest possible obfuscation or hidden strings, but without execution these remain candidate artifacts.",
+    "findings": [
+      {
+        "business_impact": "The binary may read or write files and compare strings, potentially indicating data exfiltration or configuration handling.",
+        "confidence": "High",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "The import list includes fopen, fclose, fwrite, fprintf, and fputc, alongside strcmp, strncmp, strlen, and wcslen. These allow file and string operations. However, the actual usage is not confirmed statically.",
+        "title": "Static import set indicates potential file I/O and string comparison logic"
+      },
+      {
+        "business_impact": "VirtualProtect can alter memory permissions, potentially enabling code unpacking or shellcode execution.",
+        "confidence": "Medium",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Medium",
+        "technical_explanation": "The imports VirtualProtect and VirtualQuery are commonly used to modify memory protections or inspect process memory. Without runtime evidence, this is a static indicator.",
+        "title": "Anti-debugging or evasion primitives present via VirtualProtect and VirtualQuery"
+      },
+      {
+        "business_impact": "Obfuscated strings could hide C2 domains or payloads, but the decoded values appear mostly placeholder-like (training.example.invalid).",
+        "confidence": "Low",
+        "evidence_refs": [
+          "evidence-70f66d2aafbff445e620a70517778999c38f5100928d7b9f62e2ca14e85bc1ef"
+        ],
+        "severity": "Low",
+        "technical_explanation": "Static hints show XOR keys and values, but the decoded output includes clearly fake or test domains (training.example.invalid). This may be a false positive or sample training data.",
+        "title": "XOR decoding candidates suggest obfuscated strings or data"
+      }
+    ],
+    "human_decision_recommendations": [
+      {
+        "action": "Perform dynamic analysis in a sandbox to confirm whether the file I/O and string operations are actually executed.",
+        "decision_role": "Security Operations Lead",
+        "expected_outcome": "Confirmed behavior of file reads/writes and any obfuscated string usage.",
+        "priority": "P2",
+        "rationale": "Static imports alone are insufficient to determine malicious behavior; execution will confirm intent."
+      },
+      {
+        "action": "Investigate the XOR-encoded strings further, focusing on non-placeholder values.",
+        "decision_role": "Malware Analyst",
+        "expected_outcome": "Clarify whether real C2 domains or payloads are embedded.",
+        "priority": "P3",
+        "rationale": "The current decoded values appear to be test markers, but some may reveal internal logic."
+      }
+    ],
+    "limitations": [
+      "No dynamic execution was performed.",
+      "No full disassembly engine is bundled in this helper.",
+      "XOR decoding is heuristic and may include false positives."
+    ],
+    "model_receipt_ref": "receipt.json",
+    "next_steps": [
+      "Run the binary in a controlled sandbox with network monitoring.",
+      "Capture API calls related to imports to observe runtime behavior.",
+      "Disassemble the binary to trace usage of VirtualProtect and file I/O functions."
+    ],
+    "reverse_analysis": "The PE file imports functions such as GetLastError, VirtualProtect, VirtualQuery, and file I/O (fopen, fwrite) indicating potential file-manipulating behavior. Critical section APIs (InitializeCriticalSection, EnterCriticalSection, LeaveCriticalSection, DeleteCriticalSection) and thread-local storage (TlsGetValue) are present. The presence of __C_specific_handler suggests structured exception handling. No runtime calls were observed; all imports are static presence based on the evidence packet.",
+    "risk_assessment": {
+      "exploitability": "Unknown - static analysis only, no runtime confirmation",
+      "impact_scope": "Local system",
+      "overall_risk": "Medium",
+      "urgency": "Low to medium; further dynamic analysis recommended"
+    },
+    "scoring_claims": {
+      "behaviors": [
+        "import_static_presence",
+        "possible_file_io",
+        "possible_string_comparison",
+        "xor_decode_candidate"
+      ],
+      "error": null,
+      "facts": {
+        "architecture": "x86-64",
+        "format": "PE",
+        "import_list": [
+          "DeleteCriticalSection",
+          "EnterCriticalSection",
+          "GetLastError",
+          "GetStartupInfoA",
+          "InitializeCriticalSection",
+          "IsDBCSLeadByteEx",
+          "LeaveCriticalSection",
+          "MultiByteToWideChar",
+          "SetUnhandledExceptionFilter",
+          "Sleep",
+          "TlsGetValue",
+          "VirtualProtect",
+          "VirtualQuery",
+          "WideCharToMultiByte",
+          "__C_specific_handler",
+          "___lc_codepage_func",
+          "___mb_cur_max_func",
+          "__getmainargs",
+          "__initenv",
+          "__iob_func",
+          "__lconv_init",
+          "__set_app_type",
+          "__setusermatherr",
+          "_acmdln",
+          "_amsg_exit",
+          "_cexit",
+          "_commode",
+          "_errno",
+          "_fmode",
+          "_initterm",
+          "_lock",
+          "_onexit",
+          "_unlock",
+          "abort",
+          "calloc",
+          "exit",
+          "fclose",
+          "fopen",
+          "fprintf",
+          "fputc",
+          "free",
+          "fwrite",
+          "localeconv",
+          "malloc",
+          "memcpy",
+          "memset",
+          "puts",
+          "signal",
+          "strcmp",
+          "strerror",
+          "strlen",
+          "strncmp",
+          "vfprintf",
+          "wcslen"
+        ],
+        "section_count": 10,
+        "xor_values": [
+          "training.example.invalid",
+          "OONOOONOOONKNOK-OONDIOD",
+          "SECMIND-REVERSE-OK",
+          "OONKNOK-OONZE",
+          "OONKNOK-OON",
+          "1444-444I",
+          "SYYY-62",
+          "1aaf0aaf0aaf0aaf0aaf0aaf0aaf0aaf0aat.aaf",
+          "llmlllmlllmlllmhmlh.llmjolj",
+          "xllmhmlh.llmlllmlllmhmlh",
+          "azkmz.hogbkj.ygzf.majk",
+          "mlllmhmlh.llmhmlh",
+          "wqbjmjmd.wlhfm",
+          "gzk.zfk.bamob",
+          "mhmlh.llmjolj",
+          "w.hogbkj.ha",
+          "xllehmlh.ll",
+          "cobb.za.lk",
+          "zkj5.bamob",
+          "n.onnn.xn"
+        ]
+      },
+      "status": "completed"
+    },
+    "task_identity": {
+      "arm": "optimized",
+      "case_id": "pe-imports",
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "repeat_id": 2,
+      "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+      "suite_id": "secmind-reverse-safe-12-v1"
+    },
+    "unknowns": [
+      "Whether the static imports are actually called during runtime.",
+      "The true purpose of the XOR-encoded strings."
+    ]
+  },
+  "schema_version": "1.0",
+  "source_semantics": {
+    "evidence_boundary": "静态/模拟证据边界：除非封存证据明确标记 observed_runtime，本报告不得将事实视为宿主原生运行时观测。",
+    "import_semantics": "static_presence",
+    "sources": [
+      "static"
+    ]
+  },
+  "task_identity": {
+    "arm": "optimized",
+    "case_id": "pe-imports",
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "repeat_id": 2,
+    "sample_sha256": "efb6050e10a8d548ae454034120a233283b33d5d679e6fc06147549441f82c38",
+    "suite_id": "secmind-reverse-safe-12-v1"
+  }
+}
