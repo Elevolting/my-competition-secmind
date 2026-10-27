@@ -4,7 +4,7 @@ import { getDashboard, getIntegrationStatus, listModules } from '../api.js'
 import { RobotCanvas } from './RobotCanvas.jsx'
 import './cockpit.css'
 
-const scenes = [['code_audit', '代码审计'], ['reverse', '逆向分析'], ['penetration', '渗透测试'], ['incident_response', '应急响应'], ['log_analysis', '日志分析'], ['other', '其他任务']]
+const scenes = [['code_audit', '代码审计'], ['reverse', '逆向分析'], ['penetration', '渗透测试'], ['incident_response', '日志留痕'], ['log_analysis', '日志分析'], ['other', '其他任务']]
 
 export function CockpitPage() {
   const [data, setData] = useState(null)
@@ -67,14 +67,14 @@ export function CockpitPage() {
         </section>
         <section className="cockpit-card capacity-card"><CardTitle kicker="RUNTIME CAPABILITIES" title="模块与工具" icon="⌘" />
           <div className="capacity-list"><div><b>{integration?.native_tool_count ?? '—'}</b><small>已注册工具</small></div><div><b>{modules ? modules.filter((item) => item.available).length : '—'}</b><small>可用模块</small></div><div><b>{data?.pending_approvals ?? '—'}</b><small>待审批任务</small></div></div>
-          <p className="cockpit-empty-panel">{inventory ? `${inventory.hostname} · ${inventory.processes.length} 个进程 · ${inventory.listeners.length} 个监听端口；采集于 ${new Date(inventory.collected_at).toLocaleTimeString()}` : loading && !data ? '正在读取本机快照…' : '尚无本机快照，请到应急响应页面启动采集。'}</p>
+          <p className="cockpit-empty-panel">{inventory ? `${inventory.hostname} · ${inventory.processes.length} 个进程 · ${inventory.listeners.length} 个监听端口；采集于 ${new Date(inventory.collected_at).toLocaleTimeString()}` : loading && !data ? '正在读取本机快照…' : '尚无本机快照，请到日志留痕页面启动采集。'}</p>
         </section>
       </aside>
       <main className="cockpit-center"><MonitorNotice followRef={statusBubbleRef} data={data} value={monitorValue} state={monitorState} /></main>
       <aside className="cockpit-right"><section className="cockpit-card rank-card"><CardTitle kicker="MODULE STATUS" title="模块连接状态" icon="⌘" />
-        {modules ? modules.map((item) => <div className="rank-row cockpit-module-row" key={item.id}><span><b>{item.name}</b><i>{item.id === 'incident_response' ? (host?.running ? '本机采集中' : '本机采集器已就绪') : item.available ? '接口可用' : item.error || '接口不可用'}</i></span><strong>{item.id === 'incident_response' ? (host?.running ? '采集中' : '可启动') : item.available ? '已连接' : '离线'}</strong></div>) : <p className="cockpit-empty-panel">{loading ? '正在读取模块状态…' : '模块状态暂不可用'}</p>}
+        {modules ? modules.map((item) => <div className="rank-row cockpit-module-row" key={item.id}><span><b>{item.id === 'incident_response' ? '日志留痕' : item.name}</b><i>{item.id === 'incident_response' ? (host?.running ? '本机采集中' : '本机采集器已就绪') : item.available ? '接口可用' : item.error || '接口不可用'}</i></span><strong>{item.id === 'incident_response' ? (host?.running ? '采集中' : '可启动') : item.available ? '已连接' : '离线'}</strong></div>) : <p className="cockpit-empty-panel">{loading ? '正在读取模块状态…' : '模块状态暂不可用'}</p>}
         <CardTitle kicker="LOCAL LISTENERS" title="本机监听端口" icon="♨" />{inventory ? inventory.listeners.slice(0, 5).map((item) => <div className="rank-row cockpit-module-row" key={`${item.address}:${item.port}`}><span><b>{item.process}</b><i>{item.address}</i></span><strong>{item.port}</strong></div>) : <p className="cockpit-empty-panel">{loading && !data ? '正在读取本机监听端口…' : '尚未采集'}</p>}
-        {inventory && <p className="cockpit-empty-panel">监听端口不是攻击记录；显示端口排序前五项。{inventory.errors?.length ? '部分采集失败，请查看详情。' : ''}</p>}<button className="cockpit-workbench-link" type="button" onClick={() => go('/incident-response')}>查看本机资产与处置</button>
+        {inventory && <p className="cockpit-empty-panel">显示前五个监听端口。{inventory.errors?.length ? '部分采集失败，请查看详情。' : ''}</p>}<button className="cockpit-workbench-link" type="button" onClick={() => go('/incident-response')}>查看日志留痕</button>
       </section></aside>
     </div>
     <footer className="cockpit-summary"><span>↑</span><div><i>RUN SUMMARY</i><b>{summary}<span className="cockpit-summary-followup">{data ? `更新时间 ${new Date(data.generated_at).toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '暂无可用统计'}</span></b></div><button type="button" disabled={loading} onClick={() => refreshRef.current?.()}>{loading ? '刷新中…' : '刷新态势'}</button></footer>

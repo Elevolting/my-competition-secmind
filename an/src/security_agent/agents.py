@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from security_agent.fusion import classify_task
 from security_agent.llm import ModelCallMeta, ModelGateway, StreamObserver
+from security_agent.log_reports import LogAnalysisReport
 from security_agent.mcp_generated import GeneratedMCPStore, GeneratedToolProposal
 from security_agent.run_recovery import repeatable_call, runtime_observation_succeeded
 from security_agent.schemas import (
@@ -26,8 +27,7 @@ from security_agent.schemas import (
     Scenario,
     ToolStatus,
 )
-from security_agent.verified_outputs import (extract_verified_flags, include_verified_outputs,
-                                             without_runtime_metadata)
+from security_agent.verified_outputs import extract_verified_flags, include_verified_outputs, without_runtime_metadata
 
 
 class RouteOutput(BaseModel):
@@ -262,7 +262,7 @@ class TaskInterpreterAgent(BaseAgent):
         model_id = "deterministic-router"
         rationale = ""
 
-        if _can_call_model(state, self.gateway):
+        if fallback_scenario != Scenario.LOG_ANALYSIS and _can_call_model(state, self.gateway):
             try:
                 output, meta = await self.gateway.structured(
                     run_id=state.run_id, call_purpose="primary",
@@ -1312,6 +1312,10 @@ class ReporterAgent(BaseAgent):
             decisions=state.decisions,
             evidence=state.evidence,
             limitations=limitations,
+            log_analysis=next((LogAnalysisReport.model_validate(item.data['log_analysis'])
+                               for item in reversed(state.observations)
+                               if item.data.get('log_analysis') is not None),
+                              state.report.log_analysis if state.report else None),
             **sections,
         )
         return state

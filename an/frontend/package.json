@@ -14,10 +14,11 @@
     "antd": "^6.5.1",
     "cytoscape": "^3.34.2",
     "cytoscape-dagre": "^2.5.0",
+    "cytoscape-svg": "0.4.0",
+    "gsap": "^3.13.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
-    "gsap": "^3.13.0",
     "three": "^0.178.0",
     "vite": "^7.0.3"
   }

@@ -58,6 +58,7 @@ import { AssetCoverageGraph } from './AssetCoverageGraph.jsx'
 import { TrafficEvidencePanel } from './TrafficEvidencePanel.jsx'
 import { RetestConclusion, RetestPanel } from './RetestPanel.jsx'
 import { SideQuestionPanel } from './SideQuestionPanel.jsx'
+import { LogAnalysisPanel } from './LogAnalysisPanel.jsx'
 
 const { Text, Title, Paragraph } = Typography
 
@@ -145,7 +146,7 @@ const assetRouteLabels = {
   code_audit: '代码审计',
   reverse: '逆向分析',
   penetration: '渗透测试',
-  incident_response: '应急响应',
+  incident_response: '日志留痕',
   unsupported: '人工研判',
 }
 
@@ -819,7 +820,7 @@ export function WorkbenchPage() {
         <div className="run-view-tabs" role="group" aria-label="任务视图">
         <Segmented size="small" value={view} onChange={setView} options={[
           { value: 'stream', label: 'AI 实时流', icon: <TeamOutlined /> },
-          { value: 'graph', label: '探索路径', icon: <BranchesOutlined /> },
+          { value: 'graph', label: <span data-testid="workbench-view-graph">探索路径</span>, icon: <BranchesOutlined /> },
           { value: 'coverage', label: '资产引用图', icon: <DeploymentUnitOutlined /> },
           { value: 'thinking', label: '执行摘要', icon: <AuditOutlined /> },
           { value: 'result', label: '任务结果', icon: <FileTextOutlined /> },
@@ -857,6 +858,7 @@ export function WorkbenchPage() {
       </div>} />)}
       {view === 'stream' ? <RuntimeStream events={events} connected={streamConnected} active={Boolean(run?.run_id && run.run_id === selectedId)} /> : view === 'graph' ? <BlackboardGraph run={run} events={events} /> : view === 'coverage' ? <AssetCoverageGraph run={run} /> : view === 'thinking' ? <AIThoughtTimeline events={events} runStatus={run?.status} downloadUrl={run ? thoughtProcessUrl(run.run_id) : ''} /> : report ? <div className="report-view">
         <div className="report-hero"><Text className="panel-kicker">安全分析报告</Text><Title level={3}>{localizePublicText(report.executive_summary)}</Title><RetestConclusion runId={run.run_id} section="executive_summary" index={0} text={report.executive_summary} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /><Paragraph>{report.limitations?.map(localizePublicText).join('；') || '查看各项结论的验证状态与证据。'}</Paragraph></div>
+        <LogAnalysisPanel key={run.run_id} value={report.log_analysis} />
         {getVerifiedOutputs(report).length > 0 && <section className="verified-output-list" aria-label="已验证输出">
           {getVerifiedOutputs(report).map((value) => <article className="verified-output" key={value}>
             <div><Text className="panel-kicker">已获取 Flag</Text><code>{value}</code><RetestConclusion runId={run.run_id} section="verified_outputs" index={report.verified_outputs?.indexOf(value) ?? -1} text={value} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /></div>

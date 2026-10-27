@@ -5,6 +5,7 @@ import hashlib
 import json
 
 from security_agent.config import Settings
+from security_agent.log_reports import LogAnalysisReport
 from security_agent.penetration_integration import (
     assess_project_facts,
     evaluate_project_completion,
@@ -12,9 +13,9 @@ from security_agent.penetration_integration import (
     penetration_get,
     resolve_project_id,
 )
+from security_agent.run_recovery import runtime_goal_completed
 from security_agent.schemas import AgentReport, AgentState, Evidence, Finding, RunStatus, ToolContext, ToolStatus
 from security_agent.secmind_adapter import invoke_secmind
-from security_agent.run_recovery import runtime_goal_completed
 from security_agent.verified_outputs import include_verified_outputs
 
 
@@ -121,7 +122,9 @@ async def synchronize_report(state: AgentState, settings: Settings, gateway=None
         state.observations.append(result)
         state.report = AgentReport(run_id=state.run_id, status=state.status,
             executive_summary=result.summary, findings=state.findings, evidence=state.evidence,
-            decisions=state.decisions, limitations=limitations)
+            decisions=state.decisions, limitations=limitations,
+            log_analysis=(LogAnalysisReport.model_validate(result.data['log_analysis'])
+                          if result.data.get('log_analysis') is not None else state.report.log_analysis))
         return state
     if state.module_route != "penetration":
         return state
