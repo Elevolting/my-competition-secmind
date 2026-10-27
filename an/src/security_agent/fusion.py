@@ -25,14 +25,25 @@ def classify_task(
     target_scope: list[str] | None = None,
 ) -> dict[str, Any]:
     text = (objective or "").casefold()
-    if '日志' in text or re.search(r'\blogs?\b', text):
+    names = [str(getattr(item, "relative_path", None) or getattr(item, "name", None)
+                 or getattr(item, "ref", item)) for item in (attachments or [])]
+    log_keyword_conflict = any(
+        Path(name).suffix.casefold() in EXTENSIONS["code_audit"] | EXTENSIONS["reverse"] for name in names
+    ) or any(term in text for term in (
+        "代码审计", "审计", "源码", "code audit", "source code", "sast", "bandit", "逆向", "反编译",
+    ))
+    if ('日志' in text or re.search(r'\blogs?\b', text)) and not log_keyword_conflict:
         return {"primary_type": "log_analysis", "secondary_types": [], "confidence": 0.95,
                 "evidence": ["题目包含日志分析目标"], "needs_human_review": False, "scenario": Scenario.LOG_ANALYSIS}
     if any(term in text for term in ("应急", "incident", "事件响应")):
         scenario = Scenario.INCIDENT_RESPONSE
         return {"primary_type": "unsupported", "secondary_types": [], "confidence": 0.95, "evidence": ["题目关键词匹配：日志/应急"], "needs_human_review": True, "scenario": scenario}
-    names = [str(getattr(item, "relative_path", getattr(item, "name", item))) for item in (attachments or [])]
     scopes = [str(item) for item in (target_scope or [])]
+    log_extensions = {".log", ".jsonl", ".ndjson", ".syslog", ".evtx"}
+    if names and all(Path(name).suffix.casefold() in log_extensions for name in names):
+        return {"primary_type": "log_analysis", "secondary_types": [], "confidence": 0.95,
+                "evidence": ["输入材料均为明确日志格式"], "needs_human_review": False,
+                "scenario": Scenario.LOG_ANALYSIS}
     scores: dict[str, float] = {key: 0.0 for key in RULES}
     evidence: dict[str, list[str]] = {key: [] for key in RULES}
     for module, terms in RULES.items():

@@ -8,6 +8,7 @@ from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from security_agent.budget_policy import MAX_MODEL_CALLS, MAX_RUNTIME_SECONDS, MAX_TOOL_CALLS
+from security_agent.log_reports import LogAnalysisReport
 
 SCHEMA_VERSION = "1.0"
 
@@ -661,6 +662,7 @@ class AgentReport(BaseModel):
     ruled_out_directions: list[str] = Field(default_factory=list)
     insufficient_evidence: list[str] = Field(default_factory=list)
     worker_reports: list[str] = Field(default_factory=list)
+    log_analysis: LogAnalysisReport | None = None
     generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 

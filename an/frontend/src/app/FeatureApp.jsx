@@ -17,7 +17,7 @@ const IncidentResponsePage = lazyPage(() => import('./IncidentResponsePage.jsx')
 const CockpitPage = lazyPage(() => import('./CockpitPage.jsx'), 'CockpitPage')
 
 const { Header, Sider, Content } = Layout
-const routes = { '/cockpit': ['安全运营驾驶舱', <DashboardOutlined />], '/workbench': ['任务编排', <TeamOutlined />], '/audit': ['审计与拦截', <AuditOutlined />], '/experiences': ['经验学习库', <DatabaseOutlined />], '/assets': ['跨任务资产库', <ClusterOutlined />], '/incident-response': ['应急响应', <AlertOutlined />], '/models': ['模型与用量', <RobotOutlined />], '/prompts': ['Prompt 目录', <FileTextOutlined />], '/mcp': ['MCP 工具清单', <ToolOutlined />] }
+const routes = { '/cockpit': ['安全运营驾驶舱', <DashboardOutlined />], '/workbench': ['任务编排', <TeamOutlined />], '/audit': ['审计与拦截', <AuditOutlined />], '/experiences': ['经验学习库', <DatabaseOutlined />], '/assets': ['跨任务资产库', <ClusterOutlined />], '/incident-response': ['日志留痕', <AlertOutlined />], '/models': ['模型与用量', <RobotOutlined />], '/prompts': ['Prompt 目录', <FileTextOutlined />], '/mcp': ['MCP 工具清单', <ToolOutlined />] }
 
 export function FeatureApp({ themeMode = 'dark', onToggleTheme }) {
   const navigate = useNavigate(); const location = useLocation(); const [collapsed, setCollapsed] = useState(false); const [mobileOpen, setMobileOpen] = useState(false); const [isNarrow, setIsNarrow] = useState(() => window.matchMedia('(max-width: 900px)').matches); const [backend, setBackend] = useState(null)
@@ -34,7 +34,7 @@ export function FeatureApp({ themeMode = 'dark', onToggleTheme }) {
       { key: '/audit', icon: <AuditOutlined />, label: '审计与拦截' },
       { key: '/assets', icon: <ClusterOutlined />, label: '跨任务资产库' },
       { key: '/experiences', icon: <DatabaseOutlined />, label: '经验学习库' },
-      { key: '/incident-response', icon: <AlertOutlined />, label: '应急响应' },
+      { key: '/incident-response', icon: <AlertOutlined />, label: '日志留痕' },
     ] },
     { type: 'group', label: '系统能力', children: [
       { key: '/models', icon: <RobotOutlined />, label: '模型与用量' },

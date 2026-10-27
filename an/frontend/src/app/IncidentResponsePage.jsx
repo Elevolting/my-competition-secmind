@@ -80,7 +80,7 @@ export function IncidentResponsePage() {
       const result = await fn()
       const feedback = incidentFeedback(result, operation)
       message[feedback.level](feedback.text)
-      if (await refresh(true) === false) message.warning('操作回执已返回，应急数据暂未刷新')
+      if (await refresh(true) === false) message.warning('操作回执已返回，留痕数据暂未刷新')
       return result
     } catch (e) {
       setError(e.message)
@@ -99,23 +99,22 @@ export function IncidentResponsePage() {
     } catch (err) { setError(err.message) }
     finally { setBusy(false) }
   }
-  return <div className="incident-page">
-    <section className="page-intro"><div><Text className="panel-kicker">LOCAL HOST RESPONSE</Text><Title level={2}>本机监控与应急处置</Title><p>采集当前部署机器的进程与监听端口，保留证据；文件隔离、恢复和防火墙变更经审批后实际执行。</p></div>
+  return <div className="incident-page" data-testid="log-trace-page">
+    <section className="page-intro"><div><Text className="panel-kicker">ACTIVITY LOG</Text><Title level={2} data-testid="log-trace-title">日志留痕</Title><p>记录本机快照、操作回执与审计日志。</p></div>
       <Space><Tag color={status?.running ? 'green' : 'default'}>{status ? status.running ? '采集中' : '采集已停止' : '状态未知'}</Tag>
       <Button loading={busy} disabled={!status} onClick={() => perform(() => status.running ? stopIncidentMonitor() : startIncidentMonitor())}>{status?.running ? '停止采集' : '启动采集'}</Button><Button onClick={() => refresh(true)}>刷新</Button></Space></section>
-    {error && <Alert type="error" showIcon message={`应急数据读取失败：${error}`} />}
+    {error && <Alert type="error" showIcon message={`留痕数据读取失败：${error}`} />}
     <section className="incident-metrics">{[['本机', inventory?.hostname], ['进程', inventory?.processes?.length], ['监听端口', inventory?.listeners?.length], ['待审批', status?.pending_approvals]].map(([label, value]) => <div className="incident-metric" key={label}><span><small>{label}</small><b>{value ?? '—'}</b></span></div>)}</section>
     <section className="glass-panel" style={{ padding: 20 }}>
       <Title level={4}>本机采集结果</Title>
       <p>{inventory ? `采集于 ${new Date(inventory.collected_at).toLocaleString()} · ${inventory.platform}` : '尚未采集；启动采集或执行一次取证快照。'}</p>
       {inventory?.errors?.length > 0 && <Alert type="warning" message="部分数据读取失败，以下结果不完整" description={JSON.stringify(inventory.errors)} />}
-      <Alert type="info" message="监听端口反映本机服务暴露，不代表已遭受攻击；防火墙可能限制其可达性。" />
       <Table size="small" dataSource={inventory?.listeners || []} rowKey={row => `${row.address}:${row.port}:${row.pid}`} pagination={{ pageSize: 8 }} columns={[
         { title: '地址', dataIndex: 'address' }, { title: '端口', dataIndex: 'port' }, { title: 'PID', dataIndex: 'pid' },
         { title: '进程', dataIndex: 'process' }, { title: '监听范围', render: (_, row) => row.wildcard ? '所有接口' : '指定地址' },
       ]} />
       <details><summary>进程清单（{inventory?.processes?.length || 0}）</summary><Table size="small" rowKey="pid" dataSource={inventory?.processes || []} pagination={{ pageSize: 10 }} columns={[{ title: 'PID', dataIndex: 'pid' }, { title: '进程', dataIndex: 'name' }, { title: '程序路径', dataIndex: 'exe', ellipsis: true }]} /></details>
-      {inventory?.security_events && <details open><summary>Windows 登录失败日志（近 24 小时，最多 200 条；不直接判定为攻击）</summary>
+      {inventory?.security_events && <details open><summary>Windows 登录失败日志（近 24 小时，最多 200 条）</summary>
         {!inventory.security_events.complete && <Alert type="warning" message="安全日志读取失败，不能按 0 条解释" description={inventory.security_events.errors.join('；')} />}
         <Table size="small" rowKey="record_id" dataSource={inventory.security_events.records || []} pagination={{ pageSize: 5 }} columns={[{ title: '时间', dataIndex: 'time' }, { title: '来源 IP', dataIndex: 'source_ip' }, { title: '登录类型', dataIndex: 'logon_type' }, { title: 'Windows 状态码', dataIndex: 'status' }]} />
       </details>}

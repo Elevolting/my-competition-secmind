@@ -8,6 +8,7 @@ import './ExecutionCanvas.css'
 import ExecutionNodeCard, { StatusBadge } from './ExecutionNodeCard.jsx'
 import ExecutionDetails from './ExecutionDetails.jsx'
 import TraceSearch from './TraceSearch.jsx'
+import { createBlackboardSvg, downloadBlackboardSvg } from './blackboardSvg.js'
 
 cytoscape.use(dagre)
 
@@ -83,6 +84,14 @@ export function BlackboardGraph({ run, events = [] }) {
   const [follow, setFollow] = useState(true)
   const [error, setError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
+  const exportRequestRef = useRef(0)
+  useEffect(() => {
+    exportRequestRef.current += 1
+    setExporting(false); setExportError('')
+    return () => { exportRequestRef.current += 1 }
+  }, [run?.run_id])
   const [syncedAt, setSyncedAt] = useState('')
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false)
   const [light, setLight] = useState(() => document.body.classList.contains('light-theme'))
@@ -334,6 +343,26 @@ export function BlackboardGraph({ run, events = [] }) {
     })
     return () => cancelAnimationFrame(frame)
   }, [mobileView])
+  const exportSvg = async () => {
+    const serial = ++exportRequestRef.current
+    const runId = run.run_id
+    setExporting(true); setExportError('')
+    try {
+      const snapshot = structuredClone(shown)
+      const view = canvasRef.current?.closest('.execution-view')
+      if (!(view instanceof HTMLElement)) throw new TypeError('找不到黑板主题容器，请重新打开执行画布')
+      await document.fonts.ready
+      if (serial !== exportRequestRef.current) return
+      const content = createBlackboardSvg(snapshot, view)
+      downloadBlackboardSvg(content, runId)
+    } catch (cause) {
+      const failure = new Error(`任务 ${runId} 导出 SVG 失败：${cause instanceof Error ? cause.message : String(cause)}`, { cause })
+      console.error('Blackboard SVG export failed', { runId, error: failure })
+      if (serial === exportRequestRef.current) setExportError(failure.message)
+    } finally {
+      if (serial === exportRequestRef.current) setExporting(false)
+    }
+  }
   const pauseFollow = () => { cyRef.current?.stop(); followRef.current = false; setFollow(false) }
   const elapsed = (node) => executionElapsed(node, clock, run?.status, shown.project?.status)
   const intents = useMemo(() => (shown.nodes || []).filter(isIntent), [shown])
@@ -364,6 +393,7 @@ export function BlackboardGraph({ run, events = [] }) {
   if (!run) return <div className="execution-empty"><Empty description="选择任务后查看执行画布" /></div>
   return <div className={`execution-view ${light ? 'is-light' : ''} ${motionEnabled ? 'motion-enabled' : ''}`}>
     {error && <div className="execution-error" role="alert">{error} · 保留上次同步结果 <Button size="small" onClick={() => refresh()}>重试</Button></div>}
+    {exportError && <div className="execution-error" role="alert">{exportError}</div>}
     <div className="execution-overview">
       <div className="execution-metric active-metric"><small>正在执行的想法</small><b>{running.length}<em>条分支</em></b></div>
       <div className="execution-metric"><small>等待审批</small><b>{intents.filter((node) => node.status === 'approval').length}<em>条分支</em></b></div>
@@ -373,13 +403,13 @@ export function BlackboardGraph({ run, events = [] }) {
     <nav className="execution-mobile-tabs" aria-label="画布视图">{[['list', '清单'], ['graph', '画布'], ['detail', '详情']].map(([id, label]) => <button key={id} className={mobileView === id ? 'active' : ''} onClick={() => setMobileView(id)}>{label}</button>)}</nav>
     <div className="execution-columns">
       <aside className={`execution-list execution-mobile-${mobileView}`}><div className="execution-pane-heading"><b>验证想法</b><span>{intents.length} 个想法</span></div>
-        <Input prefix={<SearchOutlined />} allowClear placeholder="搜索想法、事实、证据" value={query} onChange={(event) => setQuery(event.target.value)} />
+        <Input data-testid="blackboard-search" prefix={<SearchOutlined />} allowClear placeholder="搜索想法、事实、证据" value={query} onChange={(event) => setQuery(event.target.value)} />
         <div className="execution-list-scroll">
           <div className="execution-section-label"><span>当前执行</span><span>{running.length.toString().padStart(2, '0')}</span></div>
           {running.filter(matchesQueue).map((node) => queueRow(node))}
           <div className="execution-section-label"><span>等待处理</span><span>{waiting.length.toString().padStart(2, '0')}</span></div>
           {waiting.filter(matchesQueue).map((node) => queueRow(node))}
-          <div className="execution-section-label"><span>已完成 · {complete.length}</span><button className="execution-history-toggle" aria-expanded={history} onClick={() => setHistory(!history)}>{history ? '收起 ▴' : '展开 ▾'}</button></div>
+          <div className="execution-section-label"><span>已完成 · {complete.length}</span><button data-testid="blackboard-history-toggle" className="execution-history-toggle" aria-expanded={history} onClick={() => setHistory(!history)}>{history ? '收起 ▴' : '展开 ▾'}</button></div>
           {history && complete.filter(matchesQueue).map((node) => queueRow(node, true))}
           {!intents.length && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无验证想法" />}
           <p className="execution-queue-footer">选择一个想法，即可追溯它的依据、当前动作与产出。</p>
@@ -389,6 +419,7 @@ export function BlackboardGraph({ run, events = [] }) {
         <header className="execution-canvas-header"><div><b>执行分支</b><small>{selectedNode ? '当前验证路径' : '正在发生的验证'}</small></div><div className="execution-canvas-actions">
           <button aria-label="跟随执行" className={follow ? 'is-active' : ''} onClick={() => { followRef.current = true; setFollow(true); const current = cyRef.current?.nodes('.state-running, .state-exploring').first(); if (current?.nonempty()) cyRef.current.animate({ center: { eles: current }, duration: reducedMotion ? 0 : 380 }) }}>● 跟随执行</button>
           <button aria-label="查看全图" onClick={() => { pauseFollow(); setHistory(true); requestAnimationFrame(() => requestAnimationFrame(() => cyRef.current?.fit(cyRef.current.elements(), 50))) }}>查看全图</button>
+          <button type="button" aria-label="导出全局SVG" data-testid="blackboard-export-svg" aria-busy={exporting} disabled={exporting || !shown.nodes?.some((node) => !['hint', 'worker'].includes(node.type))} onClick={exportSvg}>{exporting ? '导出中…' : '导出全局 SVG'}</button>
         </div></header>
         <div className="execution-viewport">
           <div ref={canvasRef} className="execution-cytoscape" data-testid="penetration-blackboard-canvas" />

@@ -894,7 +894,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "available": penetration_ok, "base_url": actual_settings.penetration_base_url,
                 **({"error": penetration_error} if penetration_error else {}),
             },
-            {"id": "incident_response", "name": "应急响应", "adapter": "local_incident_runtime", "available": True},
+            {"id": "incident_response", "name": "日志留痕", "adapter": "local_incident_runtime", "available": True},
         ]}
 
     @app.get("/api/v1/incident/status")

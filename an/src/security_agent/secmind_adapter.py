@@ -10,6 +10,7 @@ from urllib.parse import quote
 
 import httpx
 
+from security_agent.log_reports import project_log_analysis
 from security_agent.schemas import Evidence, ToolContext, ToolResult, ToolStatus
 
 
@@ -30,11 +31,14 @@ async def invoke_secmind(files: list[Path], context: ToolContext, *, domain: str
 
     def result(status, *, error=None, summary='', report=None, **data):
         report = report or {}
+        log_analysis = project_log_analysis(report.get('answer_type'), report.get('answer_payload'),
+                                            report.get('coverage', {}), report.get('evidence', []))
         return ToolResult(status=status, error_code=error, error_message=summary if error else None,
             summary=summary or str(report.get('executive_summary', '')),
             data={'adapter': adapter, 'remote_run_id': remote.get('remote_run_id'),
                   'remote_status': remote.get('status'), 'findings': report.get('findings', []),
                   'answer_payload': report.get('answer_payload'), 'limitations': report.get('limitations', []),
+                  'log_analysis': log_analysis.model_dump(mode='json') if log_analysis is not None else None,
                   'partial_evidence': bool(report) and status != ToolStatus.SUCCESS, **data},
             evidence=[Evidence.model_validate(item) for item in report.get('evidence', [])],
             duration_ms=int((time.monotonic() - started) * 1000))
