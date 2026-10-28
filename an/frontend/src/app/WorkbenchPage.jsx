@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ApiOutlined,
   AuditOutlined,
@@ -54,8 +54,6 @@ import { retryTaskBudget, validTaskBudget } from './task-budget.js'
 import { TaskBudgetFields } from './TaskBudgetFields.jsx'
 import './workbench-header.css'
 import { ModuleFlow } from './ModuleFlow.jsx'
-import { BlackboardGraph } from './BlackboardGraph.jsx'
-import { AssetCoverageGraph } from './AssetCoverageGraph.jsx'
 import { TrafficEvidencePanel } from './TrafficEvidencePanel.jsx'
 import { RetestConclusion, RetestPanel } from './RetestPanel.jsx'
 import { SideQuestionPanel } from './SideQuestionPanel.jsx'
@@ -63,6 +61,8 @@ import { LogAnalysisPanel } from './LogAnalysisPanel.jsx'
 import { EvidenceDrawer } from './EvidenceDrawer.jsx'
 import { ReportExportButtons } from './ReportExportButtons.jsx'
 
+const BlackboardGraph = lazy(() => import('./BlackboardGraph.jsx').then(module => ({ default: module.BlackboardGraph })))
+const AssetCoverageGraph = lazy(() => import('./AssetCoverageGraph.jsx').then(module => ({ default: module.AssetCoverageGraph })))
 const { Text, Title, Paragraph } = Typography
 
 function formatTokens(value) {
@@ -463,30 +463,21 @@ export function WorkbenchPage() {
       }
       if (!isCurrent()) return
       setRun(nextRun)
-      if (['completed', 'partial', 'failed', 'denied'].includes(nextRun.status)
-        && reportFailedRun.current !== runId && !reportRefreshInFlight.current) {
-        setReportRead(current => current.runId === runId && current.status === 'ready' ? current : { runId, status: 'loading', error: '' })
-      }
-
-      const ledgerResult = await ledgerPromise
-      if (!isCurrent()) return
-      // The run summary is authoritative for status. A ledger read can fail
-      // independently (large file, temporary lock, or a reconnect race); in
-      // that case keep the last known events and still refresh the report.
-      if (!ledgerResult.error) {
+      // Reports do not depend on the ledger. Keep both reads in the shared
+      // refresh request while allowing either result to render independently.
+      const terminal = ['completed', 'partial', 'failed', 'denied'].includes(nextRun.status)
+      const reportPromise = terminal && reportFailedRun.current !== runId && !reportRefreshInFlight.current
+        ? readReport(runId) : Promise.resolve()
+      const applyLedger = ledgerPromise.then((ledgerResult) => {
+        if (!isCurrent() || ledgerResult.error) return
         const ledgerEvents = ledgerResult.value.events || []
         const sequence = ledgerEvents.reduce((cursor, event) => Math.max(cursor, event.sequence || 0), afterSequence)
         ledgerCursor.current = { runId, sequence }
         lastSequence.current = Math.max(lastSequence.current, sequence)
         if (ledgerEvents.length) setEvents((current) => mergeLedgerEvents(ledgerEvents, current))
-      }
-      // A report is a terminal artifact.  Avoid repeatedly requesting a 409
-      // while the exploration path is still running, and never present an
-      // early/partial report as the final result.
-      const terminal = ['completed', 'partial', 'failed', 'denied'].includes(nextRun.status)
-      if (terminal) {
-        if (reportFailedRun.current !== runId && !reportRefreshInFlight.current) await readReport(runId)
-      } else if (isCurrent()) {
+      })
+      // Never present an early report as the final result of an active run.
+      if (!terminal) {
         setReport(null)
         setSelectedEvidence(null)
         if (!reportRefreshInFlight.current) {
@@ -496,6 +487,7 @@ export function WorkbenchPage() {
         }
         if (reportFailedRun.current !== runId) setReportRead({ runId, status: 'idle', error: '' })
       }
+      await Promise.all([reportPromise, applyLedger])
       return nextRun
     })()
     refreshRequest.current = { runId, promise: request, token }
@@ -961,7 +953,7 @@ export function WorkbenchPage() {
         <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: 320, overflowY: 'auto' }}>{JSON.stringify(item.arguments, null, 2)}</pre>
         <Space><Button type="primary" loading={mcpApprovalBusy === item.approval_id} disabled={Boolean(mcpApprovalBusy)} onClick={() => decideMcp(item, 'approve')}>批准本次调用</Button><Button danger disabled={Boolean(mcpApprovalBusy)} onClick={() => decideMcp(item, 'deny')}>拒绝</Button></Space>
       </div>} />)}
-      {view === 'stream' ? <RuntimeStream events={events} connected={streamConnected} active={Boolean(run?.run_id && run.run_id === selectedId)} /> : view === 'graph' ? <BlackboardGraph run={run} events={events} /> : view === 'coverage' ? <AssetCoverageGraph run={run} /> : view === 'thinking' ? <AIThoughtTimeline events={events} runStatus={run?.status} downloadUrl={run ? thoughtProcessUrl(run.run_id) : ''} /> : currentReport ? <div className="report-view">
+      {view === 'stream' ? <RuntimeStream events={events} connected={streamConnected} active={Boolean(run?.run_id && run.run_id === selectedId)} /> : view === 'graph' ? <Suspense fallback={<div className="route-loading" role="status" data-testid="workbench-graph-loading">正在加载探索路径…</div>}><BlackboardGraph run={run} events={events} /></Suspense> : view === 'coverage' ? <Suspense fallback={<div className="route-loading" role="status" data-testid="workbench-coverage-loading">正在加载资产引用图…</div>}><AssetCoverageGraph run={run} /></Suspense> : view === 'thinking' ? <AIThoughtTimeline events={events} runStatus={run?.status} downloadUrl={run ? thoughtProcessUrl(run.run_id) : ''} /> : currentReport ? <div className="report-view">
         <EvidenceDrawer key={selectedId} open={selectedEvidence?.runId === selectedId} evidenceId={selectedEvidence?.evidenceId || null} report={currentReport} onClose={() => setSelectedEvidence(null)} />
         <div className="report-hero"><header className="report-heading"><Title level={3}>安全分析报告</Title><ReportExportButtons key={selectedId} report={currentReport} run={run} /></header><Paragraph className="report-summary" data-testid="report-summary">{localizePublicText(report.executive_summary)}</Paragraph><RetestConclusion runId={run.run_id} section="executive_summary" index={0} text={report.executive_summary} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /><Paragraph className="report-limitations">{report.limitations?.map(localizePublicText).join('；') || '查看各项结论的验证状态与证据。'}</Paragraph></div>
         <LogAnalysisPanel key={run.run_id} value={report.log_analysis} onEvidenceSelect={selectEvidence} />
