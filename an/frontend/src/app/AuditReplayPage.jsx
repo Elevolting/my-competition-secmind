@@ -230,7 +230,7 @@ export function AuditReplayPage() {
                     onChange={(event) => seek(event.currentTarget.valueAsNumber)} style={{ flex: 1, minWidth: 0 }} />
                   <span data-testid="replay-position">{cursor} / {events.length} 个事件 · {progress}%</span>
                 </div>
-                <Space wrap style={{ flexBasis: '100%' }}>
+                <Space wrap className="playback-phases">
                   <Button data-testid="replay-previous-event" disabled={previousEvent === undefined} onClick={() => { if (previousEvent !== undefined) seek(previousEvent) }}>上个关键事件</Button>
                   <Button data-testid="replay-next-event" disabled={nextEvent === undefined} onClick={() => { if (nextEvent !== undefined) seek(nextEvent) }}>下个关键事件</Button>
                   {navigation.phases.map((phase) => <Button key={phase.id} data-testid={`replay-phase-${phase.id}`} disabled={phase.cursor === null}
@@ -238,7 +238,7 @@ export function AuditReplayPage() {
                 </Space>
               </section>
 
-              <section className="glass-panel replay-security-panel" style={{ padding: 20 }}>
+              <section className="glass-panel replay-security-panel">
                 <div className="panel-heading"><div><Text className="panel-kicker">GUARDRAIL & APPROVAL AUDIT</Text><Title level={4}>审计与拦截</Title></div><Tag color={securityEvents.length ? 'gold' : 'default'}>{securityEvents.length} 条记录</Tag></div>
                 {securityEvents.length ? <Table size="small" pagination={{ pageSize: 8 }} rowKey="event_id" dataSource={securityEvents} columns={[
                   { title: '时间', dataIndex: 'timestamp', render: value => new Date(value).toLocaleString() },
