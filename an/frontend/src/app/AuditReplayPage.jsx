@@ -6,7 +6,7 @@ import {
   ReloadOutlined,
   StepForwardOutlined,
 } from '@ant-design/icons'
-import { Alert, Button, Empty, Progress, Select, Space, Spin, Table, Tag, Typography } from 'antd'
+import { Alert, Button, Empty, Select, Space, Spin, Table, Tag, Typography } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getLedger, getRun, listRuns, thoughtProcessUrl } from '../api.js'
 import { AgentNetwork } from './AgentNetwork.jsx'
@@ -14,6 +14,7 @@ import { AIThoughtTimeline } from './AIThoughtTimeline.jsx'
 import { RuntimeStream } from './RuntimeStream.jsx'
 import { compactId, deriveNetwork, projectSecurityEvents } from './runtimeModel.js'
 import { StatusTag } from './StatusTag.jsx'
+import { boundReplayCursor, buildReplayNavigation } from './replayNavigation.js'
 
 const { Text, Title } = Typography
 function replayDelay(events, cursor, speed) {
@@ -43,6 +44,7 @@ export function AuditReplayPage() {
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
   const runsInFlight = useRef(null)
+  const playbackTimer = useRef(null)
 
   const refreshRuns = useCallback((silent = false) => {
     if (runsInFlight.current) return runsInFlight.current
@@ -74,6 +76,7 @@ export function AuditReplayPage() {
 
   useEffect(() => {
     let disposed = false
+    if (playbackTimer.current !== null) window.clearTimeout(playbackTimer.current)
     setPlaying(false)
     setCursor(0)
     setEvents([])
@@ -122,12 +125,16 @@ export function AuditReplayPage() {
       return undefined
     }
     const timer = window.setTimeout(() => {
-      setCursor((current) => Math.min(events.length, current + 1))
+      setCursor((current) => boundReplayCursor(current + 1, events.length))
     }, replayDelay(events, cursor, speed))
+    playbackTimer.current = timer
     return () => window.clearTimeout(timer)
   }, [playing, cursor, speed, events])
 
-  const visibleEvents = useMemo(() => events.slice(0, cursor), [events, cursor])
+  const visibleEvents = useMemo(() => events.slice(0, boundReplayCursor(cursor, events.length)), [events, cursor])
+  const navigation = useMemo(() => buildReplayNavigation(events), [events])
+  const previousEvent = navigation.meaningful.findLast((position) => position < cursor)
+  const nextEvent = navigation.meaningful.find((position) => position > cursor)
   // The audit table follows the replay cursor as well. Showing all security
   // events while the stream is still paused would reveal future decisions.
   const securityEvents = useMemo(() => projectSecurityEvents(visibleEvents), [visibleEvents])
@@ -141,21 +148,25 @@ export function AuditReplayPage() {
   function startOrPause() {
     if (!events.length) return
     if (playing) {
-      setPlaying(false)
+      seek(cursor)
       return
     }
     if (cursor >= events.length) setCursor(0)
     setPlaying(true)
   }
 
-  function reset() {
+  function seek(position) {
+    if (playbackTimer.current !== null) window.clearTimeout(playbackTimer.current)
     setPlaying(false)
-    setCursor(0)
+    setCursor(boundReplayCursor(position, events.length))
+  }
+
+  function reset() {
+    seek(0)
   }
 
   function step() {
-    setPlaying(false)
-    setCursor((current) => Math.min(events.length, current + 1))
+    seek(cursor + 1)
   }
 
   return <div className="replay-workspace">
@@ -204,19 +215,27 @@ export function AuditReplayPage() {
                 </div>
               </div>
 
-              <section className="glass-panel playback-bar">
+              <section className="glass-panel playback-bar" style={{ flexWrap: 'wrap' }}>
                 <Space wrap>
-                  <Button type="primary" icon={playing ? <PauseOutlined /> : <CaretRightOutlined />} onClick={startOrPause}>
+                  <Button data-testid="replay-play-pause" type="primary" icon={playing ? <PauseOutlined /> : <CaretRightOutlined />} onClick={startOrPause}>
                     {playing ? '暂停' : cursor > 0 && cursor < events.length ? '继续' : '启动'}
                   </Button>
-                  <Button icon={<StepForwardOutlined />} onClick={step} disabled={cursor >= events.length}>单步</Button>
-                  <Button icon={<RedoOutlined />} onClick={reset}>重新开始</Button>
-                  <Select value={speed} onChange={setSpeed} options={[0.5, 1, 2, 4, 8].map((value) => ({ value, label: `${value}×` }))} />
+                  <Button data-testid="replay-step" icon={<StepForwardOutlined />} onClick={step} disabled={cursor >= events.length}>单步</Button>
+                  <Button data-testid="replay-reset" icon={<RedoOutlined />} onClick={reset}>重新开始</Button>
+                  <Select aria-label="回放速度" data-testid="replay-speed" value={speed} onChange={setSpeed} options={[0.5, 1, 2, 4, 8].map((value) => ({ value, label: `${value}×` }))} />
                 </Space>
-                <div className="playback-progress">
-                  <Progress percent={progress} showInfo={false} strokeColor={{ from: '#55d9ff', to: '#a979ff' }} />
-                  <span>{cursor} / {events.length} 个事件 · {progress}%</span>
+                <div className="playback-progress" style={{ minWidth: 220 }}>
+                  <input type="range" aria-label="回放事件位置" data-testid="replay-seek" min={0} max={events.length} step={1}
+                    value={boundReplayCursor(cursor, events.length)} aria-valuetext={`已显示 ${cursor} / ${events.length} 个事件`}
+                    onChange={(event) => seek(event.currentTarget.valueAsNumber)} style={{ flex: 1, minWidth: 0 }} />
+                  <span data-testid="replay-position">{cursor} / {events.length} 个事件 · {progress}%</span>
                 </div>
+                <Space wrap style={{ flexBasis: '100%' }}>
+                  <Button data-testid="replay-previous-event" disabled={previousEvent === undefined} onClick={() => { if (previousEvent !== undefined) seek(previousEvent) }}>上个关键事件</Button>
+                  <Button data-testid="replay-next-event" disabled={nextEvent === undefined} onClick={() => { if (nextEvent !== undefined) seek(nextEvent) }}>下个关键事件</Button>
+                  {navigation.phases.map((phase) => <Button key={phase.id} data-testid={`replay-phase-${phase.id}`} disabled={phase.cursor === null}
+                    onClick={() => { if (phase.cursor !== null) seek(phase.cursor) }}>{phase.label}</Button>)}
+                </Space>
               </section>
 
               <section className="glass-panel replay-security-panel" style={{ padding: 20 }}>
