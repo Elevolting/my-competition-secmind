@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Alert, App, Button, Empty, Form, Input, Modal, Popconfirm, Select, Space, Statistic, Table, Tag, Typography } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Alert, App, Button, Empty, Form, Input, Modal, Popconfirm, Select, Space, Spin, Statistic, Table, Tag, Typography } from 'antd'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { backfillExperiences, createExperience, deleteExperience, listExperiences, getExperience, editExperience,
   reviewExperience, distillExperience, searchExperiences, feedbackExperience } from '../api.js'
 const { Title, Text } = Typography
@@ -15,6 +15,9 @@ const labelTime = value => value ? new Date(value).toLocaleString() : '—'
 export function ExperienceLibraryPage() {
   const { message } = App.useApp()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const experienceId = searchParams.get('experience') || ''
+  const linkedRunId = searchParams.get('run') || ''
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -22,6 +25,9 @@ export function ExperienceLibraryPage() {
   const [filters, setFilters] = useState({ module_route: '', review_status: '', q: '' })
   const [page, setPage] = useState(1)
   const [detail, setDetail] = useState(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState('')
+  const [usagePage, setUsagePage] = useState(1)
   const [editor, setEditor] = useState(null)
   const [form] = Form.useForm()
   const [previewQuery, setPreviewQuery] = useState('')
@@ -41,18 +47,75 @@ export function ExperienceLibraryPage() {
     catch(e) { if (sequence === loadSequence.current) { setData(null); setError(e.message) }; return false }
   }
   useEffect(() => { load() }, [filters.module_route, filters.review_status, filters.q, page])
-  const openDetail = async item => {
+  const refreshDetail = useCallback(async id => {
     const sequence = ++detailSequence.current
-    detailTarget.current = item.experience_id
+    detailTarget.current = id
     setDetail(null)
+    setDetailLoading(true)
+    setDetailError('')
     try {
-      const next = await getExperience(item.experience_id)
-      if (sequence === detailSequence.current) setDetail(next)
+      const next = await getExperience(id)
+      if (sequence !== detailSequence.current) return false
+      if (next?.experience?.experience_id !== id || !Array.isArray(next.uses) || !Array.isArray(next.history)
+        || next.uses.some(use => typeof use?.run_id !== 'string' || !use.run_id || !Number.isInteger(use.version) || use.version < 1)) {
+        throw new TypeError(`经验 ${id} 的详情响应缺少有效的 experience、uses 或 history 字段，请刷新重试`)
+      }
+      setDetail(next)
       return true
     } catch(e) {
-      if (sequence === detailSequence.current) { setDetail(null); message.warning(`详情暂未刷新：${e.message}`) }
+      if (sequence === detailSequence.current) setDetailError(e.message)
       return false
+    } finally {
+      if (sequence === detailSequence.current) setDetailLoading(false)
     }
+  }, [])
+  useEffect(() => {
+    setFeedback(null)
+    setEditor(null)
+    editorSequence.current += 1
+    if (experienceId) refreshDetail(experienceId)
+    else {
+      detailTarget.current = null
+      setDetail(null)
+      setDetailLoading(false)
+      setDetailError('')
+    }
+    return () => {
+      detailSequence.current += 1
+      editorSequence.current += 1
+      detailTarget.current = null
+    }
+  }, [experienceId, refreshDetail])
+  useEffect(() => {
+    const index = detail?.uses.findIndex(use => use.run_id === linkedRunId) ?? -1
+    setUsagePage(index < 0 ? 1 : Math.floor(index / 5) + 1)
+    setFeedback(null)
+  }, [detail, linkedRunId])
+  const openDetail = async item => {
+    if (item.experience_id === experienceId) return refreshDetail(item.experience_id)
+    // Invalidate before navigation so an older request cannot reopen a detail.
+    detailSequence.current += 1
+    detailTarget.current = item.experience_id
+    setDetail(null)
+    setFeedback(null)
+    setSearchParams(current => {
+      const next = new URLSearchParams(current)
+      next.set('experience', item.experience_id)
+      return next
+    })
+    return true
+  }
+  const closeDetail = () => {
+    detailSequence.current += 1
+    detailTarget.current = null
+    setDetail(null)
+    setDetailLoading(false)
+    setFeedback(null)
+    setSearchParams(current => {
+      const next = new URLSearchParams(current)
+      next.delete('experience')
+      return next
+    })
   }
   const act = async fn => {
     if (actionInFlight.current) return
@@ -89,10 +152,13 @@ export function ExperienceLibraryPage() {
     })
   }
   const review = async (item, decision) => { const sequence = detailSequence.current; return act(async () => { const result = await reviewExperience(item.experience_id, { decision, expected_version: item.version, note: '' }); message.success(statuses[result.experience.review_status]); if (sequence === detailSequence.current) await openDetail(result.experience) }) }
-  const experience = detail?.experience
+  const experience = detail?.experience.experience_id === experienceId ? detail.experience : null
+  const linkedUses = experience ? detail.uses.filter(use => use.run_id === linkedRunId) : []
+  const taskUrl = linkedRunId ? `/workbench?${new URLSearchParams({ run: linkedRunId })}` : ''
   const metric = (title, value) => <div className="catalog-metric" key={title}><Statistic title={title} value={value ?? '—'} /></div>
   return <div className="experience-page">
     <section className="page-intro"><div><Text className="panel-kicker">EVIDENCE → REVIEW → RETRIEVAL → USE</Text><Title level={2}>经验学习库</Title><p>从实际任务观测提炼经验，审核后按相关性检索进入后续规划；保留具体版本、使用任务与结果反馈。</p></div><Space wrap>
+      {taskUrl && <Link data-testid="experience-return-task" to={taskUrl}>返回任务</Link>}
       <Button loading={busy} onClick={() => act(async () => { const r = await backfillExperiences(); message.success(`新建 ${r.created} · 更新 ${r.updated} · 未变化 ${r.unchanged} · 跳过 ${r.skipped}`) })}>提取历史任务经验</Button>
       <Button type="primary" onClick={() => openEditor(null)}>新增人工经验</Button><Button onClick={load}>刷新</Button></Space></section>
     {error && <Alert type="error" message={`读取失败：${error}`} />}
@@ -111,10 +177,17 @@ export function ExperienceLibraryPage() {
     <Table rowKey="experience_id" dataSource={data?.experiences || []} pagination={{ current: page, pageSize, total: data?.statistics?.total || 0, showTotal: total => `共 ${total} 条` }} onChange={pagination => setPage(pagination.current)} columns={[
       { title: '经验', render: (_, item) => <div><Button type="link" style={{ padding: 0 }} onClick={()=>openDetail(item)}>{item.title}</Button><p style={{ maxWidth: 480, margin: 0 }}>{item.summary.slice(0, 180)}</p><small>{modules[item.module_route]} · {kinds[item.experience_kind]} · {methods[item.extraction_method]}</small></div> },
       { title: '版本与状态', render: (_, item) => <><Tag color={item.review_status === 'approved' ? 'green' : 'default'}>{statuses[item.review_status]}</Tag><p>v{item.version} · {labelTime(item.updated_at)}</p></> },
-      { title: '注入规划', dataIndex: 'usage_count' }, { title: '操作', render: (_, item) => <Space direction="vertical"><Button size="small" onClick={()=>openDetail(item)}>详情 / 审核</Button><Button size="small" onClick={()=>openEditor(item)}>编辑</Button>{item.source_run_id && <Button size="small" onClick={()=>navigate(`/workbench?run=${item.source_run_id}`)}>来源任务</Button>}<Popconfirm title="删除后，历史同步不会重新生成此经验。确认删除？" onConfirm={()=>act(async()=>{await deleteExperience(item.experience_id); if(detailTarget.current === item.experience_id){detailSequence.current += 1; detailTarget.current = null; setDetail(null); setFeedback(null)}})}><Button size="small" danger>删除</Button></Popconfirm></Space> },
+      { title: '注入规划', dataIndex: 'usage_count' }, { title: '操作', render: (_, item) => <Space direction="vertical"><Button size="small" onClick={()=>openDetail(item)}>详情 / 审核</Button><Button size="small" onClick={()=>openEditor(item)}>编辑</Button>{item.source_run_id && <Button size="small" onClick={()=>navigate(`/workbench?run=${item.source_run_id}`)}>来源任务</Button>}<Popconfirm title="删除后，历史同步不会重新生成此经验。确认删除？" onConfirm={()=>act(async()=>{await deleteExperience(item.experience_id); if(detailTarget.current === item.experience_id) closeDetail()})}><Button size="small" danger>删除</Button></Popconfirm></Space> },
     ]} /></section>
-    <Modal open={!!detail && !editor && !feedback} title="经验详情与使用证据" width={1000} onCancel={()=>{ detailSequence.current += 1; detailTarget.current = null; setDetail(null) }} footer={null}>
-      {experience && <><Title level={4}>{experience.title}</Title><Space wrap><Tag>{statuses[experience.review_status]}</Tag><Tag>v{experience.version}</Tag><Tag>{methods[experience.extraction_method]}</Tag><Text>哈希 {experience.content_hash.slice(0,16)}</Text></Space><p>{experience.summary}</p>
+    <Modal open={!!experienceId && !editor && !feedback} title="经验详情与使用证据" width={1000} onCancel={closeDetail} footer={null} data-testid="experience-detail">
+      {taskUrl && <p><Link data-testid="experience-detail-return-task" to={taskUrl}>返回任务</Link></p>}
+      {(detailLoading || (!experience && !detailError)) && <div role="status" data-testid="experience-detail-loading"><Spin /> 正在读取经验详情…</div>}
+      {detailError && <Alert type="error" showIcon message="经验详情读取失败" description={detailError} data-testid="experience-detail-error"
+        action={<Button data-testid="experience-detail-retry" onClick={() => refreshDetail(experienceId)}>重试</Button>} />}
+      {experience && <><Title level={4}>{experience.title}</Title><Space wrap><Tag>{statuses[experience.review_status]}</Tag><Tag>当前版本 v{experience.version}</Tag><Tag>{methods[experience.extraction_method]}</Tag><Text>哈希 {experience.content_hash.slice(0,16)}</Text></Space><p>{experience.summary}</p>
+      {linkedRunId && <Alert type={linkedUses.length ? 'info' : 'warning'} showIcon data-testid="experience-linked-use"
+        message={linkedUses.length ? `此任务实际注入版本：${linkedUses.map(use => `v${use.version}`).join('、')}` : '未找到此任务的实际使用记录'}
+        description={linkedUses.length ? '已定位并标记下方对应使用记录；反馈针对该次注入版本，不是经验当前版本。' : '不会创建使用记录或自动提交反馈。'} />}
       <Alert type="info" message="审核表示操作人允许将此版本作为历史参考，不等于验证了通用正确率。账本完整性、相关度与使用反馈分别记录。" />
       {distilling && <Alert type="info" showIcon style={{ marginTop: 12 }} message="AI 正在提炼经验" description="模型调用和证据校验可能需要约 2 分钟。完成或失败后会在这里提示结果。" />}
       {['conditions','lessons','steps','limitations'].map((key,i)=><section key={key}><Title level={5}>{['适用条件','可复用经验','实际步骤 / 建议步骤','适用限制'][i]}</Title><ol>{experience[key].map((text,index)=><li key={index}>{text}</li>)}</ol></section>)}
@@ -124,10 +197,13 @@ export function ExperienceLibraryPage() {
       {experience.review_status !== 'approved' && <Button type="primary" loading={busy} onClick={()=>review(experience,'approve')}>审核并启用</Button>}
       {experience.review_status === 'approved' ? <Button loading={busy} onClick={()=>review(experience,'retire')}>停用</Button> : <Button loading={busy} onClick={()=>review(experience,'reject')}>拒绝</Button>}</Space>
       <Title level={5}>实际使用记录</Title><p>计数只发生在模型成功接收经验并返回规划后。任务完成不直接证明经验有效，可对具体使用记录反馈。</p>
-      <Table size="small" rowKey={r=>`${r.run_id}-${r.version}`} dataSource={detail.uses} pagination={{pageSize:5}} columns={[
-        {title:'任务 / 版本',render:(_,r)=><Button type="link" onClick={()=>navigate(`/workbench?run=${r.run_id}`)}>{r.run_id.slice(0,12)} · v{r.version}</Button>},
+      <Table size="small" data-testid="experience-usage-table" rowKey={r=>`${r.run_id}-${r.version}`} dataSource={detail.uses}
+        pagination={{current:usagePage,pageSize:5,showSizeChanger:false}} onChange={pagination=>setUsagePage(pagination.current)}
+        onRow={r=>({ 'data-testid': `experience-use-${r.run_id}-${r.version}`, 'aria-current': r.run_id === linkedRunId ? 'true' : undefined,
+          style: r.run_id === linkedRunId ? { background: 'rgba(22,119,255,0.12)' } : undefined })} columns={[
+        {title:'任务 / 注入版本',render:(_,r)=><><Link to={`/workbench?${new URLSearchParams({run:r.run_id})}`}>{r.run_id.slice(0,12)} · v{r.version}</Link>{r.run_id === linkedRunId && <Tag color="blue">当前任务</Tag>}</>},
         {title:'使用情况',render:(_,r)=><span>{r.model_cited?'模型声明采用':'已注入；未声明采用'}<br/>{r.outcome} · {r.model_id}</span>},
-        {title:'反馈',render:(_,r)=><Button onClick={()=>{setFeedback(r);setNote(r.feedback?.note || '')}}>{r.feedback ? {helpful:'有帮助',not_helpful:'无帮助',uncertain:'不确定'}[r.feedback.verdict] : '填写反馈'}</Button>},
+        {title:'反馈',render:(_,r)=><Button data-testid={`experience-feedback-${r.run_id}-${r.version}`} onClick={()=>{setFeedback({...r,experience_id:experience.experience_id});setNote(r.feedback?.note || '')}}>{r.feedback ? {helpful:'有帮助',not_helpful:'无帮助',uncertain:'不确定'}[r.feedback.verdict] : '填写反馈'}</Button>},
       ]}/>
       <details><summary>版本与审核历史（{detail.history.length}）</summary>{detail.history.map((h,i)=><div key={i}><b>{h.action} · {labelTime(h.at)} · v{h.snapshot?.version || '旧版'}</b><p>{h.note}</p><pre style={{whiteSpace:'pre-wrap',maxHeight:150,overflow:'auto'}}>{JSON.stringify(h.snapshot,null,2)}</pre></div>)}</details>
       {experience.model_receipt && <details><summary>模型提炼回执</summary><pre>{JSON.stringify(experience.model_receipt,null,2)}</pre></details>}
@@ -138,6 +214,19 @@ export function ExperienceLibraryPage() {
       <Space><Form.Item name="module_route" label="模块"><Select style={{width:160}} disabled={!!editor?.item} options={Object.entries(modules).map(([value,label])=>({value,label}))}/></Form.Item><Form.Item name="experience_kind" label="类型"><Select style={{width:170}} disabled={!!editor?.item} options={Object.entries(kinds).map(([value,label])=>({value,label}))}/></Form.Item></Space>
       {['conditions','lessons','steps','limitations','tags'].map((key,i)=><Form.Item key={key} name={key} label={['适用条件（每行一条）','可复用经验（每行一条）','步骤（每行一条）','限制（每行一条）','标签（每行一条）'][i]} rules={i<2?[{required:true}]:[]}><Input.TextArea rows={i===1?5:2}/></Form.Item>)}</Form>
     </Modal>
-    <Modal open={!!feedback} title="这次使用是否有帮助？" onCancel={()=>!busy && setFeedback(null)} closable={!busy} keyboard={!busy} maskClosable={!busy} footer={<Space>{['helpful','not_helpful','uncertain'].map(verdict=><Button key={verdict} loading={busy} disabled={busy} onClick={()=>{const sequence=detailSequence.current; return act(async()=>{await feedbackExperience(experience.experience_id,{run_id:feedback.run_id,version:feedback.version,verdict,note});setFeedback(null);message.success('反馈已保存');if(sequence===detailSequence.current)await openDetail(experience)})}}>{ {helpful:'有帮助',not_helpful:'无帮助',uncertain:'不确定'}[verdict]}</Button>)}</Space>}><Input.TextArea disabled={busy} rows={4} maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} placeholder="请根据这次任务的实际结果填写原因" /></Modal>
+    <Modal open={!!feedback && !!experience && feedback.experience_id === experience.experience_id} title="这次使用是否有帮助？" data-testid="experience-feedback-dialog"
+      onCancel={()=>!busy && setFeedback(null)} closable={!busy} keyboard={!busy} maskClosable={!busy}
+      footer={<Space>{['helpful','not_helpful','uncertain'].map(verdict=><Button key={verdict} data-testid={`experience-feedback-submit-${verdict}`} loading={busy} disabled={busy || !experience} onClick={()=>{
+        if (!feedback || !experience || feedback.experience_id !== experience.experience_id) return
+        const sequence=detailSequence.current
+        return act(async()=>{
+          await feedbackExperience(feedback.experience_id,{run_id:feedback.run_id,version:feedback.version,verdict,note})
+          message.success('反馈已保存')
+          if(sequence===detailSequence.current) { setFeedback(null); await refreshDetail(feedback.experience_id) }
+        })
+      }}>{ {helpful:'有帮助',not_helpful:'无帮助',uncertain:'不确定'}[verdict]}</Button>)}</Space>}>
+      <p>任务 {feedback?.run_id} · 实际注入版本 v{feedback?.version}</p>
+      <Input.TextArea data-testid="experience-feedback-note" aria-label="使用反馈原因" disabled={busy} rows={4} maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} placeholder="请根据这次任务的实际结果填写原因" />
+    </Modal>
   </div>
 }

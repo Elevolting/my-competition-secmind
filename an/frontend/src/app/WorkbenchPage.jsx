@@ -10,13 +10,14 @@ import {
   DeploymentUnitOutlined,
   EditOutlined,
   FileTextOutlined,
+  LinkOutlined,
   PlusOutlined,
   ReloadOutlined,
   SafetyCertificateOutlined,
   TeamOutlined,
 } from '@ant-design/icons'
 import { Alert, App, Button, Drawer, Empty, Form, Input, Modal, Popconfirm, Segmented, Select, Space, Statistic, Tag, Typography, Tooltip } from 'antd'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   eventSocketUrl,
   getLedger,
@@ -59,6 +60,8 @@ import { TrafficEvidencePanel } from './TrafficEvidencePanel.jsx'
 import { RetestConclusion, RetestPanel } from './RetestPanel.jsx'
 import { SideQuestionPanel } from './SideQuestionPanel.jsx'
 import { LogAnalysisPanel } from './LogAnalysisPanel.jsx'
+import { EvidenceDrawer } from './EvidenceDrawer.jsx'
+import { ReportExportButtons } from './ReportExportButtons.jsx'
 
 const { Text, Title, Paragraph } = Typography
 
@@ -204,7 +207,8 @@ function AssetUsageDrawer({ open, onClose, loading, events, experiences, run }) 
           {!experiences.length && !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="当前任务没有实际注入规划的经验" />}
           {experiences.map((item, index) => <article className={`asset-memory-row ${item.displayOnly ? 'is-display-only' : ''}`} key={`${item.experience_id}-${item.version}-${index}`}>
             <span className="asset-icon is-memory"><BookOutlined /></span>
-            <div><b>{item.title}</b><p>{item.summary}</p><small>{item.source_run_id ? `来源任务：${item.source_run_id.slice(0, 12)}` : '人工经验'} · 注入时 v{item.version}</small></div>
+            <div><b>{run?.run_id && item.experience_id ? <Link to={`/experiences?experience=${encodeURIComponent(item.experience_id)}&run=${encodeURIComponent(run.run_id)}`}
+              data-testid="task-experience-link" data-experience-id={item.experience_id} aria-label={`查看经验 ${item.title}`}>{item.title}</Link> : item.title}</b><p>{item.summary}</p><small>{item.source_run_id ? `来源任务：${item.source_run_id.slice(0, 12)}` : '人工经验'} · 注入时 v{item.version}</small></div>
             <Tag color={item.model_cited ? 'success' : 'default'}>{item.model_cited ? '模型声明采用' : '已注入；未声明采用'}</Tag>
           </article>)}
         </div>
@@ -315,6 +319,61 @@ export function WorkbenchPage() {
     }
   }
   const refreshRequest = useRef({ runId: '', promise: null })
+  /** @type {[{ runId: string, status: 'idle' | 'loading' | 'ready' | 'not_ready' | 'error', error: string }, React.Dispatch<React.SetStateAction<{ runId: string, status: 'idle' | 'loading' | 'ready' | 'not_ready' | 'error', error: string }>>]} */
+  const [reportRead, setReportRead] = useState({ runId: '', status: 'idle', error: '' })
+  const [reportReading, setReportReading] = useState(false)
+  /** @type {[{ runId: string, evidenceId: string } | null, React.Dispatch<React.SetStateAction<{ runId: string, evidenceId: string } | null>>]} */
+  const [selectedEvidence, setSelectedEvidence] = useState(null)
+  const reportFailedRun = useRef('')
+  const reportReadSequence = useRef(0)
+  /** @type {React.RefObject<{ runId: string, promise: Promise<void> } | null>} */
+  const reportReadRequest = useRef(null)
+
+  /** @param {Error & { status?: number }} cause @param {string} runId @param {string} method */
+  const recordReportFailure = useCallback((cause, runId, method) => {
+    const notReady = cause.status === 409
+    reportFailedRun.current = notReady ? '' : runId
+    setReport(null)
+    setSelectedEvidence(null)
+    setReportRead({ runId, status: notReady ? 'not_ready' : 'error',
+      error: `${method} /api/v1/runs/${encodeURIComponent(runId)}/report${method === 'POST' ? '/refresh' : ''} · ${cause.status ? `HTTP ${cause.status}` : '网络或报告数据错误'} · ${cause.message}` })
+  }, [])
+
+  /**
+   * Share reads across polling and manual retry. Failures stay visible until
+   * explicit retry/refresh rather than vanishing on the next poll.
+   * @param {string} runId
+   * @returns {Promise<void>}
+   */
+  const readReport = useCallback(async (runId) => {
+    if (!runId || runId !== selectedIdRef.current || reportRefreshInFlight.current) return
+    if (reportReadRequest.current?.runId === runId) return reportReadRequest.current.promise
+    const sequence = ++reportReadSequence.current
+    const isCurrent = () => sequence === reportReadSequence.current && runId === selectedIdRef.current
+    reportFailedRun.current = ''
+    setReportReading(true)
+    setReportRead(current => current.runId === runId && current.status === 'ready' ? current : { runId, status: 'loading', error: '' })
+    const request = (async () => {
+      try {
+        const nextReport = await getReport(runId)
+        if (!isCurrent()) return
+        if (!nextReport || nextReport.run_id !== runId || typeof nextReport.executive_summary !== 'string') {
+          throw new TypeError(`任务 ${runId} 返回了不匹配或缺少摘要的报告；请重新读取`)
+        }
+        setReport(nextReport)
+        setReportRead({ runId, status: 'ready', error: '' })
+      } catch (cause) {
+        if (!isCurrent()) return
+        if (!(cause instanceof Error)) throw cause
+        recordReportFailure(cause, runId, 'GET')
+      } finally {
+        if (isCurrent()) setReportReading(false)
+      }
+    })()
+    reportReadRequest.current = { runId, promise: request }
+    try { await request }
+    finally { if (reportReadRequest.current?.promise === request) reportReadRequest.current = null }
+  }, [recordReportFailure])
 
   const refreshRuns = useCallback(async (force = false) => {
     if (!force && runsRequest.current?.promise) return runsRequest.current.promise
@@ -404,6 +463,10 @@ export function WorkbenchPage() {
       }
       if (!isCurrent()) return
       setRun(nextRun)
+      if (['completed', 'partial', 'failed', 'denied'].includes(nextRun.status)
+        && reportFailedRun.current !== runId && !reportRefreshInFlight.current) {
+        setReportRead(current => current.runId === runId && current.status === 'ready' ? current : { runId, status: 'loading', error: '' })
+      }
 
       const ledgerResult = await ledgerPromise
       if (!isCurrent()) return
@@ -422,14 +485,16 @@ export function WorkbenchPage() {
       // early/partial report as the final result.
       const terminal = ['completed', 'partial', 'failed', 'denied'].includes(nextRun.status)
       if (terminal) {
-        try {
-          const nextReport = await getReport(runId)
-          if (isCurrent()) setReport(nextReport)
-        } catch {
-          if (isCurrent()) setReport(null)
-        }
+        if (reportFailedRun.current !== runId && !reportRefreshInFlight.current) await readReport(runId)
       } else if (isCurrent()) {
         setReport(null)
+        setSelectedEvidence(null)
+        if (!reportRefreshInFlight.current) {
+          reportReadSequence.current += 1
+          reportReadRequest.current = null
+          setReportReading(false)
+        }
+        if (reportFailedRun.current !== runId) setReportRead({ runId, status: 'idle', error: '' })
       }
       return nextRun
     })()
@@ -441,7 +506,7 @@ export function WorkbenchPage() {
         refreshRequest.current = { runId: '', promise: null }
       }
     }
-  }, [selectedId])
+  }, [selectedId, readReport])
 
   const clearMissingRun = useCallback(async (missingId) => {
     if (selectedIdRef.current !== missingId) return
@@ -476,10 +541,18 @@ export function WorkbenchPage() {
   useEffect(() => {
     refreshToken.current += 1
     setRun(null); setEvents([]); setReport(null)
+    reportReadSequence.current += 1
+    reportReadRequest.current = null
+    reportFailedRun.current = ''
+    setReportRead({ runId: selectedId, status: 'idle', error: '' })
+    setReportReading(false)
+    setRefreshingReport(false)
+    setSelectedEvidence(null)
     lastSequence.current = 0
     ledgerCursor.current = { runId: selectedId, sequence: 0 }
     assetRequestToken.current += 1
     setAssetDrawerOpen(false); setAssetRunId(''); setAssetExperiences([]); setAssetLoading(false)
+    return () => { reportReadSequence.current += 1 }
   }, [selectedId])
 
   useEffect(() => {
@@ -543,6 +616,21 @@ export function WorkbenchPage() {
 
   const network = useMemo(() => deriveNetwork(events, run?.status), [events, run?.status])
   const isGraphView = view === 'graph' || view === 'coverage'
+  const currentReport = report?.run_id === selectedId && run?.run_id === selectedId
+    && ['completed', 'partial', 'failed', 'denied'].includes(run.status)
+    && reportRead.runId === selectedId && reportRead.status === 'ready' ? report : null
+
+  /** @param {string} evidenceId */
+  function selectEvidence(evidenceId) {
+    if (!currentReport || currentReport.run_id !== selectedIdRef.current) return
+    setSelectedEvidence({ runId: currentReport.run_id, evidenceId })
+  }
+
+  async function retryReportRead() {
+    const runId = selectedIdRef.current
+    if (!runId || run?.run_id !== runId || reportReadRequest.current || reportRefreshInFlight.current) return
+    await readReport(runId)
+  }
 
   useEffect(() => {
     if (!approvalQueued) return
@@ -620,33 +708,50 @@ export function WorkbenchPage() {
   async function refreshLatestResult() {
     const runId = selectedIdRef.current
     const selected = run?.run_id === runId ? run : runs.find((item) => item.run_id === runId)
-    if (reportRefreshInFlight.current || !runId
+    if (reportRefreshInFlight.current || reportReadRequest.current || !runId
       || !['penetration', 'code_audit', 'reverse', 'log_analysis'].includes(selected?.module_route)) return
+    const sequence = ++reportReadSequence.current
+    const isCurrent = () => sequence === reportReadSequence.current && runId === selectedIdRef.current
+    const synchronizeReport = !['pending', 'running', 'waiting_approval'].includes(selected.status)
     reportRefreshInFlight.current = true
     setRefreshingReport(true)
     let reportSynced = false
-    let latestReport = null
     try {
-      if (!['pending', 'running', 'waiting_approval'].includes(selected.status)) {
-        latestReport = await refreshRunReport(runId)
+      if (synchronizeReport) {
+        setReport(null)
+        setSelectedEvidence(null)
+        reportFailedRun.current = ''
+        setReportReading(true)
+        setReportRead({ runId, status: 'loading', error: '' })
+        const latestReport = await refreshRunReport(runId)
+        if (!isCurrent()) return
+        if (!latestReport || latestReport.run_id !== runId || typeof latestReport.executive_summary !== 'string') {
+          throw new TypeError(`任务 ${runId} 返回了不匹配或缺少摘要的报告；请重新读取`)
+        }
         reportSynced = true
-        if (runId === selectedIdRef.current) setReport(latestReport)
+        setReport(latestReport)
+        setReportRead({ runId, status: 'ready', error: '' })
       }
       const refreshed = await refreshSelected(runId)
-      if (runId !== selectedIdRef.current) return
+      if (!isCurrent()) return
       if (!refreshed) throw new Error('任务状态暂未刷新')
-      if (latestReport) setReport(latestReport)
       try { await refreshRuns() }
-      catch (error) { message.warning(`任务已刷新，任务列表暂未更新：${error.message}`); return }
-      message.success(reportSynced ? '报告和任务状态已同步' : '任务状态已刷新')
+      catch (error) { if (isCurrent()) message.warning(`任务已刷新，任务列表暂未更新：${error.message}`); return }
+      if (isCurrent()) message.success(reportSynced ? '报告和任务状态已同步' : '任务状态已刷新')
     } catch (error) {
-      if (runId === selectedIdRef.current) {
-        if (reportSynced) message.warning(`报告已同步，任务状态暂未刷新：${error.message}`)
-        else message.error(`同步最新内容失败：${error.message}`)
+      if (!isCurrent()) return
+      if (!(error instanceof Error)) throw error
+      if (reportSynced) message.warning(`报告已同步，任务状态暂未刷新：${error.message}`)
+      else {
+        if (synchronizeReport) recordReportFailure(error, runId, 'POST')
+        message.error(`同步最新内容失败：${error.message}`)
       }
     } finally {
       reportRefreshInFlight.current = false
-      setRefreshingReport(false)
+      if (isCurrent()) {
+        setRefreshingReport(false)
+        setReportReading(false)
+      }
     }
   }
 
@@ -829,8 +934,8 @@ export function WorkbenchPage() {
         <div className="run-heading-actions">
         {run?.run_id === selectedId && ['pending', 'running', 'waiting_approval'].includes(run.status) && <Button size="small" danger loading={cancelling} onClick={() => Modal.confirm({ title: '终止当前任务？', content: '终止后会停止后续执行，并保留当前账本与黑板记录。', okText: '终止任务', cancelText: '继续运行', okButtonProps: { danger: true }, onOk: stopCurrentRun })}>终止任务</Button>}
         {run?.run_id === selectedId && ['partial', 'failed'].includes(run.status) && <Tooltip title={run.can_retry ? '保留原记录，重新规划并执行' : run.retry_blocked_reason}><span><Button aria-label="重试任务" size="small" type="primary" icon={<ReloadOutlined />} disabled={!run.can_retry} loading={retrying} onClick={openRetry}>重试任务</Button></span></Tooltip>}
-        {['penetration', 'code_audit', 'reverse', 'log_analysis'].includes(run?.module_route || runs.find((item) => item.run_id === selectedId)?.module_route) && <Button size="small" icon={<ReloadOutlined />} loading={refreshingReport} onClick={refreshLatestResult}>刷新最新内容</Button>}
-        <Button size="small" icon={<DatabaseOutlined />} disabled={!run || run.run_id !== selectedId} onClick={openAssetDrawer}>资产调用</Button>
+        {['penetration', 'code_audit', 'reverse', 'log_analysis'].includes(run?.module_route || runs.find((item) => item.run_id === selectedId)?.module_route) && <Button size="small" icon={<ReloadOutlined />} data-testid="report-refresh-latest" aria-label="刷新最新内容" loading={refreshingReport} disabled={reportReading} onClick={refreshLatestResult}>刷新最新内容</Button>}
+        <Button size="small" icon={<DatabaseOutlined />} data-testid="task-assets-open" aria-label="查看任务资产调用" disabled={!run || run.run_id !== selectedId} onClick={openAssetDrawer}>资产调用</Button>
         <Button type="text" title="打开审计回放" icon={<AuditOutlined />} onClick={() => navigate(selectedId ? `/audit/${selectedId}` : '/audit')} />
         </div>
       </div>
@@ -856,9 +961,10 @@ export function WorkbenchPage() {
         <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: 320, overflowY: 'auto' }}>{JSON.stringify(item.arguments, null, 2)}</pre>
         <Space><Button type="primary" loading={mcpApprovalBusy === item.approval_id} disabled={Boolean(mcpApprovalBusy)} onClick={() => decideMcp(item, 'approve')}>批准本次调用</Button><Button danger disabled={Boolean(mcpApprovalBusy)} onClick={() => decideMcp(item, 'deny')}>拒绝</Button></Space>
       </div>} />)}
-      {view === 'stream' ? <RuntimeStream events={events} connected={streamConnected} active={Boolean(run?.run_id && run.run_id === selectedId)} /> : view === 'graph' ? <BlackboardGraph run={run} events={events} /> : view === 'coverage' ? <AssetCoverageGraph run={run} /> : view === 'thinking' ? <AIThoughtTimeline events={events} runStatus={run?.status} downloadUrl={run ? thoughtProcessUrl(run.run_id) : ''} /> : report ? <div className="report-view">
-        <div className="report-hero"><Text className="panel-kicker">安全分析报告</Text><Title level={3}>{localizePublicText(report.executive_summary)}</Title><RetestConclusion runId={run.run_id} section="executive_summary" index={0} text={report.executive_summary} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /><Paragraph>{report.limitations?.map(localizePublicText).join('；') || '查看各项结论的验证状态与证据。'}</Paragraph></div>
-        <LogAnalysisPanel key={run.run_id} value={report.log_analysis} />
+      {view === 'stream' ? <RuntimeStream events={events} connected={streamConnected} active={Boolean(run?.run_id && run.run_id === selectedId)} /> : view === 'graph' ? <BlackboardGraph run={run} events={events} /> : view === 'coverage' ? <AssetCoverageGraph run={run} /> : view === 'thinking' ? <AIThoughtTimeline events={events} runStatus={run?.status} downloadUrl={run ? thoughtProcessUrl(run.run_id) : ''} /> : currentReport ? <div className="report-view">
+        <EvidenceDrawer key={selectedId} open={selectedEvidence?.runId === selectedId} evidenceId={selectedEvidence?.evidenceId || null} report={currentReport} onClose={() => setSelectedEvidence(null)} />
+        <div className="report-hero"><Space wrap><Text className="panel-kicker">安全分析报告</Text><ReportExportButtons key={selectedId} report={currentReport} run={run} /></Space><Title level={3}>{localizePublicText(report.executive_summary)}</Title><RetestConclusion runId={run.run_id} section="executive_summary" index={0} text={report.executive_summary} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /><Paragraph>{report.limitations?.map(localizePublicText).join('；') || '查看各项结论的验证状态与证据。'}</Paragraph></div>
+        <LogAnalysisPanel key={run.run_id} value={report.log_analysis} onEvidenceSelect={selectEvidence} />
         {getVerifiedOutputs(report).length > 0 && <section className="verified-output-list" aria-label="已验证输出">
           {getVerifiedOutputs(report).map((value) => <article className="verified-output" key={value}>
             <div><Text className="panel-kicker">已获取 Flag</Text><code>{value}</code><RetestConclusion runId={run.run_id} section="verified_outputs" index={report.verified_outputs?.indexOf(value) ?? -1} text={value} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(item => item.evidence_id)} /></div>
@@ -869,8 +975,9 @@ export function WorkbenchPage() {
           ? [['已确认发现', report.confirmed_findings], ['待验证候选', report.candidate_findings]]
           : [['发现与证据', report.findings]]).map(([label, findings]) => <section key={label} aria-label={label}>
           <Title level={4}>{label} · {findings?.length || 0}</Title>
-          {findings?.map(localizeFinding).map((finding) => <article className="finding-card" key={finding.finding_id}><span className={`severity is-${finding.severity.toLowerCase()}`}>{severityLabels[finding.severity] || finding.severity}</span><div><b>{finding.title}</b><p>{finding.description}</p>{finding.remediation && <p className="finding-remediation"><strong>修复建议：</strong>{finding.remediation}</p>}<small>{finding.path}{finding.line ? `:${finding.line}` : ''} · 证据 {(finding.evidence_ids || []).join(', ') || '暂无有效证据'}</small><TrafficEvidencePanel runId={run.run_id} finding={finding} events={events} evidence={report.evidence} onChanged={() => refreshSelected(run.run_id)} /><RetestPanel runId={run.run_id} kind="finding" reference={finding.finding_id} conclusion={finding.title} moduleRoute={run.module_route} originalEvidence={finding.evidence_ids} /></div></article>)}
+          {findings?.map(localizeFinding).map((finding) => <article className="finding-card" key={finding.finding_id}><span className={`severity is-${finding.severity.toLowerCase()}`}>{severityLabels[finding.severity] || finding.severity}</span><div><b>{finding.title}</b><p>{finding.description}</p>{finding.remediation && <p className="finding-remediation"><strong>修复建议：</strong>{finding.remediation}</p>}<small>{finding.path}{finding.line ? `:${finding.line}` : ''} · 证据 {finding.evidence_ids?.length ? finding.evidence_ids.map((id, index) => <Button type="link" size="small" key={`${id}:${index}`} data-testid="report-evidence-reference" data-evidence-id={id} aria-label={`查看证据 ${id}`} onClick={() => selectEvidence(id)}>{id}</Button>) : '暂无有效证据'}</small><TrafficEvidencePanel runId={run.run_id} finding={finding} events={events} evidence={report.evidence} onChanged={() => refreshSelected(run.run_id)} /><RetestPanel runId={run.run_id} kind="finding" reference={finding.finding_id} conclusion={finding.title} moduleRoute={run.module_route} originalEvidence={finding.evidence_ids} /></div></article>)}
         </section>)}
+        {report.evidence?.length > 0 && <section aria-label="报告证据索引" data-testid="report-evidence-index"><Title level={4}>证据索引 · {report.evidence.length}</Title><Space wrap>{report.evidence.map((item, index) => <Button type="link" size="small" key={`${item.evidence_id}:${index}`} data-testid="report-evidence-reference" data-evidence-id={item.evidence_id} aria-label={`查看证据 ${item.evidence_id}`} onClick={() => selectEvidence(item.evidence_id)}>{item.evidence_id}</Button>)}</Space></section>}
         {[['已排除方向', 'ruled_out_directions', report.ruled_out_directions], ['证据不足', 'insufficient_evidence', report.insufficient_evidence], ['Worker 报告', 'worker_reports', report.worker_reports], ['执行限制', 'limitations', report.limitations]].map(([label, section, items]) => items?.length > 0 && <section key={label} aria-label={label}><Title level={4}>{label} · {items.length}</Title><ul>{items.map((item, index) => <li key={index}>{localizePublicText(item)} <RetestConclusion runId={run.run_id} section={section} index={index} text={item} moduleRoute={run.module_route} originalEvidence={(report.evidence || []).map(evidence => evidence.evidence_id)} /></li>)}</ul></section>)}
         {report.retests?.length > 0 && <section aria-label="独立复核记录"><Title level={4}>独立复核 · {report.retests.length}</Title>
           {report.retests.map(item => <div className="retest-report-row" key={item.retest_id}>
@@ -879,7 +986,11 @@ export function WorkbenchPage() {
             <Button size="small" icon={<LinkOutlined />} onClick={() => navigate(`/workbench?run=${encodeURIComponent(item.child_run_id)}`)}>查看复核任务</Button>
           </div>)}
         </section>}
-      </div> : <Empty description={run && !['completed', 'partial', 'failed', 'denied'].includes(run.status) ? '探索路径尚未完成，结果生成已延迟' : '报告将在运行结束后生成'} />}
+      </div> : reportRead.runId === selectedId && reportRead.status === 'error' ? <Alert type="error" showIcon role="alert" data-testid="report-load-error" title="报告读取失败" description={reportRead.error}
+        action={<Button size="small" data-testid="report-read-retry" aria-label="重新读取报告" loading={reportReading} disabled={reportReading || refreshingReport || run?.run_id !== selectedId} onClick={retryReportRead}>重新读取报告</Button>} />
+        : reportRead.runId === selectedId && reportRead.status === 'loading' ? <div role="status" data-testid="report-loading">正在读取报告…</div>
+          : reportRead.runId === selectedId && reportRead.status === 'not_ready' ? <div data-testid="report-not-ready"><Empty description="报告尚未生成（HTTP 409）" /><Button size="small" data-testid="report-read-retry" aria-label="重新读取报告" disabled={reportReading || refreshingReport || run?.run_id !== selectedId} onClick={retryReportRead}>重新读取报告</Button></div>
+            : <Empty description={run && !['completed', 'partial', 'failed', 'denied'].includes(run.status) ? '探索路径尚未完成，结果生成已延迟' : '报告将在运行结束后生成'} />}
     </section>
 
     <aside className={`glass-panel inspector-panel ${isGraphView ? 'is-graph-hidden' : ''}`}>
